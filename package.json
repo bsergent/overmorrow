@@ -1,9 +1,11 @@
 {
-  "name": "mining-proto",
+  "name": "overmorrow",
   "version": "0.0.1",
-  "description": "Prototype of the planned mining mechanics for Coalition",
-  "main": "main.js",
+  "description": "Typescript canvas game library",
+  "main": "Demo.js",
   "dependencies": {
+    "@types/jquery": "^3.2.16",
+    "jquery": "^3.2.1",
     "lodash": "^4.17.4"
   },
   "devDependencies": {},

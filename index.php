@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>BFSV-Coding | Demo</title>
-		<script data-main="js/Demo.js" src="js/lib/require.js"></script>
+		<script data-main="js/config.js" src="js/lib/require.js"></script>
 
 		<style>
 			body {
@@ -19,7 +19,10 @@
       p {
         margin: 0px 0px 15px;
         font-size: 12px;
-      }
+			}
+			a {
+        color: #66653c;
+			}
 			#game-container {
 				text-align: center;
 				padding: 0px;
@@ -43,6 +46,7 @@
       <div id="game-container">
         <canvas id="game" width="800" height="600" tabfocus="1" style=""></canvas>
         <canvas id="buffer" width="800" height="600" tabfocus="1" style="visibility:hidden; display:none;"></canvas>
-      </div>
+			</div>
+			<p><a href="https://github.com/bsergent/overmorrow">Overmorrow on GitHub</a></p>
 	</body>
 </html>

@@ -1,2 +1,6 @@
 *.png
 *.DSStore
+*.js
+*.js.map
+-js/lib/*.js
+/node_modules/
