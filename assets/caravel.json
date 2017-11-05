@@ -1,0 +1,32 @@
+{ "frames": {
+   "caravel.ase": {
+    "frame": { "x": 0, "y": 0, "w": 32, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 16 },
+    "sourceSize": { "w": 32, "h": 16 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.1.13",
+  "format": "I8",
+  "size": { "w": 32, "h": 16 },
+  "scale": "1",
+  "layers": [
+   { "name": "Hull_1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Hull_2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Deck_1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Deck_2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Deck_3", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_3", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_4", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_5", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_6", "opacity": 255, "blendMode": "normal" },
+   { "name": "Mast_7", "opacity": 255, "blendMode": "normal" }
+  ]
+ }
+}

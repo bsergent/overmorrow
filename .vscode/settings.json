@@ -1,0 +1,21 @@
+{
+  "files.exclude": {
+    "**/*.js": { "when": "$(basename).ts"},
+    "**/*.map": true
+  },
+  "todohighlight.isEnable": true,
+  "todohighlight.isCaseSensitive": true,
+  "todohighlight.keywords": [
+      {
+          "text": "TODO",
+          "color": "yellow",
+          "border":"1px solid orange",
+          "borderRadius":"2px",
+          "backgroundColor": "rgba(0,0,0,0.2)"
+      }
+  ],
+  "todohighlight.include": "{**/*.js,**/*.jsx,**/*.ts,**/*.tsx,**/*.html,**/*.php,**/*.css,**/*.scss}",
+  "todohighlight.exclude": "{**/node_modules/**,**/bower_components/**,**/dist/**,**/build/**,**/.vscode/**,**/_output/**,**/*.min.*,**/*.map}",
+  "todohighlight.maxFilesForSearch": 5120,
+  "todohighlight.toggleURI": false
+}
