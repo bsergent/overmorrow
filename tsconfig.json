@@ -3,7 +3,8 @@
     "target": "es6",
     "module": "amd",
     "sourceMap": true,
-    "allowJs": false
+    "allowJs": false,
+    "watch": true
   },
   "exclude": [
     "oldjs"

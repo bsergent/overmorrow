@@ -1,3 +1,4 @@
+import { Renderer } from 'Renderer';
 export default interface Drawable {
-  draw():void;
+  draw(ui: Renderer):void;
 }

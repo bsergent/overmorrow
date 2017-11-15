@@ -1,10 +1,10 @@
 import $ = require('jquery');
 export class Controller {
-  private inputQueue:JQuery.Event[] = [];
-  private $canvas:JQuery;
-  private listeners:Listener[] = [];
+  private inputQueue: JQuery.Event[] = [];
+  private $canvas: JQuery;
+  private listeners: Listener[] = [];
 
-  constructor(canvas:JQuery) {
+  constructor(canvas: JQuery) {
     this.$canvas = canvas;
     canvas.click(event => {
       this.queueInput(event);
@@ -22,11 +22,11 @@ export class Controller {
     });
   }
 
-  public queueInput(event:JQuery.Event):void {
+  public queueInput(event: JQuery.Event): void {
     this.inputQueue.push(event);
   }
 
-  public processInput():void {
+  public processInput(): void {
     for (let e of this.inputQueue) {
       for (let l of this.listeners) {
         if (l.type === e.type && l.keys.indexOf(e.which) !== -1) {
@@ -37,7 +37,7 @@ export class Controller {
     this.inputQueue = [];
   }
 
-  public addListener(type:'click'|'mousemove'|'keydown'):Listener {
+  public addListener(type: 'click'|'mousemove'|'keydown'): Listener {
     let l = new Listener(type);
     this.listeners.push(l);
     return l;
@@ -45,29 +45,29 @@ export class Controller {
 }
 
 export class Listener {
-  private _type:'click'|'mousemove'|'keydown';
-  private _keys:Keys[];
-  private _action:Function;
+  private _type: 'click'|'mousemove'|'keydown';
+  private _keys: Keys[];
+  private _action: Function;
 
-  constructor(type:'click'|'mousemove'|'keydown') {
+  constructor(type: 'click'|'mousemove'|'keydown') {
     this._type = type;
   }
-  public setKeys(keys:Keys[]):Listener {
+  public setKeys(keys: Keys[]): Listener {
     this._keys = keys;
     return this;
   }
-  public setAction(action:Function) { // Function will be passed JQuery.Event
+  public setAction(action: Function) { // Function will be passed JQuery.Event
     this._action = action;
     return this;
   }
 
-  public get type():'click'|'mousemove'|'keydown' {
+  public get type(): 'click'|'mousemove'|'keydown' {
     return this._type;
   }
-  public get keys():Keys[] {
+  public get keys(): Keys[] {
     return this._keys;
   }
-  public get action():Function {
+  public get action(): Function {
     return this._action;
   }
 }
