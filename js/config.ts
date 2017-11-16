@@ -1,4 +1,5 @@
 declare var requirejs;
+var DEBUG = false;
 requirejs.config({
   //By default load any module IDs from js/lib
   baseUrl: 'js',

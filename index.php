@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>BFSV-Coding | Demo</title>
+		<link rel="icon" href="assets/hexagon.png">
 		<script data-main="js/config.js" src="js/lib/require.js"></script>
 
 		<style>

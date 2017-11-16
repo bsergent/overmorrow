@@ -3,17 +3,20 @@ import $ = require('jquery');
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Color from 'overmorrow/primitives/Color';
 import Drawable from 'overmorrow/interfaces/Drawable';
+declare var DEBUG;
 
-
+// TODO Figure out how to pass controls to UIComponents (such as button click or panel drag)
 
 export class Renderer {
   private _canvasActive: JQuery;
   private _canvasBuffer: JQuery;
   private _contextActive: any;
   private _contextBuffer: any;
-  private _imageCache: Map<string, HTMLImageElement>;
+  private _imageCache: Map<string, HTMLImageElement> = new Map();
   private _viewport: Rectangle;
   private _components: UIComponent[][] = [];
+  private _width: number;
+  private _height: number;
 
   constructor(canvasActive: JQuery, canvasBuffer: JQuery) {
     this._canvasActive = canvasActive;
@@ -21,7 +24,9 @@ export class Renderer {
     this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
     this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('2d');
     this._contextBuffer.imageSmoothingEnabled = false;
-    this._viewport = new Rectangle(0, 0, 100, 100);
+    this._width = this._canvasActive.width();
+    this._height = this._canvasActive.height();
+    this._viewport = new Rectangle(0, 0, this._width, this._height);
   }
 
   public loadImages(urls: string[]) {
@@ -34,7 +39,7 @@ export class Renderer {
   }
 
   public draw() {
-    this.drawRect(new Rectangle(0, 0, 100, 100), Color.blue);
+    this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.black);
     for (let componentArray of this._components) {
       if (componentArray === undefined)
         continue;
@@ -64,7 +69,7 @@ export class Renderer {
     return this._viewport;
   }
 
-  public isOnScreen(rect: Rectangle) {
+  public isOnScreen(rect: Rectangle) { // TODO Actually use the isOnScreen in all the other draw functions
     return rect.x1 < this._viewport.x2
       && rect.y1 < this._viewport.y2
       && rect.x2 > this._viewport.x1
@@ -76,8 +81,20 @@ export class Renderer {
     return null;
   }
 
+  public getWidth(): number {
+    return this._width;
+  }
+
+  public getHeight(): number {
+    return this._height;
+  }
+
   public setAA(enable: boolean): void {
     this._contextBuffer.imageSmoothingEnabled = enable;
+  }
+
+  public translateContext(x: number, y: number): void {
+    this._contextBuffer.translate(x ,y);
   }
 
   public drawRect(rect: Rectangle, color: Color): void {
@@ -97,8 +114,9 @@ export class Renderer {
     this._contextBuffer.closePath();
   }
 
-  public drawRectRel(): void {
+  public drawRectRel(rect: Rectangle, color: Color): void {
     // TODO Should there even be relative functions or should they all be relative to the UIPanels?
+    //  Maybe just do something special inside the UIWorld to handle tile scaling
   }
 
   public drawImage(): void {
@@ -109,16 +127,33 @@ export class Renderer {
 
   }
 
-  public drawSprite(): void {
-
+  public drawSprite(rect: Rectangle, drect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
+    if (!this._imageCache.has(url)) {
+      this._imageCache.set(url, new Image());
+      this._imageCache.get(url).src = url;
+    }
+    this._contextBuffer.globalAlpha = opacity;
+    // TODO Implement rotation
+    if (drect.width == 0 && drect.height == 0)
+      this._contextBuffer.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
+    else
+      this._contextBuffer.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);
+    this._contextBuffer.globalAlpha = 1;
   }
 
   public drawSpriteRel(): void {
 
   }
 
-  public drawText(): void {
-
+  public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, centered: boolean): void {
+    if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), Color.red);
+    this._contextBuffer.beginPath();
+    this._contextBuffer.fillStyle = color.rgba;
+    this._contextBuffer.textAlign = centered ? 'center' : 'left';
+    this._contextBuffer.textBaseline = 'hanging';
+    this._contextBuffer.font = size + 'px ' + font;
+    this._contextBuffer.fillText(text, rect.x1, rect.y1);
+    this._contextBuffer.closePath();
   }
 
   public drawTextRel(): void {
@@ -134,12 +169,191 @@ export abstract class UIComponent extends Rectangle implements Drawable {
   public abstract draw(ui: Renderer): void;
 }
 
+interface UISkin {
+  img: HTMLImageElement,
+  url: string,
+  width: number,
+  widthScaled: number,
+  scale: number,
+  color: Color
+}
+
 export class UIPanel extends UIComponent {
   private _title: string;
-  private _children: UIPanel[];
+  private _padding: number = 0;
+  private _skin: UISkin;
+  private _components: UIComponent[][] = [];
+  constructor(x: number, y: number, width: number, height: number) {
+    super(x, y, width, height);
+    this.setSkin('assets/borderPatch.png', 1, Color.blue);
+  }
+  public setTitle(title: string): UIPanel {
+    this._title = title;
+    return this;
+  }
+  public setPadding(padding: number): UIPanel {
+    this._padding = padding;
+    return this;
+  }
+  public setSkin(skin: string, scale: number, color: Color): UIPanel {
+    let skinImage = new Image();
+    skinImage.src = skin;
+    skinImage.onload = () => {
+      this._skin = {
+        img: skinImage,
+        url: skin,
+        width: skinImage.width / 3,
+        widthScaled: (skinImage.width / 3) * scale,
+        scale: scale,
+        color: color
+      };
+      console.log('Set skin scale to ' + this._skin.scale);
+      // TODO Fix race condition with resetting the skin directly after creation
+    };
+    return this;
+  }
+  public addComponent(component: UIComponent, zindex: number): UIPanel {
+    if (this._components[zindex] === undefined)
+      this._components[zindex] = [];
+    this._components[zindex].push(component);
+    return this;
+  }
   public draw(ui: Renderer): void {
-    // TODO Also pass offset for panel (so that it can be later moved and such)
-    ui.drawRect(this, Color.blue);
+    // Draw background
+    this.drawBackground(ui);
+
+    // Draw components
+    ui.translateContext(this.x1 + this._padding, this.y1 + this._padding);
+    for (let componentArray of this._components) {
+      if (componentArray === undefined)
+        continue;
+      for (let comp of componentArray)
+        comp.draw(ui);
+    }
+    ui.translateContext(-(this.x1 + this._padding), -(this.y1 + this._padding));
+  }
+  private drawBackground(ui: Renderer): void {
+    if (this._skin === undefined) return;
+
+    // Background
+    ui.drawRect(new Rectangle(
+        this.x1 + this._skin.widthScaled,
+        this.y1 + this._skin.widthScaled,
+        this.width - 2*this._skin.widthScaled,
+        this.height - 2*this._skin.widthScaled
+      ), this._skin.color);
+
+    // Border
+    /* 0 1 2 (Render order)
+       3 - 4
+       5 6 7 */
+    // Top
+    ui.drawSprite(
+      new Rectangle(
+        this.x1,
+        this.y1,
+        this._skin.widthScaled,
+        this._skin.widthScaled),
+      new Rectangle(
+        0,
+        0,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    ui.drawSprite(
+      new Rectangle(
+        this.x1 + this._skin.widthScaled,
+        this.y1,
+        this.width - 2*this._skin.widthScaled,
+        this._skin.widthScaled),
+      new Rectangle(
+        this._skin.width,
+        0,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    ui.drawSprite(
+      new Rectangle(
+        this.x1 + this.width - this._skin.widthScaled,
+        this.y1,
+        this._skin.widthScaled,
+        this._skin.widthScaled),
+      new Rectangle(
+        2*this._skin.width,
+        0,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    // Middle
+    ui.drawSprite(
+      new Rectangle(
+        this.x1,
+        this.y1 + this._skin.widthScaled,
+        this._skin.widthScaled,
+        this.height - 2*this._skin.widthScaled),
+      new Rectangle(
+        0,
+        this._skin.width,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    ui.drawSprite(
+      new Rectangle(
+        this.x1 + this.width - this._skin.widthScaled,
+        this.y1 + this._skin.widthScaled,
+        this._skin.widthScaled,
+        this.height - 2*this._skin.widthScaled),
+      new Rectangle(
+        2*this._skin.width,
+        this._skin.width,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    // Bottom
+    ui.drawSprite(
+      new Rectangle(
+        this.x1,
+        this.y1 + this.height - this._skin.widthScaled,
+        this._skin.widthScaled,
+        this._skin.widthScaled),
+      new Rectangle(
+        0,
+        2*this._skin.width,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    ui.drawSprite(
+      new Rectangle(
+        this.x1 + this._skin.widthScaled,
+        this.y1 + this.height - this._skin.widthScaled,
+        this.width - 2*this._skin.widthScaled,
+        this._skin.widthScaled),
+      new Rectangle(
+        this._skin.width,
+        2*this._skin.width,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
+    ui.drawSprite(
+      new Rectangle(
+        this.x1 + this.width - this._skin.widthScaled,
+        this.y1 + this.height - this._skin.widthScaled,
+        this._skin.widthScaled,
+        this._skin.widthScaled),
+      new Rectangle(
+        2*this._skin.width,
+        2*this._skin.width,
+        this._skin.width,
+        this._skin.width),
+      this._skin.url
+    );
   }
 }
 
@@ -155,24 +369,28 @@ export class UILabel extends UIComponent {
     this._text = text;
   }
   public setText(text: string): UILabel {
+    this._text = text;
     return this;
   }
   public setFont(font: string): UILabel {
+    this._font = font;
     return this;
   }
   public setSize(size: number): UILabel {
+    this._size = size;
     return this;
   }
   public setColor(color: Color): UILabel {
+    this._color = color;
     return this;
   }
   public setCentered(center: boolean): UILabel {
+    this._centered = center;
     return this;
   }
 
   public draw(ui: Renderer): void {
-    ui.drawText();
-    ui.drawRect(new Rectangle(this.x1, this.y1, this._size, this._size), this._color);
+    ui.drawText(this, this._text, this._font, this._size, this._color, this._centered);
   }
 }
 

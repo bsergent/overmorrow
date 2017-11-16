@@ -1,9 +1,7 @@
 import { Controller, Keys } from 'overmorrow/Controller';
-import { Renderer, UILabel } from 'overmorrow/Renderer';
+import { Renderer, UIPanel, UILabel } from 'overmorrow/Renderer';
 import Color from 'overmorrow/primitives/Color';
 import $ = require('jquery');
-
-var DEBUG = false;
 
 class Demo {
   public static main(): void {
@@ -20,9 +18,12 @@ class Demo {
       
       // Set up UI
       var renderer = new Renderer($('#game'), $('#buffer'));
-      let testLabel = new UILabel(5, 5, 'test');
-      testLabel.setCentered(true).setSize(24).setColor(Color.white);
-      renderer.addComponent(testLabel, 1);
+      let panel = new UIPanel(10, 10, 250, 250);
+      panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
+      renderer.addComponent(panel, 2);
+      let testLabel = new UILabel(0, 0, 'test');
+      testLabel.setCentered(false).setSize(24).setColor(Color.white);
+      panel.addComponent(testLabel, 0);
 
       // Main game loop
       function update() {
