@@ -1,35 +1,54 @@
 import $ = require('jquery');
 export class Controller {
-  private inputQueue: JQuery.Event[] = [];
+  private inputQueue: InputEvent[] = [];
   private $canvas: JQuery;
   private listeners: Listener[] = [];
+  private mousePosX: number = 0;
+  private mousePosY: number = 0;
 
   constructor(canvas: JQuery) {
     this.$canvas = canvas;
     canvas.click(event => {
-      this.queueInput(event);
+      this.queueInput(new InputEvent(event));
+    });
+    canvas.mousedown(event => {
+      let mouseEvent = new InputEvent(event);
+      mouseEvent.x = event.clientX - canvas.position().left;
+      mouseEvent.y = event.clientY - canvas.position().top;
+      this.queueInput(mouseEvent);
+    });
+    canvas.mouseup(event => {
+      let mouseEvent = new InputEvent(event);
+      mouseEvent.x = event.clientX - canvas.position().left;
+      mouseEvent.y = event.clientY - canvas.position().top;
+      this.queueInput(mouseEvent);
     });
     $(document).keydown(event => {
       canvas.focus();
-      this.queueInput(event);
+      this.queueInput(new InputEvent(event));
       if ([9].indexOf(event.which) !== -1) { // Disabled tab key
         event.preventDefault();
         return false;
       }
     });
     canvas.mousemove(event => {
-      this.queueInput(event);
+      let mouseEvent = new InputEvent(event);
+      mouseEvent.dx = this.mousePosX - event.clientX;
+      mouseEvent.dy = this.mousePosY - event.clientY;
+      this.mousePosX = event.clientX;
+      this.mousePosY = event.clientY;
+      this.queueInput(mouseEvent);
     });
   }
 
-  public queueInput(event: JQuery.Event): void {
+  public queueInput(event: InputEvent): void {
     this.inputQueue.push(event);
   }
 
   public processInput(): void {
     for (let e of this.inputQueue) {
       for (let l of this.listeners) {
-        if (l.type === e.type && l.keys.indexOf(e.which) !== -1) {
+        if (l.type === EventTypes.ALL || (l.type === e.type && l.keys.indexOf(e.key) !== -1)) {
           l.action(e);
         }
       }
@@ -37,7 +56,7 @@ export class Controller {
     this.inputQueue = [];
   }
 
-  public addListener(type: 'click'|'mousemove'|'keydown'): Listener {
+  public addListener(type: EventTypes): Listener {
     let l = new Listener(type);
     this.listeners.push(l);
     return l;
@@ -45,23 +64,23 @@ export class Controller {
 }
 
 export class Listener {
-  private _type: 'click'|'mousemove'|'keydown';
+  private _type: EventTypes;
   private _keys: Keys[];
   private _action: Function;
 
-  constructor(type: 'click'|'mousemove'|'keydown') {
+  constructor(type: EventTypes) {
     this._type = type;
   }
   public setKeys(keys: Keys[]): Listener {
     this._keys = keys;
     return this;
   }
-  public setAction(action: Function) { // Function will be passed JQuery.Event
+  public setAction(action: Function) { // Function will be passed InputEvent
     this._action = action;
     return this;
   }
 
-  public get type(): 'click'|'mousemove'|'keydown' {
+  public get type(): EventTypes {
     return this._type;
   }
   public get keys(): Keys[] {
@@ -69,6 +88,19 @@ export class Listener {
   }
   public get action(): Function {
     return this._action;
+  }
+}
+
+export class InputEvent {
+  key: Keys;
+  type: EventTypes;
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
+  constructor(event: JQuery.Event) {
+    this.key = event.which;
+    this.type = EventTypes[event.type.toUpperCase()];
   }
 }
 
@@ -136,4 +168,13 @@ export enum Keys {
   KEY_SQUARE_BRACKET_LEFT = 219,
   KEY_SQUARE_BRACKET_RIGHT = 221,
   KEY_BACKSLASH = 220,
+}
+
+export enum EventTypes {
+  CLICK,
+  MOUSEMOVE,
+  MOUSEDOWN,
+  MOUSEUP,
+  KEYDOWN,
+  ALL
 }

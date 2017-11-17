@@ -4,9 +4,14 @@
     "module": "amd",
     "sourceMap": true,
     "allowJs": false,
-    "watch": true
+    "removeComments": true,
+    "watch": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": [
     "oldjs"
+  ],
+  "include": [
+    "js/**/*"
   ]
 }

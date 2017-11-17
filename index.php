@@ -43,11 +43,11 @@
 
 	<body>
       <h1>Overmorrow Demo</h1>
-      <p>v0.0.1</p>
+      <p>v0.0.3</p>
       <div id="game-container">
         <canvas id="game" width="800" height="600" tabfocus="1" style=""></canvas>
         <canvas id="buffer" width="800" height="600" tabfocus="1" style="visibility:hidden; display:none;"></canvas>
 			</div>
-			<p><a href="https://github.com/bsergent/overmorrow">Overmorrow on GitHub</a></p>
+			<p><a href="https://github.com/bsergent/overmorrow">Overmorrow on GitHub</a> TPS=<span id="tps"></span></p>
 	</body>
 </html>

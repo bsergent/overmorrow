@@ -1,11 +1,10 @@
 import $ = require('jquery');
-//import moment from 'moment';
+import * as moment from '../../node_modules/moment/moment';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Color from 'overmorrow/primitives/Color';
 import Drawable from 'overmorrow/interfaces/Drawable';
+import { Controller, EventTypes, InputEvent } from 'overmorrow/Controller';
 declare var DEBUG;
-
-// TODO Figure out how to pass controls to UIComponents (such as button click or panel drag)
 
 export class Renderer {
   private _canvasActive: JQuery;
@@ -18,7 +17,7 @@ export class Renderer {
   private _width: number;
   private _height: number;
 
-  constructor(canvasActive: JQuery, canvasBuffer: JQuery) {
+  constructor(canvasActive: JQuery, canvasBuffer: JQuery, controller: Controller) {
     this._canvasActive = canvasActive;
     this._canvasBuffer = canvasBuffer;
     this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
@@ -27,9 +26,10 @@ export class Renderer {
     this._width = this._canvasActive.width();
     this._height = this._canvasActive.height();
     this._viewport = new Rectangle(0, 0, this._width, this._height);
+    controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
   }
 
-  public loadImages(urls: string[]) {
+  public preloadImages(urls: string[]) {
     for (let url of urls) {
       if (this._imageCache.has(url)) continue;
       let img = new Image();
@@ -38,7 +38,8 @@ export class Renderer {
     }
   }
 
-  public draw() {
+  public draw(): number {
+    let startTime = moment();
     this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.black);
     for (let componentArray of this._components) {
       if (componentArray === undefined)
@@ -47,6 +48,28 @@ export class Renderer {
         comp.draw(this);
     }
     this.drawBuffer();
+    return moment().diff(startTime);
+  }
+
+  private processInput(e: InputEvent): void {
+    // Check higher indices first
+    for (let c = this._components.length - 1; c >= 0; c--) {
+      if (this._components[c] === undefined)
+        continue;
+      for (let comp of this._components[c]) {
+        if (comp.input(this, e))
+          break;
+      }
+    }
+  }
+
+  public selectComponent(component: UIComponent) {
+    for (let componentArray of this._components) {
+      if (componentArray === undefined)
+        continue;
+      for (let comp of componentArray)
+        comp.selected = comp === component;
+    }
   }
 
   public addComponent(component: UIComponent, zindex: number): void {
@@ -166,7 +189,11 @@ export class Renderer {
 }
 
 export abstract class UIComponent extends Rectangle implements Drawable {
+  public selected: boolean = false;
   public abstract draw(ui: Renderer): void;
+  public input(ui: Renderer, e: InputEvent): boolean {
+    return false; // Return true if event is consumed
+  }
 }
 
 interface UISkin {
@@ -183,6 +210,8 @@ export class UIPanel extends UIComponent {
   private _padding: number = 0;
   private _skin: UISkin;
   private _components: UIComponent[][] = [];
+  private _currentSkinChange: number = 0;
+  private _draggable: boolean = true;
   constructor(x: number, y: number, width: number, height: number) {
     super(x, y, width, height);
     this.setSkin('assets/borderPatch.png', 1, Color.blue);
@@ -195,10 +224,18 @@ export class UIPanel extends UIComponent {
     this._padding = padding;
     return this;
   }
+  public setDraggable(draggable: boolean): UIPanel {
+    this._draggable = draggable;
+    return this;
+  }
   public setSkin(skin: string, scale: number, color: Color): UIPanel {
     let skinImage = new Image();
     skinImage.src = skin;
+    let skinChangeId = ++this._currentSkinChange;
     skinImage.onload = () => {
+      // Prevent race conditions between changing skins too quickly
+      if (this._currentSkinChange !== skinChangeId)
+        return;
       this._skin = {
         img: skinImage,
         url: skin,
@@ -207,8 +244,6 @@ export class UIPanel extends UIComponent {
         scale: scale,
         color: color
       };
-      console.log('Set skin scale to ' + this._skin.scale);
-      // TODO Fix race condition with resetting the skin directly after creation
     };
     return this;
   }
@@ -354,6 +389,21 @@ export class UIPanel extends UIComponent {
         this._skin.width),
       this._skin.url
     );
+  }
+  public input(ui: Renderer, e: InputEvent): boolean {
+    if (e.type === EventTypes.MOUSEDOWN && this.inside(e.x, e.y)) {
+      ui.selectComponent(this);
+      return true;
+    } else if (e.type === EventTypes.MOUSEUP) {
+      ui.selectComponent(null);
+      return true;
+    } else if (e.type === EventTypes.MOUSEMOVE && this.selected && this._draggable) {
+      // Move self
+      this.x1 -= e.dx;
+      this.y1 -= e.dy;
+      return true;
+    }
+    return false;
   }
 }
 
