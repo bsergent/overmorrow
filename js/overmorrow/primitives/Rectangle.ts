@@ -22,9 +22,15 @@ export default class Rectangle {
   get width(): number {
     return this.x2 - this._x1;
   }
+  set width(value: number) {
+    this.x2 += (value - this.width);
+  }
 
   get height(): number {
     return this.y2 - this._y1;
+  }
+  set height(value: number) {
+    this.y2 += (value - this.height);
   }
 
   constructor(x: number, y: number, width: number, height: number) {
@@ -40,5 +46,9 @@ export default class Rectangle {
 
   inside(x: number, y: number): boolean {
     return x <= this.x2 && x >= this.x1 && y <= this.y2 && y >= this.y1;
+  }
+
+  clone(): Rectangle {
+    return new Rectangle(this._x1, this._y1, this.width, this.height);
   }
 }

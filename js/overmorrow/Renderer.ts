@@ -15,7 +15,6 @@ export default class Renderer {
   private _contextActive: any;
   private _contextBuffer: any;
   private _imageCache: Map<string, HTMLImageElement> = new Map();
-  private _viewport: Rectangle;
   private _components: UIComponent[][] = [];
   private _width: number;
   private _height: number;
@@ -28,7 +27,6 @@ export default class Renderer {
     this._contextBuffer.imageSmoothingEnabled = false;
     this._width = this._canvasActive.width();
     this._height = this._canvasActive.height();
-    this._viewport = new Rectangle(0, 0, this._width, this._height);
     controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
   }
 
@@ -91,13 +89,6 @@ export default class Renderer {
     return false;
   }
 
-  public isOnScreen(rect: Rectangle) { // TODO Actually use the isOnScreen in all the other draw functions
-    return rect.x1 < this._viewport.x2
-      && rect.y1 < this._viewport.y2
-      && rect.x2 > this._viewport.x1
-      && rect.y2 > this._viewport.y1;
-  }
-
   public getWidth(): number {
     return this._width;
   }
@@ -115,15 +106,14 @@ export default class Renderer {
   }
 
   public drawRect(rect: Rectangle, color: Color): void {
-    // TODO Check on screen
     this._contextBuffer.beginPath();
     this._contextBuffer.fillStyle = color.rgba;
     // Start with x,y on original canvas
     // Translate by the viewPort x,y
     // Scale to fill viewPort
     this._contextBuffer.rect(
-        (rect.x1 - this._viewport.x1),
-        (rect.y1 - this._viewport.y1),
+        rect.x1,
+        rect.y1,
         rect.width,
         rect.height);
     this._contextBuffer.fill();
@@ -136,12 +126,15 @@ export default class Renderer {
     //  Ya, move the viewport into the UIWorld
   }
 
-  public drawImage(): void {
-
-  }
-
-  public drawImageRel(): void {
-
+  public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
+    if (!this._imageCache.has(url)) {
+      this._imageCache.set(url, new Image());
+      this._imageCache.get(url).src = url;
+    }
+    this._contextBuffer.globalAlpha = opacity;
+    // TODO Implement rotation
+    this._contextBuffer.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
+    this._contextBuffer.globalAlpha = 1;
   }
 
   public drawSprite(rect: Rectangle, drect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
@@ -158,10 +151,6 @@ export default class Renderer {
     this._contextBuffer.globalAlpha = 1;
   }
 
-  public drawSpriteRel(): void {
-
-  }
-
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
     if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), Color.red);
     this._contextBuffer.beginPath();
@@ -171,10 +160,6 @@ export default class Renderer {
     this._contextBuffer.font = size + 'px ' + font;
     this._contextBuffer.fillText(text, rect.x1, rect.y1);
     this._contextBuffer.closePath();
-  }
-
-  public drawTextRel(): void {
-
   }
 
   public drawBuffer(): void {
