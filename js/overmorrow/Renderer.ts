@@ -4,9 +4,12 @@ import Rectangle from 'overmorrow/primitives/Rectangle';
 import Color from 'overmorrow/primitives/Color';
 import Drawable from 'overmorrow/interfaces/Drawable';
 import { Controller, EventTypes, InputEvent } from 'overmorrow/Controller';
+import UIComponent from 'overmorrow/ui/UIComponent';
+import UILabel from 'overmorrow/ui/UILabel';
+import UIPanel from 'overmorrow/ui/UIPanel';
 declare var DEBUG;
 
-export class Renderer {
+export default class Renderer {
   private _canvasActive: JQuery;
   private _canvasBuffer: JQuery;
   private _contextActive: any;
@@ -88,20 +91,11 @@ export class Renderer {
     return false;
   }
 
-  public getViewport(): Rectangle {
-    return this._viewport;
-  }
-
   public isOnScreen(rect: Rectangle) { // TODO Actually use the isOnScreen in all the other draw functions
     return rect.x1 < this._viewport.x2
       && rect.y1 < this._viewport.y2
       && rect.x2 > this._viewport.x1
       && rect.y2 > this._viewport.y1;
-  }
-
-  public getVisibleTileArea(): Rectangle {
-    // TODO Get this working again once I figure out the tileScale stuff
-    return null;
   }
 
   public getWidth(): number {
@@ -122,7 +116,6 @@ export class Renderer {
 
   public drawRect(rect: Rectangle, color: Color): void {
     // TODO Check on screen
-    // TODO Handle scaling
     this._contextBuffer.beginPath();
     this._contextBuffer.fillStyle = color.rgba;
     // Start with x,y on original canvas
@@ -140,6 +133,7 @@ export class Renderer {
   public drawRectRel(rect: Rectangle, color: Color): void {
     // TODO Should there even be relative functions or should they all be relative to the UIPanels?
     //  Maybe just do something special inside the UIWorld to handle tile scaling
+    //  Ya, move the viewport into the UIWorld
   }
 
   public drawImage(): void {
@@ -168,11 +162,11 @@ export class Renderer {
 
   }
 
-  public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, centered: boolean): void {
+  public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
     if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), Color.red);
     this._contextBuffer.beginPath();
     this._contextBuffer.fillStyle = color.rgba;
-    this._contextBuffer.textAlign = centered ? 'center' : 'left';
+    this._contextBuffer.textAlign = alignment;
     this._contextBuffer.textBaseline = 'hanging';
     this._contextBuffer.font = size + 'px ' + font;
     this._contextBuffer.fillText(text, rect.x1, rect.y1);
@@ -185,267 +179,5 @@ export class Renderer {
 
   public drawBuffer(): void {
     this._contextActive.drawImage(this._canvasBuffer[0], 0, 0);
-  }
-}
-
-export abstract class UIComponent extends Rectangle implements Drawable {
-  public selected: boolean = false;
-  public abstract draw(ui: Renderer): void;
-  public input(ui: Renderer, e: InputEvent): boolean {
-    return false; // Return true if event is consumed
-  }
-}
-
-interface UISkin {
-  img: HTMLImageElement,
-  url: string,
-  width: number,
-  widthScaled: number,
-  scale: number,
-  color: Color
-}
-
-export class UIPanel extends UIComponent {
-  private _title: string;
-  private _padding: number = 0;
-  private _skin: UISkin;
-  private _components: UIComponent[][] = [];
-  private _currentSkinChange: number = 0;
-  private _draggable: boolean = true;
-  constructor(x: number, y: number, width: number, height: number) {
-    super(x, y, width, height);
-    this.setSkin('assets/borderPatch.png', 1, Color.blue);
-  }
-  public setTitle(title: string): UIPanel {
-    this._title = title;
-    return this;
-  }
-  public setPadding(padding: number): UIPanel {
-    this._padding = padding;
-    return this;
-  }
-  public setDraggable(draggable: boolean): UIPanel {
-    this._draggable = draggable;
-    return this;
-  }
-  public setSkin(skin: string, scale: number, color: Color): UIPanel {
-    let skinImage = new Image();
-    skinImage.src = skin;
-    let skinChangeId = ++this._currentSkinChange;
-    skinImage.onload = () => {
-      // Prevent race conditions between changing skins too quickly
-      if (this._currentSkinChange !== skinChangeId)
-        return;
-      this._skin = {
-        img: skinImage,
-        url: skin,
-        width: skinImage.width / 3,
-        widthScaled: (skinImage.width / 3) * scale,
-        scale: scale,
-        color: color
-      };
-    };
-    return this;
-  }
-  public addComponent(component: UIComponent, zindex: number): UIPanel {
-    if (this._components[zindex] === undefined)
-      this._components[zindex] = [];
-    this._components[zindex].push(component);
-    return this;
-  }
-  public draw(ui: Renderer): void {
-    // Draw background
-    this.drawBackground(ui);
-
-    // Draw components
-    ui.translateContext(this.x1 + this._padding, this.y1 + this._padding);
-    for (let componentArray of this._components) {
-      if (componentArray === undefined)
-        continue;
-      for (let comp of componentArray)
-        comp.draw(ui);
-    }
-    ui.translateContext(-(this.x1 + this._padding), -(this.y1 + this._padding));
-  }
-  private drawBackground(ui: Renderer): void {
-    if (this._skin === undefined) return;
-
-    // Background
-    ui.drawRect(new Rectangle(
-        this.x1 + this._skin.widthScaled,
-        this.y1 + this._skin.widthScaled,
-        this.width - 2*this._skin.widthScaled,
-        this.height - 2*this._skin.widthScaled
-      ), this._skin.color);
-
-    // Border
-    /* 0 1 2 (Render order)
-       3 - 4
-       5 6 7 */
-    // Top
-    ui.drawSprite(
-      new Rectangle(
-        this.x1,
-        this.y1,
-        this._skin.widthScaled,
-        this._skin.widthScaled),
-      new Rectangle(
-        0,
-        0,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    ui.drawSprite(
-      new Rectangle(
-        this.x1 + this._skin.widthScaled,
-        this.y1,
-        this.width - 2*this._skin.widthScaled,
-        this._skin.widthScaled),
-      new Rectangle(
-        this._skin.width,
-        0,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    ui.drawSprite(
-      new Rectangle(
-        this.x1 + this.width - this._skin.widthScaled,
-        this.y1,
-        this._skin.widthScaled,
-        this._skin.widthScaled),
-      new Rectangle(
-        2*this._skin.width,
-        0,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    // Middle
-    ui.drawSprite(
-      new Rectangle(
-        this.x1,
-        this.y1 + this._skin.widthScaled,
-        this._skin.widthScaled,
-        this.height - 2*this._skin.widthScaled),
-      new Rectangle(
-        0,
-        this._skin.width,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    ui.drawSprite(
-      new Rectangle(
-        this.x1 + this.width - this._skin.widthScaled,
-        this.y1 + this._skin.widthScaled,
-        this._skin.widthScaled,
-        this.height - 2*this._skin.widthScaled),
-      new Rectangle(
-        2*this._skin.width,
-        this._skin.width,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    // Bottom
-    ui.drawSprite(
-      new Rectangle(
-        this.x1,
-        this.y1 + this.height - this._skin.widthScaled,
-        this._skin.widthScaled,
-        this._skin.widthScaled),
-      new Rectangle(
-        0,
-        2*this._skin.width,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    ui.drawSprite(
-      new Rectangle(
-        this.x1 + this._skin.widthScaled,
-        this.y1 + this.height - this._skin.widthScaled,
-        this.width - 2*this._skin.widthScaled,
-        this._skin.widthScaled),
-      new Rectangle(
-        this._skin.width,
-        2*this._skin.width,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-    ui.drawSprite(
-      new Rectangle(
-        this.x1 + this.width - this._skin.widthScaled,
-        this.y1 + this.height - this._skin.widthScaled,
-        this._skin.widthScaled,
-        this._skin.widthScaled),
-      new Rectangle(
-        2*this._skin.width,
-        2*this._skin.width,
-        this._skin.width,
-        this._skin.width),
-      this._skin.url
-    );
-  }
-  public input(ui: Renderer, e: InputEvent): boolean {
-    if (e.type === EventTypes.MOUSEDOWN && this.inside(e.x, e.y)) {
-      ui.selectComponent(this);
-      return true;
-    } else if (e.type === EventTypes.MOUSEUP) {
-      ui.selectComponent(null);
-      return true;
-    } else if (e.type === EventTypes.MOUSEMOVE && this.selected && this._draggable) {
-      // Move self
-      this.x1 -= e.dx;
-      this.y1 -= e.dy;
-      return true;
-    }
-    return false;
-  }
-}
-
-export class UILabel extends UIComponent {
-  private _text: string;
-  private _font: string = 'Times New Roman';
-  private _size: number = 16;
-  private _color: Color = Color.black;
-  private _centered: boolean = false;
-
-  constructor(x: number, y: number, text: string) {
-    super(x, y, 0, 0);
-    this._text = text;
-  }
-  public setText(text: string): UILabel {
-    this._text = text;
-    return this;
-  }
-  public setFont(font: string): UILabel {
-    this._font = font;
-    return this;
-  }
-  public setSize(size: number): UILabel {
-    this._size = size;
-    return this;
-  }
-  public setColor(color: Color): UILabel {
-    this._color = color;
-    return this;
-  }
-  public setCentered(center: boolean): UILabel {
-    this._centered = center;
-    return this;
-  }
-
-  public draw(ui: Renderer): void {
-    ui.drawText(this, this._text, this._font, this._size, this._color, this._centered);
-  }
-}
-
-export class UIWorld extends UIComponent {
-  public draw(ui: Renderer): void {
-
   }
 }
