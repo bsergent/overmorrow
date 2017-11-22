@@ -9,7 +9,7 @@ export class TimeKeep {
   private _globalStartTime: moment.Moment;
   private _currentStartTime: moment.Moment;
   private _totalTicks: number;
-  private _lastFrameTime: number;
+  private _lastFrameTime: number = 1;
 
   constructor() {
     this._globalStartTime = moment();
@@ -52,6 +52,13 @@ export class TimeKeep {
     if (this._index > 20)
       this._index = 0;
   }
+}
+
+export enum Direction {
+  UP,
+  RIGHT,
+  DOWN,
+  LEFT
 }
 
 export class Perlin {

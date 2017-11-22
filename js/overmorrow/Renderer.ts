@@ -120,12 +120,6 @@ export default class Renderer {
     this._contextBuffer.closePath();
   }
 
-  public drawRectRel(rect: Rectangle, color: Color): void {
-    // TODO Should there even be relative functions or should they all be relative to the UIPanels?
-    //  Maybe just do something special inside the UIWorld to handle tile scaling
-    //  Ya, move the viewport into the UIWorld
-  }
-
   public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
     if (!this._imageCache.has(url)) {
       this._imageCache.set(url, new Image());

@@ -8,6 +8,7 @@ import UIPanel from 'overmorrow/ui/UIPanel';
 import UIButton from 'overmorrow/ui/UIButton';
 import UIWorld from 'overmorrow/ui/UIWorld';
 import World from 'overmorrow/classes/World';
+import EntityPlayer from 'overmorrow/classes/EntityPlayer';
 
 class Demo {
   public static main(): void {
@@ -18,6 +19,10 @@ class Demo {
     let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
     tpsLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(tpsLabel, 10);
+    
+    let playerPosLabel = new UILabel(0, renderer.getHeight() - 14, '0,0');
+    playerPosLabel.setAlignment('left').setColor(Color.white);
+    renderer.addComponent(playerPosLabel, 10);
 
     let panel = new UIPanel(10, 10, 250, 250);
     panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
@@ -36,6 +41,10 @@ class Demo {
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setTileScale(128).setWorld(world);
     renderer.addComponent(uiworld, 0);
+
+    let player = new EntityPlayer(0, 0, 'ha1fBit');
+    world.addEntity(player);
+
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)
@@ -45,22 +54,22 @@ class Demo {
         console.log('DEBUG=' + DEBUG);
       });
     controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_D])
+      .setKeys([Keys.KEY_RIGHT])
       .setAction(event => {
         uiworld.viewport.x1 += 16;
       });
     controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_A])
+      .setKeys([Keys.KEY_LEFT])
       .setAction(event => {
         uiworld.viewport.x1 -= 16;
       });
     controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_S])
+      .setKeys([Keys.KEY_DOWN])
       .setAction(event => {
         uiworld.viewport.y1 += 16;
       });
     controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_W])
+      .setKeys([Keys.KEY_UP])
       .setAction(event => {
         uiworld.viewport.y1 -= 16;
       });
@@ -76,6 +85,30 @@ class Demo {
         uiworld.tileScale -= 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
+    controller.addListener(EventTypes.KEYDOWN)
+      .setKeys([Keys.KEY_W])
+      .setAction(event => {
+        if (player.isAligned())
+          player.vel.y = -player.speed1;
+      });
+    controller.addListener(EventTypes.KEYDOWN)
+      .setKeys([Keys.KEY_S])
+      .setAction(event => {
+        if (player.isAligned())
+          player.vel.y = player.speed1;
+      });
+    controller.addListener(EventTypes.KEYDOWN)
+      .setKeys([Keys.KEY_A])
+      .setAction(event => {
+        if (player.isAligned())
+          player.vel.x = -player.speed1;
+      });
+    controller.addListener(EventTypes.KEYDOWN)
+      .setKeys([Keys.KEY_D])
+      .setAction(event => {
+        if (player.isAligned())
+          player.vel.x = player.speed1;
+      });
 
     console.log('Initialized');
 
@@ -85,10 +118,11 @@ class Demo {
     function update() {
       timekeep.startUpdate();
       controller.processInput();
-      timekeep.addTick(0); // Pass timekeep.getDelta() to world
+      timekeep.addTick(world.tick(timekeep.getDelta())); // Pass timekeep.getDelta() to world
+      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
-      //$tps.text(timekeep.getTPS().toFixed(0));
+      $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
       
       setTimeout(update, timekeep.getTimeToWait());

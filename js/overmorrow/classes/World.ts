@@ -1,3 +1,4 @@
+import * as moment from '../../../node_modules/moment/moment';
 import Tickable from 'overmorrow/interfaces/Tickable';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Color from 'overmorrow/primitives/Color';
@@ -9,11 +10,12 @@ export default class World implements Tickable {
 	private _name;
 	private _entities: Entity[] = [];
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
+	private _backgroundLayer: any; // TODO Probably make this Image
 	private _tiles: Tile[][]; // Tile information
+	private _foregroundLayer: any;
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
 	private _width: number;
 	private _height: number;
-	// TODO Handle layers, maybe give tiles backgrounds and foregrounds, gotta do something for TiledMap layers
 
 	constructor(width: number, height: number) {
 		this._width = width;
@@ -34,12 +36,20 @@ export default class World implements Tickable {
 		return this._height;
 	}
 
+	public addEntity(entity: Entity) {
+		this._entities.push(entity);
+	}
+
 	public getTileAt(x: number, y: number): Tile {
 		return this._tiles[y][x];
 	}
 
-	public tick(delta: number): void {
+	public tick(delta: number): number {
+    let startTime = moment();
 		this._tiles.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
+		for (let e of this._entities)
+			e.tick(delta);
+		return moment().diff(startTime);
 	}
 
 	public draw(ui: WorldRenderer): void {
@@ -58,6 +68,9 @@ export default class World implements Tickable {
 		ui.drawRect(new Rectangle(1,2,1,1), Color.green);
 		ui.drawRect(new Rectangle(2,2,1,1), Color.green);
 		ui.drawRect(new Rectangle(3,1,1,1), Color.green);
+
+		for (let e of this._entities)
+			e.draw(ui);
 	}
 
 	public loadFromTiledMap(url: string): boolean { // Returns true if successfully loaded
