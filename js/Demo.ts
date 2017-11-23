@@ -35,16 +35,19 @@ class Demo {
       testButton.setText(Math.random().toString(16).substr(2, 5));
     });
     panel.addComponent(testButton, 0);
+    let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
+    closeButton.setAction(() => {
+      renderer.removeComponent(panel);
+    });
+    panel.addComponent(closeButton, 0);
     renderer.addComponent(panel, 1);
 
     let world = new World(16, 16);
-    let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
-    uiworld.setTileScale(128).setWorld(world);
-    renderer.addComponent(uiworld, 0);
-
     let player = new EntityPlayer(0, 0, 'ha1fBit');
     world.addEntity(player);
-
+    let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
+    uiworld.setWorld(world).setPlayer(player).setTileScale(128);
+    renderer.addComponent(uiworld, 0);
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)

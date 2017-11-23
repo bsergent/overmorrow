@@ -79,11 +79,11 @@ export default class Renderer {
     this._components[zindex].push(component);
   }
 
-  public removePanel(panel: UIPanel): boolean {
-    for (let panelArray of this._components)
-      for (let p of panelArray)
-        if (p === panel) {
-          p = null; // TODO Check if this actually works
+  public removeComponent(component: UIComponent): boolean {
+    for (let componentArray of this._components)
+      for (let p of componentArray)
+        if (p === component) {
+          componentArray.splice(componentArray.indexOf(p), 1);
           return true;
         }
     return false;
