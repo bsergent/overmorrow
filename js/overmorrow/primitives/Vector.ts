@@ -9,6 +9,12 @@ export default class Vector {
     return Math.sqrt(this.x*this.x + this.y*this.y);
   }
   set magnitude(value: number) {
+    let magnitude = this.magnitude;
+    this.x *= value / magnitude;
+    this.y *= value / magnitude;
+  }
 
+  public clone() {
+    return new Vector(this.x, this.y);
   }
 }

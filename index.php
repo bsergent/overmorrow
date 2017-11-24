@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>BFSV-Coding | Demo</title>
+		<title>BFSV-Coding | Overmorrow</title>
 		<link rel="icon" href="assets/logo.png">
 		<script data-main="js/config.js" src="js/lib/require.js"></script>
 

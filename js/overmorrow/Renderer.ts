@@ -22,12 +22,17 @@ export default class Renderer {
   constructor(canvasActive: JQuery, canvasBuffer: JQuery, controller: Controller) {
     this._canvasActive = canvasActive;
     this._canvasBuffer = canvasBuffer;
-    this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
-    this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('2d');
-    this._contextBuffer.imageSmoothingEnabled = false;
-    this._width = this._canvasActive.width();
-    this._height = this._canvasActive.height();
-    controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
+    if (canvasActive !== null) {
+      this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
+      this._width = this._canvasActive.width();
+      this._height = this._canvasActive.height();
+    }
+    if (canvasBuffer !== null) {
+      this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('2d');
+      this._contextBuffer.imageSmoothingEnabled = false;
+    }
+    if (controller !== null)
+      controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
   }
 
   public preloadImages(urls: string[]) {
@@ -138,7 +143,7 @@ export default class Renderer {
     }
     this._contextBuffer.globalAlpha = opacity;
     // TODO Implement rotation
-    if (drect.width == 0 && drect.height == 0)
+    if (drect.width === 0 && drect.height === 0)
       this._contextBuffer.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
     else
       this._contextBuffer.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);

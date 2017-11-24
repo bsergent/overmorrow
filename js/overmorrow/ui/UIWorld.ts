@@ -70,13 +70,14 @@ export default class UIWorld extends UIComponent {
   }
 }
 
-export class WorldRenderer { // Wrapper for Renderer class that handles the viewport
+export class WorldRenderer extends Renderer { // Wrapper for Renderer class that handles the viewport
   public viewport: Rectangle;
   public tileScale: number; // Number of pixels a single tile occupies
   public world: World;
   private _renderer: Renderer;
 
   constructor(renderer: Renderer, viewport: Rectangle, tileScale: number = 16) {
+    super(null, null, null); // Ignore own rrender functions and just call them on the given Renderer with needed transformations
     this._renderer = renderer;
     this.viewport = viewport;
     this.tileScale = tileScale;
@@ -110,5 +111,15 @@ export class WorldRenderer { // Wrapper for Renderer class that handles the view
     // TODO Instead of offsetting all the rectangles, could the canvas context be translated and scaled as done with UIPanel?
     if (!this.isOnScreen(rect)) return;
     this._renderer.drawRect(this.rectToViewPort(rect), color);
+  }
+
+  public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
+    if (!this.isOnScreen(rect)) return;
+    this._renderer.drawImage(this.rectToViewPort(rect), url, rotationDeg, opacity);
+  }
+
+  public drawSprite(rect: Rectangle, drect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
+    if (!this.isOnScreen(rect)) return;
+    this._renderer.drawSprite(this.rectToViewPort(rect), drect, url, rotationDeg, opacity);
   }
 }
