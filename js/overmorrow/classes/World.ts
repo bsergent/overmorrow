@@ -8,14 +8,13 @@ import Tile from 'overmorrow/classes/Tile';
 
 export default class World implements Tickable {
 	private _name;
-	private _entities: Entity[] = [];
+	protected _entities: Entity[] = [];
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
-	private _backgroundLayer: any; // TODO Probably make this Image
 	private _tiles: Tile[][]; // Tile information
-	private _foregroundLayer: any;
+	protected _collision: boolean[][];
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
-	private _width: number;
-	private _height: number;
+	protected _width: number;
+	protected _height: number;
 
 	constructor(width: number, height: number) {
 		this._width = width;
@@ -71,9 +70,5 @@ export default class World implements Tickable {
 
 		for (let e of this._entities)
 			e.draw(ui);
-	}
-
-	public loadFromTiledMap(url: string): boolean { // Returns true if successfully loaded
-		return false;
 	}
 }

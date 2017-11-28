@@ -8,6 +8,7 @@ import UIPanel from 'overmorrow/ui/UIPanel';
 import UIButton from 'overmorrow/ui/UIButton';
 import UIWorld from 'overmorrow/ui/UIWorld';
 import World from 'overmorrow/classes/World';
+import WorldTiled from 'overmorrow/classes/WorldTiled';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
 
 class Demo {
@@ -42,7 +43,8 @@ class Demo {
     panel.addComponent(closeButton, 0);
     renderer.addComponent(panel, 1);
 
-    let world = new World(16, 16);
+    //let world = new World(16, 16);
+    let world = new WorldTiled('assets/testmap.json');
     let player = new EntityPlayer(0, 0, 'ha1fBit');
     world.addEntity(player);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
