@@ -45,7 +45,7 @@ class Demo {
 
     //let world = new World(16, 16);
     let world = new WorldTiled('assets/testmap.json');
-    let player = new EntityPlayer(0, 0, 'ha1fBit');
+    let player = new EntityPlayer(2, 3, 'ha1fBit');
     world.addEntity(player);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128);

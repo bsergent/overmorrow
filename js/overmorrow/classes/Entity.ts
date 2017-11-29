@@ -1,11 +1,11 @@
-import Tickable from 'overmorrow/interfaces/Tickable';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
+import World from 'overmorrow/classes/World';
 import { Direction } from 'overmorrow/Utilities';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Vector from 'overmorrow/primitives/Vector';
 
-export default abstract class Entity extends Rectangle implements Tickable {
+export default abstract class Entity extends Rectangle {
 	private static _nextId: number = 0;
 
 	private _type: string;
@@ -28,12 +28,17 @@ export default abstract class Entity extends Rectangle implements Tickable {
 	}
 
 	public abstract draw(ui: WorldRenderer): void;
-	public tick(delta: number): void {
+	public tick(delta: number, world: World): void {
 		this.prevPos.x = this.x1;
     this.prevPos.y = this.y1;
 
-    // TODO Check collision
-    //  Maybe let world do all collision checks and then set a flag on each Entity?
+		// TODO Maybe let world do all collision checks and then set a flag on each Entity for will collide?
+		if (world.isTileOccupied(this.x1 + Math.sign(this.vel.x), this.y1 + Math.sign(this.vel.y), this)) {
+			this.vel.x = 0;
+			this.vel.y = 0;
+			// TODO Make sure entity is aligned to grid upon collision
+			return;
+		}
     this.x1 += this.vel.x * delta;
     this.y1 += this.vel.y * delta;
 
@@ -52,7 +57,7 @@ export default abstract class Entity extends Rectangle implements Tickable {
     if (this.isAligned()) {
       this.vel.x = 0;
       this.vel.y = 0;
-    }
+		}
 	};
 
 	public isAligned(): boolean {

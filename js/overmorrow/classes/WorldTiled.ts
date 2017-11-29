@@ -42,7 +42,7 @@ export default class WorldTiled extends World {
         for (let c = 0; c < this._collision.length; c++) {
           this._collision[c] = new Array(layer.width);
           for (var d = layer.width * c; d < layer.width * (c + 1); d++)
-            this._collision[c][d] = layer.data[d] != 0;
+            this._collision[c][d - layer.width * c] = layer.data[d] != 0;
           continue;
         }
       }

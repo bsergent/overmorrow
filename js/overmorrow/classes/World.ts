@@ -43,11 +43,22 @@ export default class World implements Tickable {
 		return this._tiles[y][x];
 	}
 
+	public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
+		x = Math.floor(x);
+		y = Math.floor(y);
+		if (x < 0 || y < 0 || x >= this._width + 1 || y >= this._height + 1 || this._collision[y][x])
+			return true;
+		for (let e of this._entities)
+			if (e !== entityToIgnore && e.intersects(new Rectangle(x, y, 1, 1)))
+				return true;
+		return false;
+	}
+
 	public tick(delta: number): number {
     let startTime = moment();
 		this._tiles.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
 		for (let e of this._entities)
-			e.tick(delta);
+			e.tick(delta, this);
 		return moment().diff(startTime);
 	}
 

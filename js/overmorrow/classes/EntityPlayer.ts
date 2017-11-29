@@ -3,6 +3,7 @@ import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Color from 'overmorrow/primitives/Color';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
+import World from 'overmorrow/classes/World';
 
 export default class EntityPlayer extends Entity {
   private _username: string;
@@ -23,8 +24,8 @@ export default class EntityPlayer extends Entity {
     //ui.drawRect(this, Color.blue);
     this._aniSheet.draw(ui, this);
   }
-	public tick(delta: number): void {
-    super.tick(delta);
+	public tick(delta: number, world: World): void {
+    super.tick(delta, world);
     if (this.x1 === 2)
       this._aniSheet.setFrameTag('action');
     else {
