@@ -59,26 +59,6 @@ class Demo {
         console.log('DEBUG=' + DEBUG);
       });
     controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_RIGHT])
-      .setAction(event => {
-        uiworld.viewport.x1 += 16;
-      });
-    controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_LEFT])
-      .setAction(event => {
-        uiworld.viewport.x1 -= 16;
-      });
-    controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_DOWN])
-      .setAction(event => {
-        uiworld.viewport.y1 += 16;
-      });
-    controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_UP])
-      .setAction(event => {
-        uiworld.viewport.y1 -= 16;
-      });
-    controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_EQUALS])
       .setAction(event => {
         uiworld.tileScale += 16;
@@ -90,29 +70,25 @@ class Demo {
         uiworld.tileScale -= 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setAction(event => {
-        if (player.isAligned())
-          player.vel.y = -player.speed1;
+        player.velIntended.y = -player.speed1;
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setAction(event => {
-        if (player.isAligned())
-          player.vel.y = player.speed1;
+        player.velIntended.y = player.speed1;
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setAction(event => {
-        if (player.isAligned())
-          player.vel.x = -player.speed1;
+        player.velIntended.x = -player.speed1;
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setAction(event => {
-        if (player.isAligned())
-          player.vel.x = player.speed1;
+        player.velIntended.x = player.speed1;
       });
 
     console.log('Initialized');

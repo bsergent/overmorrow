@@ -16,6 +16,7 @@ export default abstract class Entity extends Rectangle {
 
 	public facing: Direction;
 	public vel: Vector = new Vector(0, 0);
+	public velIntended: Vector = new Vector(0, 0);
 	public prevPos: Vector;
 
 	constructor(x: number, y: number, width: number, height: number, type: string, speed1: number, speed2: number) {
@@ -29,21 +30,29 @@ export default abstract class Entity extends Rectangle {
 
 	public abstract draw(ui: WorldRenderer): void;
 	public tick(delta: number, world: World): void {
+		console.log(`${this.velIntended.magnitude} -> ${this.vel.magnitude}`);
 		this.prevPos.x = this.x1;
     this.prevPos.y = this.y1;
 
+    if (this.isAligned()) {
+			this.vel.x = this.velIntended.x;
+			this.vel.y = this.velIntended.y;
+		}
 		// TODO Maybe let world do all collision checks and then set a flag on each Entity for will collide?
-		if (world.isTileOccupied(this.x1 + Math.sign(this.vel.x), this.y1 + Math.sign(this.vel.y), this)) {
+		if (world.isTileOccupied(
+				this.x1 + Math.sign(this.vel.x),
+				this.y1 + Math.sign(this.vel.y),
+				this)) {
 			this.vel.x = 0;
 			this.vel.y = 0;
-			// TODO Make sure entity is aligned to grid upon collision
+			this.velIntended.magnitude = 0;
 			return;
 		}
     this.x1 += this.vel.x * delta;
     this.y1 += this.vel.y * delta;
 
     // Attempt to align to grid and stop
-    if (!this.isAligned()) {
+    if (!this.isAligned() && this.velIntended.magnitude === 0) {
       // If changed grid boundary in last tick, align to grid
       if (Math.floor(this.x1) - Math.floor(this.prevPos.x) > 0)
         this.x1 = Math.floor(this.x1);
@@ -52,12 +61,11 @@ export default abstract class Entity extends Rectangle {
       if (Math.floor(this.y1) - Math.floor(this.prevPos.y) > 0)
         this.y1 = Math.floor(this.y1);
       if (Math.ceil(this.y1) - Math.ceil(this.prevPos.y) < 0)
-        this.y1 = Math.ceil(this.y1);
+				this.y1 = Math.ceil(this.y1);
+			if (this.isAligned())
+				this.vel.magnitude = 0;
     }
-    if (this.isAligned()) {
-      this.vel.x = 0;
-      this.vel.y = 0;
-		}
+		this.velIntended.magnitude = 0;
 	};
 
 	public isAligned(): boolean {

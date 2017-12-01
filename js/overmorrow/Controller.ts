@@ -5,6 +5,7 @@ export class Controller {
   private listeners: Listener[] = [];
   private mousePosX: number = 0;
   private mousePosY: number = 0;
+  private pressedKeys: Keys[] = [];
 
   constructor(canvas: JQuery) {
     this.$canvas = canvas;
@@ -25,6 +26,19 @@ export class Controller {
     });
     $(document).keydown(event => {
       canvas.focus();
+      if (this.pressedKeys.indexOf(event.which as Keys) === -1)
+        this.pressedKeys.push(event.which as Keys);
+      this.queueInput(new InputEvent(event));
+      if ([9].indexOf(event.which) !== -1) { // Disabled tab key
+        event.preventDefault();
+        return false;
+      }
+    });
+    $(document).keyup(event => {
+      canvas.focus();
+      let i = this.pressedKeys.indexOf(event.which as Keys)
+      if (i !== -1)
+        this.pressedKeys.splice(i, 1);
       this.queueInput(new InputEvent(event));
       if ([9].indexOf(event.which) !== -1) { // Disabled tab key
         event.preventDefault();
@@ -54,6 +68,16 @@ export class Controller {
       }
     }
     this.inputQueue = [];
+    for (let k of this.pressedKeys) {
+      for (let l of this.listeners) {
+        if (l.type === EventTypes.ALL || (l.type === EventTypes.KEYHELD && l.keys.indexOf(k) !== -1)) {
+          let keyheldEvent = new InputEvent(null);
+          keyheldEvent.type = EventTypes.KEYHELD;
+          keyheldEvent.key = k;
+          l.action(keyheldEvent);
+        }
+      }
+    }
   }
 
   public addListener(type: EventTypes): Listener {
@@ -99,6 +123,7 @@ export class InputEvent {
   dx: number;
   dy: number;
   constructor(event: JQuery.Event) {
+    if (event === null) return;
     this.key = event.which;
     this.type = EventTypes[event.type.toUpperCase()];
   }
@@ -176,5 +201,7 @@ export enum EventTypes {
   MOUSEDOWN,
   MOUSEUP,
   KEYDOWN,
+  KEYUP,
+  KEYHELD,
   ALL
 }

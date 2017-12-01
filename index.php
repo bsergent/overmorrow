@@ -27,6 +27,7 @@
 			#game-container {
 				text-align: center;
 				padding: 0px;
+				user-selection: none;
 			}
 			canvas#game {
 				width: 800px;
@@ -34,9 +35,8 @@
 				box-shadow: 0px 0px 5px #E3BD40;
 				border: 2px solid #E3BD40;
 				image-rendering: pixelated;
-			}
-			#game-container > canvas {
 				background-color: black;
+				user-selection: none;
 			}
 		</style>
 	</head>
