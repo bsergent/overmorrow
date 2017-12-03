@@ -47,7 +47,7 @@ class Demo {
     let world = new WorldTiled('assets/testmap.json');
     let player = new EntityPlayer(2, 3, 'ha1fBit');
     world.addEntity(player);
-    let darkblade = new EntityPlayer(2, 5, 'Darkblade');
+    /*let darkblade = new EntityPlayer(2, 5, 'Darkblade');
     world.addEntity(darkblade);
     setInterval(() => {
       if (Math.random() < 0.5)
@@ -55,7 +55,7 @@ class Demo {
       else
         darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed1;
       console.log(darkblade.velIntended);
-    }, 3000);
+    }, 3000);*/
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128);
     renderer.addComponent(uiworld, 0);
@@ -82,22 +82,22 @@ class Demo {
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setAction(event => {
-        player.velIntended.y = -player.speed1;
+        player.velIntended.y = -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1);
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setAction(event => {
-        player.velIntended.y = player.speed1;
+        player.velIntended.y = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1;;
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setAction(event => {
-        player.velIntended.x = -player.speed1;
+        player.velIntended.x = -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1);
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setAction(event => {
-        player.velIntended.x = player.speed1;
+        player.velIntended.x = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1;
       });
 
     console.log('Initialized');

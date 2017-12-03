@@ -30,7 +30,7 @@ export default abstract class Entity extends Rectangle {
 
 	public abstract draw(ui: WorldRenderer): void;
 	public tick(delta: number, world: World): void {
-		//console.log(`${this.velIntended.magnitude} -> ${this.vel.magnitude}`);
+		console.log(`${this.velIntended.magnitude} -> ${this.vel.magnitude}`);
 		this.prevPos.x = this.x1;
 		this.prevPos.y = this.y1;
 
@@ -38,10 +38,6 @@ export default abstract class Entity extends Rectangle {
 			this.vel.x = this.velIntended.x;
 			this.vel.y = this.velIntended.y;
 		}
-		// TODO Maybe let world do all collision checks and then set a flag on each Entity for will collide?
-		//  Probably have each entity remember the two cells they're in, and then have the world grid remember
-		//  the cells the entities are in. Thus they can just check the world's boolean[][] instead of doing
-		//  O(n^2) operations, it'd just be O(1) + the work to place the entities in their cells
     this.x1 += this.vel.x * delta;
     this.y1 += this.vel.y * delta;
 

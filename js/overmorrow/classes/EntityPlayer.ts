@@ -14,7 +14,7 @@ export default class EntityPlayer extends Entity {
   }
 
   constructor(x: number, y: number, username: string) {
-    super(x, y, 1, 1, 'player', 0.10, 0.20);
+    super(x, y, 1, 1, 'player', 0.10, 0.15);
     this._username = username;
     this._aniSheet = new AnimationSheet('assets/player.png').setDurationMultipler(1);
   }

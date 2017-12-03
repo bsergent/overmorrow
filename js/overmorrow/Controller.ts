@@ -85,6 +85,10 @@ export class Controller {
     this.listeners.push(l);
     return l;
   }
+
+  public isKeyDown(key: Keys): boolean {
+    return this.pressedKeys.indexOf(key) !== -1;
+  }
 }
 
 export class Listener {
