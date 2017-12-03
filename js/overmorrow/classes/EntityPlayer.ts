@@ -23,6 +23,7 @@ export default class EntityPlayer extends Entity {
     // Should already be offset by viewport, so draw relative to world
     //ui.drawRect(this, Color.blue);
     this._aniSheet.draw(ui, this);
+    ui.drawText(this.clone().offset(this.width / 2, 1.1), this._username, 'Courier', 12, Color.white, 'center');
   }
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);

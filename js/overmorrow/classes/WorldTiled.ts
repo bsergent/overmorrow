@@ -62,10 +62,15 @@ export default class WorldTiled extends World {
           height: ts.tileheight,
           url: 'assets/' + ts.image,
           properties: ts.tileproperties !== undefined ? ts.tileproperties[id - ts.firstgid] : null,
-          terrain: null // TODO Calculate  the terrain type
+          terrain: null // TODO Calculate the terrain type
         };
       }
     }
+
+    // Initialize entity collision map
+    this._entityCollision = new Array(this._height);
+    for (let r = 0; r < this._height; r++)
+      this._entityCollision[r] = new Array(this._width);
   }
 
   public draw(ui: WorldRenderer): void {

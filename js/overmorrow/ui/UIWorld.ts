@@ -122,4 +122,9 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
     if (!this.isOnScreen(rect)) return;
     this._renderer.drawSprite(this.rectToViewPort(rect), drect, url, rotationDeg, opacity);
   }
+
+  public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
+    if (!this.isOnScreen(rect)) return;
+    this._renderer.drawText(this.rectToViewPort(rect), text, font, size, color, alignment);
+  }
 }

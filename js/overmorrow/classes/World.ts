@@ -12,15 +12,29 @@ export default class World implements Tickable {
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
 	private _tiles: Tile[][]; // Tile information
 	protected _collision: boolean[][];
+	protected _entityCollision: number[][][];
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
 	protected _width: number;
 	protected _height: number;
 
 	constructor(width: number, height: number) {
 		this._width = width;
-		this._height = height;
+    this._height = height;
+    
 		this._tiles = new Array(height);
-		this._tiles.forEach((row) => { row = new Array(width); });
+    for (let r = 0; r < height; r++)
+      this._tiles[r] = new Array(width);
+
+		this._collision = new Array(height);
+    for (let r = 0; r < height; r++)
+      this._collision[r] = new Array(width);
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++)
+        this._collision[y][x] = false;
+
+		this._entityCollision = new Array(height);
+    for (let r = 0; r < height; r++)
+      this._entityCollision[r] = new Array(width);
 	}
 
 	public setName(name: string): World {
@@ -46,19 +60,36 @@ export default class World implements Tickable {
 	public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
 		x = Math.floor(x);
 		y = Math.floor(y);
-		if (x < 0 || y < 0 || x >= this._width + 1 || y >= this._height + 1 || this._collision[y][x])
-			return true;
-		for (let e of this._entities)
-			if (e !== entityToIgnore && e.intersects(new Rectangle(x, y, 1, 1)))
-				return true;
-		return false;
+		return x < 0
+			|| y < 0
+			|| x >= this._width + 1
+			|| y >= this._height + 1
+			|| this._collision[y][x]
+      || (entityToIgnore !== undefined
+          && this._entityCollision[y][x].length > 1
+          && this._entityCollision[y][x].indexOf(entityToIgnore.id) !== -1);
 	}
 
 	public tick(delta: number): number {
-    let startTime = moment();
+		let startTime = moment();
+		// Update tiles and entities
 		this._tiles.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
 		for (let e of this._entities)
 			e.tick(delta, this);
+		// Reset entity collision map
+		for (let y = 0; y < this._height; y++)
+			for (let x = 0; x < this._width; x++)
+        this._entityCollision[y][x] = [];
+		for (let e of this._entities) {
+			// Track current location to collision map
+			this._entityCollision[Math.floor(e.y1)][Math.floor(e.x1)].push(e.id);
+			this._entityCollision[Math.ceil(e.y1)][Math.ceil(e.x1)].push(e.id);
+    }
+		for (let e of this._entities) {
+			// Check if colliding with something from collision maps
+			if (this.isTileOccupied(e.x1, e.y1, e) || this.isTileOccupied(Math.ceil(e.x1), Math.ceil(e.y1), e))
+				e.revertMovement();
+		}
 		return moment().diff(startTime);
 	}
 

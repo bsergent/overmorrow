@@ -47,6 +47,15 @@ class Demo {
     let world = new WorldTiled('assets/testmap.json');
     let player = new EntityPlayer(2, 3, 'ha1fBit');
     world.addEntity(player);
+    let darkblade = new EntityPlayer(2, 5, 'Darkblade');
+    world.addEntity(darkblade);
+    setInterval(() => {
+      if (Math.random() < 0.5)
+        darkblade.velIntended.x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed1;
+      else
+        darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed1;
+      console.log(darkblade.velIntended);
+    }, 3000);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128);
     renderer.addComponent(uiworld, 0);
