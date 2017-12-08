@@ -10,6 +10,9 @@ import UIWorld from 'overmorrow/ui/UIWorld';
 import World from 'overmorrow/classes/World';
 import WorldTiled from 'overmorrow/classes/WorldTiled';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
+import UIImage from './overmorrow/ui/UIImage';
+import Rectangle from './overmorrow/primitives/Rectangle';
+import AnimationSheet from './overmorrow/classes/AnimationSheet';
 
 class Demo {
   public static main(): void {
@@ -25,11 +28,27 @@ class Demo {
     playerPosLabel.setAlignment('left').setColor(Color.white);
     renderer.addComponent(playerPosLabel, 10);
 
+
     let panel = new UIPanel(10, 10, 250, 250);
     panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
+
     let testLabel = new UILabel(0, 0, 'Title');
     testLabel.setSize(24).setColor(Color.white);
     panel.addComponent(testLabel, 0);
+
+    let testImage = new UIImage(0, 42, 32, 32, 'assets/collision.png');
+    panel.addComponent(testImage, 0);
+
+    let testSprite = new UIImage(64, 0, 32, 32, 'assets/f1_terrain.png');
+    testSprite.setSpriteCoords(new Rectangle(48, 0, 16, 16));
+    panel.addComponent(testSprite, 0);
+
+    let testAnimation = new UIImage(64, 48, 32, 32, '');
+    let testAniSheet = new AnimationSheet('assets/player.png');
+    testAniSheet.setFrameTag('idle');
+    testAnimation.setAnimationSheet(testAniSheet);
+    panel.addComponent(testAnimation, 0);
+
     let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
     testButton.setAction(() => {
       console.log('Clicked test button');
@@ -42,6 +61,7 @@ class Demo {
     });
     panel.addComponent(closeButton, 0);
     renderer.addComponent(panel, 1);
+
 
     //let world = new World(16, 16);
     let world = new WorldTiled('assets/testmap.json');
