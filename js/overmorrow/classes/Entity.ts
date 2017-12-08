@@ -42,7 +42,7 @@ export default abstract class Entity extends Rectangle {
     this.y1 += this.vel.y * delta;
 
     // Attempt to align to grid and stop
-    if (!this.isAligned() && this.velIntended.magnitude === 0) {
+    if (!this.isAligned() && this.velIntended !== this.vel) {
       // If changed grid boundary in last tick, align to grid
       if (Math.floor(this.x1) - Math.floor(this.prevPos.x) > 0)
         this.x1 = Math.floor(this.x1);
