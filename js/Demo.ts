@@ -23,6 +23,9 @@ class Demo {
     let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
     tpsLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(tpsLabel, 10);
+    let drawLabel = new UILabel(renderer.getWidth() - 2, 20, '1');
+    drawLabel.setAlignment('right').setColor(Color.white);
+    renderer.addComponent(drawLabel, 10);
     
     let playerPosLabel = new UILabel(0, renderer.getHeight() - 14, '0,0');
     playerPosLabel.setAlignment('left').setColor(Color.white);
@@ -64,20 +67,19 @@ class Demo {
 
 
     //let world = new World(16, 16);
-    let world = new WorldTiled('assets/testmap.json');
-    let player = new EntityPlayer(2, 3, 'ha1fBit');
+    let world = new WorldTiled('assets/dungeonEntrance.json');
+    let player = new EntityPlayer(15, 31, 'ha1fBit');
     world.addEntity(player);
-    /*let darkblade = new EntityPlayer(2, 5, 'Darkblade');
+    let darkblade = new EntityPlayer(11, 16, 'Darkblade');
     world.addEntity(darkblade);
     setInterval(() => {
       if (Math.random() < 0.5)
         darkblade.velIntended.x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed1;
       else
         darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed1;
-      console.log(darkblade.velIntended);
-    }, 3000);*/
+    }, 3000);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
-    uiworld.setWorld(world).setPlayer(player).setTileScale(128);
+    uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
     
     // Bind controls
@@ -102,22 +104,26 @@ class Demo {
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setAction(event => {
+        player.velIntended.x = 0;
         player.velIntended.y = -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1);
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setAction(event => {
+        player.velIntended.x = 0;
         player.velIntended.y = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1;;
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setAction(event => {
         player.velIntended.x = -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1);
+        player.velIntended.y = 0;
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setAction(event => {
         player.velIntended.x = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speed2 : player.speed1;
+        player.velIntended.y = 0;
       });
 
     console.log('Initialized');
@@ -134,6 +140,7 @@ class Demo {
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
+      drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
       
       setTimeout(update, timekeep.getTimeToWait());
       // TODO Also handle multiplayer stuff in here somewhere, queuing to world

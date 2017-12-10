@@ -10,6 +10,8 @@ export default class WorldTiled extends World {
   private _objects: object[] = [];
   private _background: Layer[] = [];
   private _foreground: Layer[] = [];
+  private _tileWidth: number;
+  private _tileHeight: number;
 
   constructor(jsonUrl: string) {
     super(0, 0);
@@ -26,6 +28,8 @@ export default class WorldTiled extends World {
     });
     this._width = json.width;
     this._height = json.height;
+    this._tileWidth = json.tilewidth;
+    this._tileHeight = json.tileheight;
     let color = new Color();
     color.hex = json.backgroundcolor;
     this._backgroundColor = color;
@@ -54,6 +58,8 @@ export default class WorldTiled extends World {
 
     // Construct the tile key (tile ids -> tile image coordinates, url, and terrain)
     for (let ts of json.tilesets) {
+      if (ts.tilecount === undefined)
+        ts.tilecount = (ts.imageheight / ts.tileheight) * (ts.imagewidth / ts.tilewidth);
       for (let id = ts.firstgid; id < ts.firstgid + ts.tilecount; id++) {
         this._tileKey[id] = {
           x: (id - ts.firstgid) % (ts.imagewidth / ts.tilewidth) * ts.tilewidth,
@@ -81,27 +87,32 @@ export default class WorldTiled extends World {
 	}
 
   drawLayer(ui: WorldRenderer, layer: Layer): void {
-    var vArea = ui.getVisibleTileArea();
+    let vArea = ui.getVisibleTileArea();
     // TODO Use visible tile area to lessen loop iterations
-    for (var i = 0; i < layer.data.length; i++) {
-      if (layer.data[i] == 0) continue;
-      var tileImg = this._tileKey[layer.data[i]];
-      // TODO Check if tile is animated
-      ui.drawSprite(
-        new Rectangle(
-          i % this._width,
-          Math.floor(i / this._width),
-          1,
-          1),
-        new Rectangle(
-          tileImg.x,
-          tileImg.y,
-          tileImg.width,
-          tileImg.height),
-        tileImg.url,
-        0,
-        layer.opacity
-      );
+    for (let y = vArea.y1; y < vArea.y2; y++) {
+      for (let x = vArea.x1; x < vArea.x2; x++) {
+        let i = y * this._width + x;
+        if (layer.data[i] == 0) continue;
+        var tileImg = this._tileKey[layer.data[i]];
+        if (tileImg == null)
+          continue;
+        // TODO Check if tile is animated
+        ui.drawSprite(
+          new Rectangle(
+            x - (tileImg.width / this._tileWidth) + 1,
+            y - (tileImg.height / this._tileHeight) + 1,
+            tileImg.width / 16,
+            tileImg.height / 16),
+          new Rectangle(
+            tileImg.x,
+            tileImg.y,
+            tileImg.width,
+            tileImg.height),
+          tileImg.url,
+          0,
+          layer.opacity
+        );
+      }
     }
   }
 

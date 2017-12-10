@@ -30,7 +30,7 @@ export default abstract class Entity extends Rectangle {
 
 	public abstract draw(ui: WorldRenderer): void;
 	public tick(delta: number, world: World): void {
-		console.log(`${this.velIntended.magnitude} -> ${this.vel.magnitude}`);
+		//console.log(`${this.velIntended.magnitude} -> ${this.vel.magnitude}`);
 		this.prevPos.x = this.x1;
 		this.prevPos.y = this.y1;
 

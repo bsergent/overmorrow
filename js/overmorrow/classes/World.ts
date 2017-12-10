@@ -82,6 +82,8 @@ export default class World implements Tickable {
         this._entityCollision[y][x] = [];
 		for (let e of this._entities) {
 			// Track current location to collision map
+			if (e.y1 < 0 || e.y2 >= this._height || e.x1 < 0 || e.x2 >= this._width)
+			e.revertMovement();
 			this._entityCollision[Math.floor(e.y1)][Math.floor(e.x1)].push(e.id);
 			this._entityCollision[Math.ceil(e.y1)][Math.ceil(e.x1)].push(e.id);
     }
