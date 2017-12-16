@@ -80,4 +80,8 @@ export default abstract class Entity extends Rectangle {
 	get id(): number {
 		return this._id;
 	}
+
+	get type(): string {
+		return this._type;
+	}
 }
