@@ -21,19 +21,19 @@ export default class EntityPlayer extends Entity {
 
 	public draw(ui: WorldRenderer): void {
     // Should already be offset by viewport, so draw relative to world
-    //ui.drawRect(this, Color.blue);
     this._aniSheet.draw(ui, this);
     ui.drawText(this.clone().offset(this.width / 2, 1.1), this._username, 'Courier', 12, Color.white, 'center');
   }
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);
+    this._aniSheet.setDurationMultipler(this.velIntended.magnitude === this.speed1 ? 1 : this.speed2 / this.speed1);
     if (this.x1 === 2)
-      this._aniSheet.setFrameTag('action');
+      this._aniSheet.setFrameTag('action_0');
     else {
       if (this.vel.magnitude === 0)
-        this._aniSheet.setFrameTag('idle');
+        this._aniSheet.setFrameTag('idle_' + this.facing);
       else
-        this._aniSheet.setFrameTag('walk');
+        this._aniSheet.setFrameTag('walk_' + this.facing);
     }
   }
 }

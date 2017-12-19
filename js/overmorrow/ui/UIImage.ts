@@ -9,7 +9,7 @@ export default class UIImage extends UIComponent {
     private _aniSheet: AnimationSheet = null;
     private _sprite: Rectangle = null;
   
-    constructor(x: number, y: number, width: number, height: number, imgUrl: string) {
+    constructor(x: number, y: number, width: number, height: number, imgUrl: string = '') {
       super(x, y, width, height);
       this._image = imgUrl;
     }

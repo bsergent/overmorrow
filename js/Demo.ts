@@ -46,7 +46,7 @@ class Demo {
     testSprite.setSpriteCoords(new Rectangle(48, 0, 16, 16));
     panel.addComponent(testSprite, 0);
 
-    let testAnimation = new UIImage(64, 48, 32, 32, '');
+    let testAnimation = new UIImage(64, 48, 32, 32);
     let testAniSheet = new AnimationSheet('assets/player.png');
     testAniSheet.setFrameTag('idle');
     testAnimation.setAnimationSheet(testAniSheet);
@@ -68,9 +68,9 @@ class Demo {
 
     //let world = new World(16, 16);
     let world = new WorldTiled('assets/dungeonEntrance.json');
-    let player = new EntityPlayer(15, 31, 'ha1fBit');
+    let player = new EntityPlayer(15, 31, 'Wake');
     world.addEntity(player);
-    let darkblade = new EntityPlayer(11, 16, 'Darkblade');
+    let darkblade = new EntityPlayer(11, 16, 'Raesan');
     world.addEntity(darkblade);
     setInterval(() => {
       if (Math.random() < 0.5)

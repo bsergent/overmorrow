@@ -10,6 +10,7 @@ export class TimeKeep {
   private _currentStartTime: moment.Moment;
   private _totalTicks: number;
   private _lastFrameTime: number = 1;
+  private _minFrameTime = 50;//250; // in milliseconds
 
   constructor() {
     this._globalStartTime = moment();
@@ -31,17 +32,17 @@ export class TimeKeep {
   }
   public getTPS(): number {
     if (this._index != 0) return this._avgTPS;
-    let frame = 50 - this.getTimeToWait();
+    let frame = this._minFrameTime - this.getTimeToWait();
     if (frame <= 0) frame = 1;
     this._avgTPS = 1000 / frame;
     return this._avgTPS;
   }
   public getDelta(): number {
-    this._delta = Math.floor(this._lastFrameTime / 50);
+    this._delta = Math.floor(this._lastFrameTime / this._minFrameTime);
     return this._delta !== 0 ? this._delta : 1;
   }
   public getTimeToWait(): number {
-    return 50 - this._lastFrameTime < 0 ? 0 : 50 - this._lastFrameTime;
+    return this._minFrameTime - this._lastFrameTime < 0 ? 0 : this._minFrameTime - this._lastFrameTime;
   }
   public startUpdate(): void {
     this._currentStartTime = moment();
@@ -55,10 +56,10 @@ export class TimeKeep {
 }
 
 export enum Direction {
-  UP,
-  RIGHT,
-  DOWN,
-  LEFT
+  UP = 2,
+  RIGHT = 3,
+  DOWN = 0, 
+  LEFT = 1
 }
 
 export class Perlin {

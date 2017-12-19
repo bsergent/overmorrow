@@ -13,7 +13,7 @@ export default class AnimationSheet {
   private _currentTag: FrameTag = null;
   private _frameTags: Map<string, FrameTag> = new Map();
   private _lastAnimationTime: moment.Moment;
-  private _durationMultiplier: number;
+  private _durationMultiplier: number = 1;
   private _currentDirectionForward: boolean;
 
   constructor(urlImage: string) {
@@ -72,12 +72,12 @@ export default class AnimationSheet {
   }
 
   public setFrameTag(name: string): AnimationSheet {
+    //console.log('frameTag=' + name);
     if (this._frames.length <= 0 || (this._currentTag !== null && this._currentTag.name === name)) return this;
     this._currentTag = this._frameTags.get(name);
     this._currentFrameIndex = this._currentTag.from;
     this._currentDirectionForward = this._currentTag.direction !== 'reverse';
     this._lastAnimationTime = moment();
-    console.log('frameTag=' + name);
     return this;
   }
 
