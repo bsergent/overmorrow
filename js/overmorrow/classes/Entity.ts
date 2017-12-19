@@ -42,13 +42,13 @@ export default abstract class Entity extends Rectangle {
 		
 		// Handle facing
 		if (this.velIntended.y > 0) {
-			this.facing = 0;
+			this.facing = Direction.DOWN;
 		} else if (this.velIntended.x < 0) {
-			this.facing = 1;
+			this.facing = Direction.LEFT;
 		} else if (this.velIntended.y < 0) {
-			this.facing = 2;
+			this.facing = Direction.UP;
 		} else if (this.velIntended.x > 0) {
-			this.facing = 3;
+			this.facing = Direction.RIGHT;
 		}
 
 		// Attempt to align to grid and stop

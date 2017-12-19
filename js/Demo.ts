@@ -17,7 +17,7 @@ import AnimationSheet from './overmorrow/classes/AnimationSheet';
 class Demo {
   public static main(): void {
     var controller = new Controller($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), controller);
+    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
@@ -48,7 +48,7 @@ class Demo {
 
     let testAnimation = new UIImage(64, 48, 32, 32);
     let testAniSheet = new AnimationSheet('assets/player.png');
-    testAniSheet.setFrameTag('idle');
+    testAniSheet.setFrameTag('idle_0').replaceColor(new Color(99, 129, 215), Color.white);
     testAnimation.setAnimationSheet(testAniSheet);
     panel.addComponent(testAnimation, 0);
 
@@ -71,6 +71,7 @@ class Demo {
     let player = new EntityPlayer(15, 31, 'Wake');
     world.addEntity(player);
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
+    darkblade.setEyeColor(Color.green);
     world.addEntity(darkblade);
     setInterval(() => {
       if (Math.random() < 0.5)

@@ -15,6 +15,12 @@ export default class Color {
     this.b = b;
     this.a = a;
   }
+  public equals(color: Color): boolean {
+    return color.r === this.r
+      && color.g === this.g
+      && color.b === this.b
+      && color.a === this.a;
+  }
   get hex():string {
     return '#'
       + ('0' + this.r.toString(16)).slice(-2)
@@ -34,7 +40,7 @@ export default class Color {
     this.g = parseInt(result[2], 16);
     this.b = parseInt(result[3], 16);
   }
-  get rgbaObject():any {
+  get rgbaObject(): { r: number, g: number, b: number, a: number } {
     return {
       r: this.r,
       g: this.g,
@@ -42,11 +48,11 @@ export default class Color {
       a: this.a
     }
   }
-  set rgbaObject(colorObject:any) {
+  set rgbaObject(colorObject: { r: number, g: number, b: number, a: number }) {
     this.r = colorObject.r;
     this.g = colorObject.g;
     this.b = colorObject.b;
-    if (colorObject.a != null && typeof(colorObject.a) == 'number')
+    if (colorObject.a !== undefined && colorObject.a !== null && typeof(colorObject.a) == 'number')
       this.a = colorObject.a;
   }
   get rgba():string {

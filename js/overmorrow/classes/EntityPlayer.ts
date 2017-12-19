@@ -19,6 +19,11 @@ export default class EntityPlayer extends Entity {
     this._aniSheet = new AnimationSheet('assets/player.png').setDurationMultipler(1);
   }
 
+  public setEyeColor(color: Color): EntityPlayer {
+    this._aniSheet.replaceColor(new Color(99, 129, 215), color);
+    return this;
+  }
+
 	public draw(ui: WorldRenderer): void {
     // Should already be offset by viewport, so draw relative to world
     this._aniSheet.draw(ui, this);

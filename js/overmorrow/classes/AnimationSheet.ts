@@ -3,6 +3,7 @@ import * as moment from '../../../node_modules/moment/moment';
 import Color from 'overmorrow/primitives/Color';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Renderer from 'overmorrow/Renderer';
+import { Filter, FilterReplaceColor } from '../primitives/Filter';
 
 export default class AnimationSheet {
   private _frames: Frame[] = [];
@@ -11,10 +12,12 @@ export default class AnimationSheet {
   private _imageUrl: string;
   private _currentFrameIndex: number;
   private _currentTag: FrameTag = null;
+  private _initialTag: string = '';
   private _frameTags: Map<string, FrameTag> = new Map();
   private _lastAnimationTime: moment.Moment;
   private _durationMultiplier: number = 1;
   private _currentDirectionForward: boolean;
+  private _filters: Filter[] = [];
 
   constructor(urlImage: string) {
     $.ajax({
@@ -37,7 +40,8 @@ export default class AnimationSheet {
         this._imageUrl = urlImage;
         for (let frameTag of data.meta.frameTags as FrameTag[])
           this._frameTags.set(frameTag.name, frameTag);
-        this.setFrameTag(data.meta.frameTags[0].name);
+        if (this._initialTag === '') this.setFrameTag(data.meta.frameTags[0].name);
+        else this.setFrameTag(this._initialTag);
       }
     });
   }
@@ -68,12 +72,19 @@ export default class AnimationSheet {
 
     // Draw
     let frame = this._frames[this._currentFrameIndex].frame;
+    //ui.beginTemp(rect.width, rect.height);
+    //ui.applyFilters(this._filters);
+    //ui.drawSprite(new Rectangle(0, 0, rect.width, rect.height), frame, this._imageUrl);
+    //ui.closeTemp(rect.x1, rect.y1);
     ui.drawSprite(rect, frame, this._imageUrl);
   }
 
   public setFrameTag(name: string): AnimationSheet {
     //console.log('frameTag=' + name);
-    if (this._frames.length <= 0 || (this._currentTag !== null && this._currentTag.name === name)) return this;
+    if (this._frames.length <= 0 || (this._currentTag !== null && this._currentTag.name === name)) {
+      this._initialTag = name;
+      return this;
+    }
     this._currentTag = this._frameTags.get(name);
     this._currentFrameIndex = this._currentTag.from;
     this._currentDirectionForward = this._currentTag.direction !== 'reverse';
@@ -83,6 +94,18 @@ export default class AnimationSheet {
 
   public setDurationMultipler(multiplier: number): AnimationSheet {
     this._durationMultiplier = multiplier;
+    return this;
+  }
+
+  public replaceColor(original: Color, replacement: Color): AnimationSheet {
+    for (let filter of this._filters) { // Set replacement to null to remove
+      if (filter !instanceof FilterReplaceColor) continue;
+      if ((filter as FilterReplaceColor).originalColor === original) {
+        (filter as FilterReplaceColor).replacementColor = replacement;
+        return;
+      }
+    }
+    this._filters.push(new FilterReplaceColor(original, replacement));
     return this;
   }
 }

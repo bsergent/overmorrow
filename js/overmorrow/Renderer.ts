@@ -7,30 +7,41 @@ import { Controller, EventTypes, InputEvent } from 'overmorrow/Controller';
 import UIComponent from 'overmorrow/ui/UIComponent';
 import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
+import { Filter } from './primitives/Filter';
 declare var DEBUG;
 
 export default class Renderer {
   private _canvasActive: JQuery;
   private _canvasBuffer: JQuery;
+  private _canvasTemp: JQuery;
   private _contextActive: any;
   private _contextBuffer: any;
+  private _contextTemp: any;
+  private _context: any;
   private _imageCache: Map<string, HTMLImageElement> = new Map();
   private _components: UIComponent[][] = [];
   private _width: number;
   private _height: number;
+  private _filters: Filter[] = []; // Applied to the temp canvas
 
-  constructor(canvasActive: JQuery, canvasBuffer: JQuery, controller: Controller) {
+  constructor(canvasActive: JQuery, canvasBuffer: JQuery, canvasTemp: JQuery, controller: Controller) {
     this._canvasActive = canvasActive;
     this._canvasBuffer = canvasBuffer;
-    if (canvasActive !== null) {
+    this._canvasTemp = canvasTemp;
+    if (this._canvasActive !== null && this._canvasActive.length > 0) {
       this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
       this._width = this._canvasActive.width();
       this._height = this._canvasActive.height();
     }
-    if (canvasBuffer !== null) {
+    if (this._canvasBuffer !== null && this._canvasBuffer.length > 0) {
       this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('2d');
       this._contextBuffer.imageSmoothingEnabled = false;
     }
+    if (this._canvasTemp !== null && this._canvasTemp.length > 0) {
+      this._contextTemp = (this._canvasTemp[0] as HTMLCanvasElement).getContext('2d');
+      this._contextTemp.imageSmoothingEnabled = false;
+    }
+    this._context = this._contextBuffer;
     if (controller !== null)
       controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
   }
@@ -103,26 +114,26 @@ export default class Renderer {
   }
 
   public setAA(enable: boolean): void {
-    this._contextBuffer.imageSmoothingEnabled = enable;
+    this._context.imageSmoothingEnabled = enable;
   }
 
   public translateContext(x: number, y: number): void {
-    this._contextBuffer.translate(x ,y);
+    this._context.translate(x ,y);
   }
 
   public drawRect(rect: Rectangle, color: Color): void {
-    this._contextBuffer.beginPath();
-    this._contextBuffer.fillStyle = color.rgba;
+    this._context.beginPath();
+    this._context.fillStyle = color.rgba;
     // Start with x,y on original canvas
     // Translate by the viewPort x,y
     // Scale to fill viewPort
-    this._contextBuffer.rect(
+    this._context.rect(
         rect.x1,
         rect.y1,
         rect.width,
         rect.height);
-    this._contextBuffer.fill();
-    this._contextBuffer.closePath();
+    this._context.fill();
+    this._context.closePath();
   }
 
   public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
@@ -130,10 +141,10 @@ export default class Renderer {
       this._imageCache.set(url, new Image());
       this._imageCache.get(url).src = url;
     }
-    this._contextBuffer.globalAlpha = opacity;
+    this._context.globalAlpha = opacity;
     // TODO Implement rotation
-    this._contextBuffer.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
-    this._contextBuffer.globalAlpha = 1;
+    this._context.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
+    this._context.globalAlpha = 1;
   }
 
   public drawSprite(rect: Rectangle, drect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
@@ -141,27 +152,79 @@ export default class Renderer {
       this._imageCache.set(url, new Image());
       this._imageCache.get(url).src = url;
     }
-    this._contextBuffer.globalAlpha = opacity;
+    this._context.globalAlpha = opacity;
     // TODO Implement rotation
+    // TODO Implement colorization and color replacement
     if (drect.width === 0 && drect.height === 0)
-      this._contextBuffer.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
+      this._context.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
     else
-      this._contextBuffer.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);
-    this._contextBuffer.globalAlpha = 1;
+      this._context.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);
+    this._context.globalAlpha = 1;
   }
 
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
     if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), Color.red);
-    this._contextBuffer.beginPath();
-    this._contextBuffer.fillStyle = color.rgba;
-    this._contextBuffer.textAlign = alignment;
-    this._contextBuffer.textBaseline = 'hanging';
-    this._contextBuffer.font = size + 'px ' + font;
-    this._contextBuffer.fillText(text, rect.x1, rect.y1);
-    this._contextBuffer.closePath();
+    this._context.beginPath();
+    this._context.fillStyle = color.rgba;
+    this._context.textAlign = alignment;
+    this._context.textBaseline = 'hanging';
+    this._context.font = size + 'px ' + font;
+    this._context.fillText(text, rect.x1, rect.y1);
+    this._context.closePath();
   }
 
   public drawBuffer(): void {
     this._contextActive.drawImage(this._canvasBuffer[0], 0, 0);
   }
+
+  public beginTemp(width: number, height: number): void {
+    if (this._contextTemp === undefined) return;
+    this._canvasTemp.width(width);
+    this._canvasTemp.height(height);
+    this._contextTemp = (this._canvasTemp[0] as HTMLCanvasElement).getContext('2d');
+    this._contextTemp.imageSmoothingEnabled = false;
+    this._context = this._contextTemp;
+    this._context.clearRect(0, 0, this._canvasTemp.width(), this._canvasTemp.height());
+    //this._context.clearRect(0, 0, this._width, this._height);
+  }
+  
+  public closeTemp(x: number, y: number): void {
+    if (this._context === undefined || this._context !== this._contextTemp) return;
+
+    // Apply filters
+    let imageData = this._context.getImageData(0, 0, this._width, this._height);
+    let pixelChannels = imageData.data;
+    let pixel: Color;
+    for (let i = 0; i < pixelChannels.length; i+= 4) {
+      pixel = new Color(pixelChannels[i],
+        pixelChannels[i+1],
+        pixelChannels[i+2],
+        pixelChannels[i+3] / 255);
+      for (let f of this._filters)
+        pixel = f.apply(pixel);
+      pixelChannels[i  ] = pixel.rgbaObject.r;
+      pixelChannels[i+1] = pixel.rgbaObject.g;
+      pixelChannels[i+2] = pixel.rgbaObject.b;
+      pixelChannels[i+3] = Math.floor(pixel.rgbaObject.a * 255);
+    }
+    this._context.clearRect(0, 0, this._canvasTemp.width(), this._canvasTemp.height());
+    this._context.putImageData(imageData, 0, 0);
+
+    // Draw the filtered image to the main canvas
+    this._context = this._contextBuffer;
+    this._context.drawImage(this._canvasTemp[0], x, y);
+  }
+
+  public applyFilter(filter: Filter): void {
+    this._filters.push(filter);
+  }
+
+  public applyFilters(filters: Filter[]): void {
+    this._filters = this._filters.concat(filters);
+  }
+
+  public clearFilters(): void {
+    this._filters = [];
+  }
 }
+
