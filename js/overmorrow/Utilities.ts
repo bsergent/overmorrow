@@ -59,7 +59,11 @@ export enum Direction {
   UP = 2,
   RIGHT = 3,
   DOWN = 0, 
-  LEFT = 1
+  LEFT = 1,
+  DOWNLEFT = 0.5,
+  UPLEFT = 1.5,
+  UPRIGHT = 2.5,
+  DOWNRIGHT = 3.5
 }
 
 export class Perlin {

@@ -13,6 +13,7 @@ export default abstract class Entity extends Rectangle {
 	private _image: AnimationSheet;
 	private _speed1: number;
 	private _speed2: number;
+	protected _collidable: boolean = true;
 
 	public facing: Direction = Direction.DOWN;
 	public vel: Vector = new Vector(0, 0);
@@ -91,5 +92,9 @@ export default abstract class Entity extends Rectangle {
 
 	get type(): string {
 		return this._type;
+	}
+
+	get collidable(): boolean {
+		return this._collidable;
 	}
 }

@@ -117,6 +117,11 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
     this._renderer.drawRect(this.rectToViewPort(rect), color);
   }
 
+  public drawRectWire(rect: Rectangle, color: Color): void {
+    if (!this.isOnScreen(rect)) return;
+    this._renderer.drawRectWire(this.rectToViewPort(rect), color);
+  }
+
   public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
     if (!this.isOnScreen(rect)) return;
     this._renderer.drawImage(this.rectToViewPort(rect), url, rotationDeg, opacity);

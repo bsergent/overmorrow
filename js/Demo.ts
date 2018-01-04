@@ -13,6 +13,8 @@ import EntityPlayer from 'overmorrow/classes/EntityPlayer';
 import UIImage from './overmorrow/ui/UIImage';
 import Rectangle from './overmorrow/primitives/Rectangle';
 import AnimationSheet from './overmorrow/classes/AnimationSheet';
+import EntityItem from './overmorrow/classes/EntityItem';
+import Item, { ItemType } from './overmorrow/classes/Item';
 
 class Demo {
   public static main(): void {
@@ -27,7 +29,7 @@ class Demo {
     drawLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(drawLabel, 10);
     
-    let playerPosLabel = new UILabel(0, renderer.getHeight() - 14, '0,0');
+    let playerPosLabel = new UILabel(0, 0, '0,0');
     playerPosLabel.setAlignment('left').setColor(Color.white);
     renderer.addComponent(playerPosLabel, 10);
 
@@ -63,13 +65,17 @@ class Demo {
       renderer.removeComponent(panel);
     });
     panel.addComponent(closeButton, 0);
-    renderer.addComponent(panel, 1);
+    renderer.addComponent(panel, 2);
 
 
     //let world = new World(16, 16);
     let world = new WorldTiled('assets/dungeonEntrance.json');
+    world.addEntity(new EntityItem(15, 29, new Item(ItemType.SWORD_OBSIDIAN)));
+    world.addEntity(new EntityItem(14, 26, new Item(ItemType.BOOK_OF_WYNN), 10));
     let player = new EntityPlayer(15, 31, 'Wake');
+    player.itemRight = new Item(ItemType.SWORD_OBSIDIAN);
     world.addEntity(player);
+    player.health -= 70;
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
     darkblade.setEyeColor(Color.green);
     world.addEntity(darkblade);
@@ -82,6 +88,18 @@ class Demo {
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
+
+    let healthBarBorder = new UIImage(0, renderer.getHeight() - 32, 212, 32, 'assets/health_bd.png');
+    let healthBarBackground = new UIImage(6, renderer.getHeight() - 26, 200, 20, 'assets/health_bg.png');
+    let healthBarForeground = new UIImage(6, renderer.getHeight() - 26, 200, 20, 'assets/health_fg.png');
+    let healthBarText = new UILabel(106, renderer.getHeight() - 24, '100/100');
+    healthBarText.setAlignment('center');
+    healthBarText.setSize(20);
+    healthBarText.setColor(Color.white);
+    renderer.addComponent(healthBarBorder, 1);
+    renderer.addComponent(healthBarBackground, 1);
+    renderer.addComponent(healthBarForeground, 1);
+    renderer.addComponent(healthBarText, 1);
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)
@@ -142,6 +160,8 @@ class Demo {
       $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
       drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
+      healthBarForeground.width = player.health / player.maxHealth * 200;
+      healthBarText.setText(`${player.health} / ${player.maxHealth}`);
       
       setTimeout(update, timekeep.getTimeToWait());
       // TODO Also handle multiplayer stuff in here somewhere, queuing to world

@@ -136,6 +136,11 @@ export default class Renderer {
     this._context.closePath();
   }
 
+  public drawRectWire(rect: Rectangle, color: Color): void {
+    this._context.strokeStyle = color.rgba;
+    this._context.strokeRect(rect.x1, rect.y1, rect.width, rect.height);
+  }
+
   public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
     if (!this._imageCache.has(url)) {
       this._imageCache.set(url, new Image());

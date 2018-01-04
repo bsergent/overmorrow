@@ -1,20 +1,23 @@
-import Entity from 'overmorrow/classes/Entity';
+import EntityLiving from 'overmorrow/classes/EntityLiving';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Color from 'overmorrow/primitives/Color';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import World from 'overmorrow/classes/World';
+import Item from './Item';
 
-export default class EntityPlayer extends Entity {
+export default class EntityPlayer extends EntityLiving {
   private _username: string;
   private _aniSheet: AnimationSheet;
+  public itemRight: Item = null;
+  public itemLeft: Item = null;
 
   get username(): string {
     return this._username;
   }
 
   constructor(x: number, y: number, username: string) {
-    super(x, y, 1, 1, 'player', 0.10, 0.15);
+    super(x, y, 1, 1, 'player', 0.10, 0.15, 100);
     this._username = username;
     this._aniSheet = new AnimationSheet('assets/player.png').setDurationMultipler(1);
   }
@@ -26,6 +29,11 @@ export default class EntityPlayer extends Entity {
 
 	public draw(ui: WorldRenderer): void {
     // Should already be offset by viewport, so draw relative to world
+    if (DEBUG)
+      ui.drawRectWire(this, Color.green);
+    // TODO Render the item in the correct location by decoding the item layer of the AnimationSheet
+    if (this.itemRight !== null)
+      ui.drawImage(this.clone().offset(10 / 16, -3 / 16), this.itemRight.image);
     this._aniSheet.draw(ui, this);
     ui.drawText(this.clone().offset(this.width / 2, 1.1), this._username, 'Courier', 12, Color.white, 'center');
   }

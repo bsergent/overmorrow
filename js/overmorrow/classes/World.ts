@@ -8,7 +8,7 @@ import Tile from 'overmorrow/classes/Tile';
 
 export default class World implements Tickable {
 	private _name;
-	protected _entities: Entity[] = [];
+	protected _entities: Entity[] = []; // TODO Add draw order to entities
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
 	private _tiles: Tile[][]; // Tile information
 	protected _collision: boolean[][];
@@ -53,6 +53,29 @@ export default class World implements Tickable {
 		this._entities.push(entity);
 	}
 
+	public getEntityAt(x: number, y: number): Entity {
+		for (let e of this._entities)
+			if (e.inside(x, y))
+				return e;
+		return null;
+	}
+
+	public getEntitiesByRaycast(x: number, y: number, dir: number, maxDistance: number, checkCollision: boolean): Entity[] {
+		// Return list of all entities in the specified direction ordered by distance from caster
+		throw new Error("Method not implemented.");
+	}
+
+	public removeEntity(entity: Entity): boolean {
+		// Returns false if entity could not be found
+		for (let e = 0; e < this._entities.length; e++) {
+			if (this._entities[e] === entity) {
+				this._entities.splice(e, 1);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public getTileAt(x: number, y: number): Tile {
 		return this._tiles[y][x];
 	}
@@ -83,7 +106,9 @@ export default class World implements Tickable {
 		for (let e of this._entities) {
 			// Track current location to collision map
 			if (e.y1 < 0 || e.y2 > this._height || e.x1 < 0 || e.x2 > this._width)
-			e.revertMovement();
+				e.revertMovement();
+			if (!e.collidable)
+				continue;
 			this._entityCollision[Math.floor(e.y1)][Math.floor(e.x1)].push(e.id);
 			this._entityCollision[Math.ceil(e.y1)][Math.ceil(e.x1)].push(e.id);
     }
