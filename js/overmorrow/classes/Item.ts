@@ -1,12 +1,13 @@
 import World from "./World";
 import EntityLiving from "./EntityLiving";
-import { toTitleCase } from "../Utilities";
+import { toTitleCase, directionToVector } from "../Utilities";
 
 export default class Item {
   public quantity: number;
   public quality: ItemQuality;
   public name: string;
   public description: string;
+  public power: number;
 
   private _type: ItemType;
 
@@ -19,6 +20,8 @@ export default class Item {
       this.name = type.name;
     if (this._type === undefined || this.description === this._type.description)
       this.description = type.description;
+    if (this._type === undefined || this.power === this._type.power)
+      this.power = type.power;
     this._type = type;
   }
   public get image(): string {
@@ -130,6 +133,9 @@ export class ItemType {
         // TODO Finish the default attack with melee weapon
         // Get entities in range and direction facing
         // Call defendAgainst() on them
+        for (let e of world.getEntitiesAt(user.x1 + directionToVector(user.direction).x, user.y1 + directionToVector(user.direction).y))
+          if (e instanceof EntityLiving)
+            (e as EntityLiving).defendAgainst(user, item, user.direction + 180);
       }
     }
     return this;

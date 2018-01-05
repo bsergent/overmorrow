@@ -17,6 +17,7 @@ export class Controller {
       mouseEvent.x = event.clientX - canvas.position().left;
       mouseEvent.y = event.clientY - canvas.position().top;
       this.queueInput(mouseEvent);
+      return false;
     });
     canvas.mouseup(event => {
       let mouseEvent = new InputEvent(event);

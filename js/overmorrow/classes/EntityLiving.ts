@@ -45,15 +45,16 @@ export default abstract class EntityLiving extends Entity {
     world.removeEntity(this);
   }
 
-  protected useItem(world: World, item: Item): void {
+  public useItem(world: World, item: Item): void {
     item.type.action(item, world, this);
   }
 
-  public defendAgainst(attacker: EntityLiving, item: Item, direction: number): void {
+  public defendAgainst(attacker: EntityLiving, item: Item, degrees: number): void {
     // Handle combat and damage
     // Check blocking direction
     // Check is item can even block
-    throw new Error("Method not implemented.");
+    //throw new Error("Method not implemented.");
+    this._health -= item.power;
   }
 
   public giveItem(item: Item): Item {

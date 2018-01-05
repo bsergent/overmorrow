@@ -53,14 +53,15 @@ export default class World implements Tickable {
 		this._entities.push(entity);
 	}
 
-	public getEntityAt(x: number, y: number): Entity {
+	public getEntitiesAt(x: number, y: number): Entity[] {
+		let entities: Entity[] = [];
 		for (let e of this._entities)
 			if (e.inside(x, y))
-				return e;
-		return null;
+				entities.push(e);
+		return entities;
 	}
 
-	public getEntitiesByRaycast(x: number, y: number, dir: number, maxDistance: number, checkCollision: boolean): Entity[] {
+	public getEntitiesByRaycast(x: number, y: number, degrees: number, maxDistance: number, checkCollision: boolean): Entity[] {
 		// Return list of all entities in the specified direction ordered by distance from caster
 		throw new Error("Method not implemented.");
 	}

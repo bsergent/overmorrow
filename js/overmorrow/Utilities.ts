@@ -1,4 +1,5 @@
 import * as moment from '../../node_modules/moment/moment';
+import Vector from './primitives/Vector';
 
 export class TimeKeep {
   public lastTwentyTickTimes: number[] = [];
@@ -93,6 +94,56 @@ export function degreesToDirection(degrees: number): Direction { // Assuming 0de
     Direction.EAST
   ];
   return directions[Math.floor(degrees)];
+}
+
+export function facingToDirection(facing: Facing): Direction {
+  switch (facing) {
+    case Facing.DOWN:
+      return Direction.SOUTH;
+    case Facing.LEFT:
+      return Direction.WEST;
+    case Facing.UP:
+      return Direction.NORTH;
+    case Facing.RIGHT:
+      return Direction.EAST;
+  }
+}
+
+export function directionToVector(dir: Direction): Vector {
+  // Returns unit vector in the direction
+  let vec = new Vector(0, 0);
+  switch (dir) {
+    case Direction.SOUTH:
+      vec.y = 1;
+      break;
+    case Direction.SOUTHWEST:
+      vec.x = -1;
+      vec.y = 1;
+      break;
+    case Direction.WEST:
+      vec.x = -1;
+      break;
+    case Direction.NORTHWEST:
+      vec.x = -1;
+      vec.y = -1;
+      break;
+    case Direction.NORTH:
+      vec.y = -1;
+      break;
+    case Direction.NORTHEAST:
+      vec.x = 1;
+      vec.y = -1;
+      break;
+    case Direction.EAST:
+      vec.x = 1;
+      break;
+    case Direction.SOUTHEAST:
+      vec.x = 1;
+      vec.y = 1;
+      break;
+  }
+  vec.magnitude = 1;
+  return vec;
 }
 
 export class Perlin {

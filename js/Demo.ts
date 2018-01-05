@@ -1,7 +1,7 @@
 import $ = require('jquery');
 import { Controller, Keys, EventTypes, InputEvent } from 'overmorrow/Controller';
 import Renderer from 'overmorrow/Renderer';
-import { TimeKeep, Direction, degreesToDirection } from 'overmorrow/Utilities';
+import { TimeKeep, Direction, degreesToDirection, facingToDirection } from 'overmorrow/Utilities';
 import Color from 'overmorrow/primitives/Color';
 import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
@@ -31,7 +31,7 @@ class Demo {
     drawLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(drawLabel, 10);
     
-    let playerPosLabel = new UILabel(0, 0, '0,0,SOUTH');
+    let playerPosLabel = new UILabel(0, 0, '0,0');
     playerPosLabel.setAlignment('left').setColor(Color.white);
     renderer.addComponent(playerPosLabel, 10);
 
@@ -94,9 +94,9 @@ class Demo {
       .setPower(5)
       .setRange(4)
       .setAction(function (item: Item, world: World, user: EntityLiving) {
-        for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.facing, item.type.range, true))
+        for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.direction, item.type.range, true))
           if (e instanceof EntityLiving)
-            (e as EntityLiving).defendAgainst(user, item, user.facing + 2);
+            (e as EntityLiving).defendAgainst(user, item, user.direction + 180);
       });
 
     // Build world
@@ -118,6 +118,7 @@ class Demo {
         darkblade.velIntended.x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
       else
         darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
+      darkblade.direction = facingToDirection(darkblade.facing);
     }, 3000);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
@@ -184,6 +185,11 @@ class Demo {
         let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
         player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
       });
+    controller.addListener(EventTypes.MOUSEDOWN)
+      .setKeys([Keys.MOUSE_LEFT])
+      .setAction(event => {
+        player.useItem(world, player.itemRight);
+      });
 
     console.log('Initialized');
 
@@ -194,7 +200,7 @@ class Demo {
       timekeep.startUpdate();
       controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta())); // Pass timekeep.getDelta() to world
-      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2) + ',' + Direction[player.direction]);
+      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
