@@ -1,7 +1,7 @@
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import World from 'overmorrow/classes/World';
-import { Direction } from 'overmorrow/Utilities';
+import { Facing } from 'overmorrow/Utilities';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Vector from 'overmorrow/primitives/Vector';
 
@@ -11,21 +11,19 @@ export default abstract class Entity extends Rectangle {
 	private _type: string;
 	private _id: number;
 	private _image: AnimationSheet;
-	private _speed1: number;
-	private _speed2: number;
+	private _speed: number;
 	protected _collidable: boolean = true;
 
-	public facing: Direction = Direction.DOWN;
+	public facing: Facing = Facing.DOWN;
 	public vel: Vector = new Vector(0, 0);
 	public velIntended: Vector = new Vector(0, 0);
 	public prevPos: Vector;
 
-	constructor(x: number, y: number, width: number, height: number, type: string, speed1: number, speed2: number) {
+	constructor(x: number, y: number, width: number, height: number, type: string, speed: number) {
 		super(x, y, width, height);
 		this.prevPos = new Vector(x, y);
 		this._type = type;
-		this._speed1 = speed1;
-		this._speed2 = speed2;
+		this._speed = speed;
 		this._id = Entity._nextId++;
 	}
 
@@ -43,13 +41,13 @@ export default abstract class Entity extends Rectangle {
 		
 		// Handle facing
 		if (this.velIntended.y > 0) {
-			this.facing = Direction.DOWN;
+			this.facing = Facing.DOWN;
 		} else if (this.velIntended.x < 0) {
-			this.facing = Direction.LEFT;
+			this.facing = Facing.LEFT;
 		} else if (this.velIntended.y < 0) {
-			this.facing = Direction.UP;
+			this.facing = Facing.UP;
 		} else if (this.velIntended.x > 0) {
-			this.facing = Direction.RIGHT;
+			this.facing = Facing.RIGHT;
 		}
 
 		// Attempt to align to grid and stop
@@ -78,12 +76,8 @@ export default abstract class Entity extends Rectangle {
 		// TODO Make sure entity is realigned to grid
 	}
 
-	get speed1(): number {
-		return this._speed1;
-	}
-
-	get speed2(): number {
-		return this._speed2;
+	get speed(): number {
+		return this._speed;
 	}
 
 	get id(): number {

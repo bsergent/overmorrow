@@ -55,17 +55,17 @@ export class TimeKeep {
   }
 }
 
-export enum Direction {
+export enum Facing {
   UP = 2,
   RIGHT = 3,
   DOWN = 0, 
   LEFT = 1,
-  DOWNLEFT = 0.5,
-  UPLEFT = 1.5,
-  UPRIGHT = 2.5,
-  DOWNRIGHT = 3.5
 }
 
 export class Perlin {
 
+}
+
+export function toTitleCase(str: string): string {
+    return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }

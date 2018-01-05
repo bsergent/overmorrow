@@ -4,6 +4,7 @@ export default class Color {
   public static red = new Color(255,0,0);
   public static green = new Color(0,255,0);
   public static blue = new Color(0,0,255);
+  public static brown = new Color(76,55,24);
   public static transparent = new Color(0,0,0,0);
   private r:number; // 0-255
   private g:number; // 0-255

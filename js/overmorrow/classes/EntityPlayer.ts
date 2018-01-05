@@ -5,6 +5,7 @@ import Color from 'overmorrow/primitives/Color';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import World from 'overmorrow/classes/World';
 import Item from './Item';
+import Inventory from './Inventory';
 
 export default class EntityPlayer extends EntityLiving {
   private _username: string;
@@ -20,6 +21,7 @@ export default class EntityPlayer extends EntityLiving {
     super(x, y, 1, 1, 'player', 0.10, 0.15, 100);
     this._username = username;
     this._aniSheet = new AnimationSheet('assets/player.png').setDurationMultipler(1);
+    this._inventory = new Inventory(20);
   }
 
   public setEyeColor(color: Color): EntityPlayer {
@@ -29,8 +31,11 @@ export default class EntityPlayer extends EntityLiving {
 
 	public draw(ui: WorldRenderer): void {
     // Should already be offset by viewport, so draw relative to world
-    if (DEBUG)
+    if (DEBUG) {
       ui.drawRectWire(this, Color.green);
+      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.red);
+      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.green);
+    }
     // TODO Render the item in the correct location by decoding the item layer of the AnimationSheet
     if (this.itemRight !== null)
       ui.drawImage(this.clone().offset(10 / 16, -3 / 16), this.itemRight.image);
@@ -39,7 +44,7 @@ export default class EntityPlayer extends EntityLiving {
   }
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);
-    this._aniSheet.setDurationMultipler(this.velIntended.magnitude === this.speed1 ? 1 : this.speed2 / this.speed1);
+    this._aniSheet.setDurationMultipler(this.velIntended.magnitude === this.speed ? 1 : this.speedSprint / this.speed);
     if (this.x1 === 2)
       this._aniSheet.setFrameTag('action_0');
     else {

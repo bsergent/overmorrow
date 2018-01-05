@@ -48,7 +48,7 @@
 		<div id="game-container">
 			<canvas id="game" width="800" height="600" tabfocus="1" style=""></canvas>
 			<canvas id="buffer" width="800" height="600" tabfocus="1" style="visibility:hidden; display:none;"></canvas>
-			<canvas id="temp" width="800" height="600" tabfocus="1" style=""></canvas>
+			<canvas id="temp" width="800" height="600" tabfocus="1" style="visibility:hidden; display:none;"></canvas>
 		</div>
 		<p><a href="https://github.com/bsergent/overmorrow">Overmorrow on GitHub</a> TPS=<span id="tps"></span></p>
 	</body>
