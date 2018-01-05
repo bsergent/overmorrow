@@ -4,6 +4,7 @@ import Color from 'overmorrow/primitives/Color';
 import UIComponent from 'overmorrow/ui/UIComponent';
 import World from 'overmorrow/classes/World';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
+import Vector from '../primitives/Vector';
 
 export default class UIWorld extends UIComponent {
   private _worldRenderer: WorldRenderer = null;
@@ -83,14 +84,14 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
     this.tileScale = tileScale;
   }
 
-  private isOnScreen(rect: Rectangle) {
+  private isOnScreen(rect: Rectangle): boolean {
     return rect.x1 * this.tileScale < this.viewport.x2
       && rect.y1 * this.tileScale < this.viewport.y2
       && rect.x2 * this.tileScale > this.viewport.x1
       && rect.y2 * this.tileScale > this.viewport.y1;
   }
 
-  private rectToViewPort(rect: Rectangle) {
+  private rectToViewPort(rect: Rectangle): Rectangle {
     let rect2 = rect.clone();
     rect2.x1 *= this.tileScale;
     rect2.y1 *= this.tileScale;

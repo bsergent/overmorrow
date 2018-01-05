@@ -47,6 +47,8 @@ export class Controller {
     });
     canvas.mousemove(event => {
       let mouseEvent = new InputEvent(event);
+      mouseEvent.x = event.clientX - canvas.position().left;
+      mouseEvent.y = event.clientY - canvas.position().top;
       mouseEvent.dx = this.mousePosX - event.clientX;
       mouseEvent.dy = this.mousePosY - event.clientY;
       this.mousePosX = event.clientX;
@@ -62,7 +64,7 @@ export class Controller {
   public processInput(): void {
     for (let e of this.inputQueue) {
       for (let l of this.listeners) {
-        if (l.type === EventTypes.ALL || (l.type === e.type && l.keys.indexOf(e.key) !== -1)) {
+        if (l.type === EventTypes.ALL || (l.type === e.type && (l.keys === undefined || l.keys.indexOf(e.key) !== -1))) {
           l.action(e);
         }
       }

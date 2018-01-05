@@ -11,13 +11,13 @@ export default abstract class Entity extends Rectangle {
 	private _type: string;
 	private _id: number;
 	private _image: AnimationSheet;
-	private _speed: number;
+	protected _speed: number;
 	protected _collidable: boolean = true;
 
-	public facing: Facing = Facing.DOWN;
-	public vel: Vector = new Vector(0, 0);
-	public velIntended: Vector = new Vector(0, 0);
-	public prevPos: Vector;
+	public facing: Facing = Facing.DOWN; // Current facing of sprite
+	public vel: Vector = new Vector(0, 0); // Current velocity
+	public velIntended: Vector = new Vector(0, 0); // Velocity that should be used when aligned and not colliding
+	public prevPos: Vector; // Position at beginning of previous tick
 
 	constructor(x: number, y: number, width: number, height: number, type: string, speed: number) {
 		super(x, y, width, height);

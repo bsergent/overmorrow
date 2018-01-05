@@ -6,6 +6,7 @@ import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import World from 'overmorrow/classes/World';
 import Item from './Item';
 import Inventory from './Inventory';
+import { Direction } from '../Utilities';
 
 export default class EntityPlayer extends EntityLiving {
   private _username: string;
@@ -35,6 +36,47 @@ export default class EntityPlayer extends EntityLiving {
       ui.drawRectWire(this, Color.green);
       ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.red);
       ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.green);
+      let xDir: number = 0;
+      let yDir: number = 0;
+      let offset: number = 0.5;
+      switch (this.direction) {
+        case Direction.SOUTH:
+          yDir = offset;
+          break;
+        case Direction.SOUTHWEST:
+          xDir = -offset;
+          yDir = offset;
+          break;
+        case Direction.WEST:
+          xDir = -offset;
+          break;
+        case Direction.NORTHWEST:
+          xDir = -offset;
+          yDir = -offset;
+          break;
+        case Direction.NORTH:
+          yDir = -offset;
+          break;
+        case Direction.NORTHEAST:
+          xDir = offset;
+          yDir = -offset;
+          break;
+        case Direction.EAST:
+          xDir = offset;
+          break;
+        case Direction.SOUTHEAST:
+          xDir = offset;
+          yDir = offset;
+          break;
+      }
+      ui.drawRect(
+        new Rectangle(
+          this.x1 + this.width / 2 + xDir - 0.02,
+          this.y1 + this.height / 2 + yDir - 0.02,
+          0.04,
+          0.04),
+        Color.green
+      );
     }
     // TODO Render the item in the correct location by decoding the item layer of the AnimationSheet
     if (this.itemRight !== null)
@@ -45,13 +87,9 @@ export default class EntityPlayer extends EntityLiving {
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);
     this._aniSheet.setDurationMultipler(this.velIntended.magnitude === this.speed ? 1 : this.speedSprint / this.speed);
-    if (this.x1 === 2)
-      this._aniSheet.setFrameTag('action_0');
-    else {
-      if (this.vel.magnitude === 0)
-        this._aniSheet.setFrameTag('idle_' + this.facing);
-      else
-        this._aniSheet.setFrameTag('walk_' + this.facing);
-    }
+    if (this.vel.magnitude === 0)
+      this._aniSheet.setFrameTag('idle_' + this.facing);
+    else
+      this._aniSheet.setFrameTag('walk_' + this.facing);
   }
 }

@@ -23,7 +23,7 @@ export default class EntityItem extends Entity {
 
   public draw(ui: WorldRenderer): void {
     if (DEBUG)
-      ui.drawRectWire(this.clone().offset(0, (1 - this._pulseOffset) / 4), this._pulseSpeed < 0.05 ? Color.green : Color.red);
+      ui.drawRectWire(this.clone().offset(0, (1 - this._pulseOffset) / 4), this._pulseSpeed < Math.PI * 4 / 16 ? Color.green : Color.red);
     ui.drawImage(
       this.clone().offset(0, (1 - this._pulseOffset) / 4),
       this.item.image,
@@ -38,7 +38,7 @@ export default class EntityItem extends Entity {
       if (diff > 0)
         world.removeEntity(this);
       else if (diff > -5)
-        this._pulseSpeed = Math.PI * 2 / 8;
+        this._pulseSpeed = Math.PI * 4 / 16;
     }
     this._pulseAngle += this._pulseSpeed * delta;
     if (this._pulseAngle > Math.PI * 4) this._pulseAngle -= Math.PI * 4;
@@ -46,7 +46,7 @@ export default class EntityItem extends Entity {
     this._pulseOffset = Math.sin(this._pulseAngle / 2 - Math.PI / 4) * 0.15;
     // Check collision with other EntityLiving
     // Try to pick up if they have inventory space
-    // Remove current EntityItem is picked up
+    // Remove current EntityItem if picked up
     // Probably spawn some "pickup" particles
   }
 }

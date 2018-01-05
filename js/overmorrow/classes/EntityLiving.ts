@@ -5,6 +5,7 @@ import Inventory from './Inventory';
 import Action from './Action';
 import Item, { ItemType } from './Item';
 import EntityItem from './EntityItem';
+import { Direction } from '../Utilities';
 
 export default abstract class EntityLiving extends Entity {
   // Defines entities with inventory that can use items and engage in combat
@@ -12,7 +13,8 @@ export default abstract class EntityLiving extends Entity {
   protected _maxHealth: number;
   protected _action: Action = null;
   protected _inventory: Inventory = null;
-	protected _speedSprint: number;
+  protected _speedSprint: number;
+  public direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
 
   public get health(): number {
     return this._health;
@@ -25,7 +27,7 @@ export default abstract class EntityLiving extends Entity {
   }
 	public get speedSprint(): number {
 		return this._speedSprint;
-	}
+  }
 
   constructor(x: number, y: number, width: number, height: number, type: string, speedWalk: number, speedSprint: number, maxHealth: number) {
     super(x, y, width, height, type, speedWalk);

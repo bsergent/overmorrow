@@ -62,6 +62,39 @@ export enum Facing {
   LEFT = 1,
 }
 
+export enum Direction {
+  SOUTH = 0,
+  SOUTHWEST = 45,
+  WEST = 90,
+  NORTHWEST = 135,
+  NORTH = 180,
+  NORTHEAST = 225,
+  EAST = 270,
+  SOUTHEAST = 315
+}
+
+export function degreesToDirection(degrees: number): Direction { // Assuming 0deg = East, 90deg = South, etc.
+  // Normalize degrees
+  while (degrees < 0) degrees += 360;
+  while (degrees >= 360) degrees -= 360;
+  // Convert to cardinal number
+  degrees += 22.5;
+  degrees /= 45;
+  // Convert to cardinal string
+  var directions = [
+    Direction.EAST,
+    Direction.SOUTHEAST,
+    Direction.SOUTH,
+    Direction.SOUTHWEST,
+    Direction.WEST,
+    Direction.NORTHWEST,
+    Direction.NORTH,
+    Direction.NORTHEAST,
+    Direction.EAST
+  ];
+  return directions[Math.floor(degrees)];
+}
+
 export class Perlin {
 
 }

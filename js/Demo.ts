@@ -1,7 +1,7 @@
 import $ = require('jquery');
-import { Controller, Keys, EventTypes } from 'overmorrow/Controller';
+import { Controller, Keys, EventTypes, InputEvent } from 'overmorrow/Controller';
 import Renderer from 'overmorrow/Renderer';
-import { TimeKeep } from 'overmorrow/Utilities';
+import { TimeKeep, Direction, degreesToDirection } from 'overmorrow/Utilities';
 import Color from 'overmorrow/primitives/Color';
 import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
@@ -16,6 +16,7 @@ import AnimationSheet from './overmorrow/classes/AnimationSheet';
 import EntityItem from './overmorrow/classes/EntityItem';
 import Item, { ItemType, ItemRarity } from './overmorrow/classes/Item';
 import EntityLiving from './overmorrow/classes/EntityLiving';
+import Vector from './overmorrow/primitives/Vector';
 
 class Demo {
   public static main(): void {
@@ -30,7 +31,7 @@ class Demo {
     drawLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(drawLabel, 10);
     
-    let playerPosLabel = new UILabel(0, 0, '0,0');
+    let playerPosLabel = new UILabel(0, 0, '0,0,SOUTH');
     playerPosLabel.setAlignment('left').setColor(Color.white);
     renderer.addComponent(playerPosLabel, 10);
 
@@ -110,7 +111,7 @@ class Demo {
     darkblade.setEyeColor(Color.brown);
     darkblade.giveItem(new Item('book_of_wynn'));
     darkblade.giveItem(new Item('sword_obsidian'));
-    darkblade.health = 0;
+    //darkblade.health = 0;
     world.addEntity(darkblade);
     setInterval(() => {
       if (Math.random() < 0.5)
@@ -177,6 +178,12 @@ class Demo {
         player.velIntended.x = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed;
         player.velIntended.y = 0;
       });
+    controller.addListener(EventTypes.MOUSEMOVE)
+      .setAction((event: InputEvent) => {
+        let px = (player.x1 + 0.5) * uiworld.tileScale - uiworld.viewport.x1;
+        let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
+        player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
+      });
 
     console.log('Initialized');
 
@@ -187,7 +194,7 @@ class Demo {
       timekeep.startUpdate();
       controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta())); // Pass timekeep.getDelta() to world
-      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
+      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2) + ',' + Direction[player.direction]);
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
