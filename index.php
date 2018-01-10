@@ -7,37 +7,37 @@
 		<script data-main="js/config.js" src="js/lib/require.js"></script>
 
 		<style>
-			body {
-				background-color: black;
-				color: #E3BD40;
-        padding-top: 24px;
-        text-align: center;
-        font-family: "Courier New", Courier, monospace;
-      }
-      h1 {
-        margin-bottom: 0px;
-      }
-      p {
-        margin: 0px 0px 15px;
-        font-size: 12px;
-			}
-			a {
-				color: #B38D00;
-			}
-			#game-container {
-				text-align: center;
-				padding: 0px;
-				user-selection: none;
-			}
-			canvas#game {
-				width: 800px;
-				height: 600px;
-				box-shadow: 0px 0px 5px #E3BD40;
-				border: 2px solid #E3BD40;
-				image-rendering: pixelated;
-				background-color: black;
-				user-selection: none;
-			}
+	body {
+		background-color: black;
+		color: #E3BD40;
+		padding-top: 24px;
+		text-align: center;
+		font-family: "Courier New", Courier, monospace;
+	}
+	h1 {
+		margin-bottom: 0px;
+	}
+	p {
+		margin: 0px 0px 15px;
+		font-size: 12px;
+	}
+	a {
+		color: #B38D00;
+	}
+	#game-container {
+		text-align: center;
+		padding: 0px;
+		user-selection: none;
+	}
+	canvas#game {
+		width: 800px;
+		height: 600px;
+		box-shadow: 0px 0px 5px #E3BD40;
+		border: 2px solid #E3BD40;
+		image-rendering: pixelated;
+		background-color: black;
+		user-selection: none;
+	}
 		</style>
 	</head>
 

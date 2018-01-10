@@ -14,15 +14,15 @@ export class Controller {
     });
     canvas.mousedown(event => {
       let mouseEvent = new InputEvent(event);
-      mouseEvent.x = event.clientX - canvas.position().left;
-      mouseEvent.y = event.clientY - canvas.position().top;
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       this.queueInput(mouseEvent);
       return false;
     });
     canvas.mouseup(event => {
       let mouseEvent = new InputEvent(event);
-      mouseEvent.x = event.clientX - canvas.position().left;
-      mouseEvent.y = event.clientY - canvas.position().top;
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       this.queueInput(mouseEvent);
     });
     $(document).keydown(event => {
@@ -48,8 +48,8 @@ export class Controller {
     });
     canvas.mousemove(event => {
       let mouseEvent = new InputEvent(event);
-      mouseEvent.x = event.clientX - canvas.position().left;
-      mouseEvent.y = event.clientY - canvas.position().top;
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       mouseEvent.dx = this.mousePosX - event.clientX;
       mouseEvent.dy = this.mousePosY - event.clientY;
       this.mousePosX = event.clientX;
