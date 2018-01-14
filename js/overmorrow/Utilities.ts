@@ -64,14 +64,14 @@ export enum Facing {
 }
 
 export enum Direction {
-  SOUTH = 0,
-  SOUTHWEST = 45,
-  WEST = 90,
-  NORTHWEST = 135,
-  NORTH = 180,
-  NORTHEAST = 225,
-  EAST = 270,
-  SOUTHEAST = 315
+  EAST = 0,
+  SOUTHEAST = 45,
+  SOUTH = 90,
+  SOUTHWEST = 135,
+  WEST = 180,
+  NORTHWEST = 225,
+  NORTH = 270,
+  NORTHEAST = 315
 }
 
 export function degreesToDirection(degrees: number): Direction { // Assuming 0deg = East, 90deg = South, etc.
@@ -81,7 +81,7 @@ export function degreesToDirection(degrees: number): Direction { // Assuming 0de
   // Convert to cardinal number
   degrees += 22.5;
   degrees /= 45;
-  // Convert to cardinal string
+  // Convert to cardinal direction
   var directions = [
     Direction.EAST,
     Direction.SOUTHEAST,
@@ -142,7 +142,7 @@ export function directionToVector(dir: Direction): Vector {
       vec.y = 1;
       break;
   }
-  vec.magnitude = 1;
+  //vec.magnitude = 1;
   return vec;
 }
 

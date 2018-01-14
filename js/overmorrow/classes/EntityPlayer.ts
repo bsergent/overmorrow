@@ -6,13 +6,11 @@ import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import World from 'overmorrow/classes/World';
 import Item from './Item';
 import Inventory from './Inventory';
-import { Direction, directionToVector } from '../Utilities';
+import { Direction, directionToVector, degreesToDirection } from '../Utilities';
 
 export default class EntityPlayer extends EntityLiving {
   private _username: string;
   private _aniSheet: AnimationSheet;
-  public itemRight: Item = null;
-  public itemLeft: Item = null;
 
   get username(): string {
     return this._username;
@@ -46,12 +44,16 @@ export default class EntityPlayer extends EntityLiving {
           0.04),
         Color.green
       );
+      vec = directionToVector(this.direction);
+      ui.drawRectWire(this.clone().offset(vec.x, vec.y), Color.red);
+      ui.drawRectWire(this.clone().offset(directionToVector(degreesToDirection(this.direction + 45)).x, directionToVector(degreesToDirection(this.direction + 45)).y), Color.red);
+      ui.drawRectWire(this.clone().offset(directionToVector(degreesToDirection(this.direction - 45)).x, directionToVector(degreesToDirection(this.direction - 45)).y), Color.red);
     }
     // TODO Render the item in the correct location by decoding the item layer of the AnimationSheet
-    if (this.itemRight !== null)
-      ui.drawImage(this.clone().offset(10 / 16, -3 / 16), this.itemRight.image);
+    if (this.itemPrimary !== null)
+      ui.drawImage(this.clone().offset(10 / 16, -3 / 16), this.itemPrimary.image);
     this._aniSheet.draw(ui, this);
-    ui.drawText(this.clone().offset(this.width / 2, 1.1), this._username, 'Courier', 12, Color.white, 'center');
+    ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this._username} [${this.id}]`: this._username, 'Courier', 12, Color.white, 'center');
   }
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);

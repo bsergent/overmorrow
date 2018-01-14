@@ -1,6 +1,6 @@
 import World from "./World";
 import EntityLiving from "./EntityLiving";
-import { toTitleCase, directionToVector } from "../Utilities";
+import { toTitleCase, directionToVector, degreesToDirection } from "../Utilities";
 
 export default class Item {
   public quantity: number;
@@ -130,12 +130,21 @@ export class ItemType {
     this._isWeapon = isWeapon;
     if (this._action === null) {
       this._action = function (item: Item, world: World, user: EntityLiving) {
-        // TODO Finish the default attack with melee weapon
-        // Get entities in range and direction facing
-        // Call defendAgainst() on them
+        // TODO Implement range for weapons like spears (will need to also rework defendAgainst() to multiple the attack vector's magnitude by the range)
+        // Call defendAgainst() on all the entities within the attack area
+
+        // Ahead
         for (let e of world.getEntitiesAt(user.x1 + directionToVector(user.direction).x, user.y1 + directionToVector(user.direction).y))
           if (e instanceof EntityLiving)
-            (e as EntityLiving).defendAgainst(user, item, user.direction + 180);
+            (e as EntityLiving).defendAgainst(user, item);
+        // Right
+        for (let e of world.getEntitiesAt(user.x1 + directionToVector(degreesToDirection(user.direction + 45)).x, user.y1 + directionToVector(degreesToDirection(user.direction + 45)).y))
+          if (e instanceof EntityLiving)
+            (e as EntityLiving).defendAgainst(user, item);
+        // Left
+        for (let e of world.getEntitiesAt(user.x1 + directionToVector(degreesToDirection(user.direction - 45)).x, user.y1 + directionToVector(degreesToDirection(user.direction - 45)).y))
+          if (e instanceof EntityLiving)
+            (e as EntityLiving).defendAgainst(user, item);
       }
     }
     return this;

@@ -45,7 +45,7 @@ export default class Rectangle {
   }
 
   inside(x: number, y: number): boolean {
-    return x <= this.x2 && x >= this.x1 && y <= this.y2 && y >= this.y1;
+    return x < this.x2 && x >= this.x1 && y < this.y2 && y >= this.y1;
   }
 
   clone(): Rectangle {

@@ -1,7 +1,7 @@
 import $ = require('jquery');
 import { Controller, Keys, EventTypes, InputEvent } from 'overmorrow/Controller';
 import Renderer from 'overmorrow/Renderer';
-import { TimeKeep, Direction, degreesToDirection, facingToDirection } from 'overmorrow/Utilities';
+import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from 'overmorrow/Utilities';
 import Color from 'overmorrow/primitives/Color';
 import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
@@ -88,7 +88,8 @@ class Demo {
     ItemType.addType('bread')
       .setMaxQuantity(99);
     ItemType.addType('shield_wooden')
-      .setName('Wooden Shield');
+      .setName('Wooden Shield')
+      .setShield(true);
     ItemType.addType('bow')
       .setWeapon(true)
       .setPower(5)
@@ -96,7 +97,7 @@ class Demo {
       .setAction(function (item: Item, world: World, user: EntityLiving) {
         for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.direction, item.type.range, true))
           if (e instanceof EntityLiving)
-            (e as EntityLiving).defendAgainst(user, item, user.direction + 180);
+            (e as EntityLiving).defendAgainst(user, item);
       });
 
     // Build world
@@ -104,22 +105,26 @@ class Demo {
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(15, 31, 'Wake');
-    player.itemRight = new Item('sword_obsidian');
+    player.itemPrimary = new Item('sword_obsidian');
     world.addEntity(player);
     player.health -= 70;
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
     darkblade.setEyeColor(Color.brown);
     darkblade.giveItem(new Item('book_of_wynn'));
-    darkblade.giveItem(new Item('sword_obsidian'));
-    //darkblade.health = 0;
+    darkblade.itemSecondary = new Item('shield_wooden');
     world.addEntity(darkblade);
     setInterval(() => {
-      if (Math.random() < 0.5)
+      /*if (Math.random() < 0.5)
         darkblade.velIntended.x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
       else
         darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
-      darkblade.direction = facingToDirection(darkblade.facing);
+      darkblade.direction = facingToDirection(darkblade.facing);*/
     }, 3000);
+    let gwindor = new EntityPlayer(14, 15, 'Gwindow');
+    gwindor.itemSecondary = new Item('shield_wooden');
+    gwindor.facing = Facing.RIGHT;
+    gwindor.direction = Direction.NORTHEAST;
+    world.addEntity(gwindor);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
@@ -188,7 +193,7 @@ class Demo {
     controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
-        player.useItem(world, player.itemRight);
+        player.useItem(world, player.itemPrimary);
       });
 
     console.log('Initialized');
