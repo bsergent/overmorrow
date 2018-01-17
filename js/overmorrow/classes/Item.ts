@@ -66,8 +66,8 @@ export class ItemType {
   private _description: string;
   private _maxQuantity: number = 1;
   private _rarity: ItemRarity;
-  private _isWeapon: boolean = false;
-  private _isShield: boolean = false;
+  private _canAttack: boolean = false;
+  private _canBlock: boolean = false;
   private _power: number = 0;
   private _range: number = 1;
   private _action: Function = null;
@@ -90,11 +90,11 @@ export class ItemType {
   public get rarity(): ItemRarity {
     return this._rarity;
   }
-  public get isWeapon(): boolean {
-    return this._isWeapon;
+  public get canAttack(): boolean {
+    return this._canAttack;
   }
-  public get isShield(): boolean {
-    return this._isShield;
+  public get canBlock(): boolean {
+    return this._canBlock;
   }
   public get power(): number {
     return this._power;
@@ -127,7 +127,7 @@ export class ItemType {
     return this;
   }
   public setWeapon(isWeapon: boolean): ItemType {
-    this._isWeapon = isWeapon;
+    this._canAttack = isWeapon;
     if (this._action === null) {
       this._action = function (item: Item, world: World, user: EntityLiving) {
         // TODO Implement range for weapons like spears (will need to also rework defendAgainst() to multiple the attack vector's magnitude by the range)
@@ -150,7 +150,7 @@ export class ItemType {
     return this;
   }
   public setShield(isShield: boolean): ItemType {
-    this._isShield = isShield;
+    this._canBlock = isShield;
     return this;
   }
   public setPower(power: number): ItemType {

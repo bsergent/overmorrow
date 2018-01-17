@@ -19,7 +19,25 @@ export default class Vector {
     this.y *= value / magnitude;
   }
 
-  public clone() {
+  public transpose(): void {
+    let tmp = this.x;
+    this.x = this.y;
+    this.y = tmp;
+  }
+  public perpendicular(): void {
+    let tmp = this.x;
+    this.x = this.y;
+    this.y = -tmp;
+  }
+  public invert(): void {
+    this.x *= -1;
+    this.y *= -1;
+  }
+
+  public clone(): Vector {
     return new Vector(this.x, this.y);
+  }
+  public equals(vec: Vector): boolean {
+    return this.x === vec.x && this.y === vec.y;
   }
 }

@@ -104,7 +104,7 @@ class Demo {
     let world = new WorldTiled('assets/dungeonEntrance.json');
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
-    let player = new EntityPlayer(15, 31, 'Wake');
+    let player = new EntityPlayer(12, 19, 'Wake');
     player.itemPrimary = new Item('sword_obsidian');
     world.addEntity(player);
     player.health -= 70;
@@ -204,14 +204,14 @@ class Demo {
     function update() {
       timekeep.startUpdate();
       controller.processInput();
-      timekeep.addTick(world.tick(timekeep.getDelta())); // Pass timekeep.getDelta() to world
+      timekeep.addTick(world.tick(timekeep.getDelta()));
       playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
       drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
-      healthBarForeground.width = player.health / player.maxHealth * 200;
+      healthBarForeground.width = Math.round(player.health) / player.maxHealth * 200;
       healthBarText.setText(`${player.health} / ${player.maxHealth}`);
       
       setTimeout(update, timekeep.getTimeToWait());

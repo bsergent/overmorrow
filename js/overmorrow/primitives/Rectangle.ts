@@ -1,3 +1,5 @@
+import Vector from "./Vector";
+
 export default class Rectangle {
   private _x1: number;
   private _y1: number;
@@ -52,9 +54,19 @@ export default class Rectangle {
     return new Rectangle(this._x1, this._y1, this.width, this.height);
   }
 
+  equals(rect: Rectangle): boolean {
+    return this.x1 === rect.x1 && this.y1 === rect.y1 && this.x2 === rect.x2 && this.y2 === rect.y2;
+  }
+
   offset(x: number, y: number): Rectangle {
     this.x1 += x;
     this.y1 += y;
+    return this;
+  }
+
+  offsetByVector(vec: Vector): Rectangle {
+    this.x1 += vec.x;
+    this.y1 += vec.y;
     return this;
   }
 }
