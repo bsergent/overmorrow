@@ -60,7 +60,7 @@ class UnitTesting {
     let failed: number = 0;
     function compareHealth(value: number, expected: number): boolean {
       if (value !== expected) {
-        console.error(`[FAIL] Incorrect health. Expected ${expected}. Got ${value}.\n  `
+        console.error(`[FAIL:${passed + failed}] Incorrect health. Expected ${expected}. Got ${value}.\n  `
           + (p1.x1 != p2.x1 && p1.y1 != p2.y1 ? 'Diagonal' : 'Horizontal')
           + ` P1=${Direction[p1.direction]}, P2=${Direction[p2.direction]}`);
         failed++;
@@ -103,8 +103,21 @@ class UnitTesting {
     p1.useItem(world, p1.itemPrimary);
     compareHealth(p2.health, p2.maxHealth);
 
+    p2.health = p2.maxHealth;
+    p1.direction = Direction.NORTHEAST;
+    p2.direction = Direction.NORTHWEST;
+    p1.useItem(world, p1.itemPrimary);
+    compareHealth(p2.health, p2.maxHealth - p1.itemPrimary.power / 16);
+
+    p2.health = p2.maxHealth;
+    p1.direction = Direction.EAST;
+    p2.direction = Direction.NORTHWEST;
+    p1.useItem(world, p1.itemPrimary);
+    compareHealth(p2.health, p2.maxHealth - p1.itemPrimary.power);
+
     // Diagonal
     p1.y1 += 1;
+    p2.health = p2.maxHealth;
     p1.direction = Direction.EAST;
     p2.direction = Direction.WEST;
     p1.useItem(world, p1.itemPrimary);
@@ -133,6 +146,18 @@ class UnitTesting {
     p2.direction = Direction.WEST;
     p1.useItem(world, p1.itemPrimary);
     compareHealth(p2.health, p2.maxHealth);
+
+    p2.health = p2.maxHealth;
+    p1.direction = Direction.NORTH;
+    p2.direction = Direction.SOUTHWEST;
+    p1.useItem(world, p1.itemPrimary);
+    compareHealth(p2.health, p2.maxHealth - p1.itemPrimary.power / 2);
+
+    p2.health = p2.maxHealth;
+    p1.direction = Direction.NORTHEAST;
+    p2.direction = Direction.SOUTHWEST;
+    p1.useItem(world, p1.itemPrimary);
+    compareHealth(p2.health, p2.maxHealth - p1.itemPrimary.power / 8);
 
     console.log('Finished unit tests.');
 

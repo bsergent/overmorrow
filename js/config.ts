@@ -1,6 +1,6 @@
 declare var requirejs;
 var DEBUG = false;
-var UNITTEST = true;
+var UNITTEST = false;
 requirejs.config({
   baseUrl: 'js',
   paths: {

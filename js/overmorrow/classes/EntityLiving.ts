@@ -68,41 +68,25 @@ export default abstract class EntityLiving extends Entity {
     // Check direct attack
     if (!attacker.clone().offsetByVector(aVec).intersects(this))
       damage /= 2;
-    // Normalize vectors to same possible directions based on relative positioning
-    // TODO Use rectangles instead
-    /*if (attacker.x1 > this.x2 || attacker.x2 < this.x1)
-      aVec.x *= -1;
-    if (attacker.y1 > this.y2 || attacker.y2 < this.y1)
-      aVec.y *= -1;*/
-    /*if (attacker.x1 != this.x1) {
-      if (aVec.x < 0)
-        aVec.x *= -1;
-      if (dVec.x < 0)
-        dVec.x *= -1;
-    }
-    if (attacker.y1 != this.y1) {
-      if (aVec.y < 0)
-        aVec.y *= -1;
-      if (dVec.y < 0)
-        dVec.y *= -1;
-    }*/
-    /*if (attacker.x1 != this.x1) {
-      aVec.x *= -1;
-    }
-    if (attacker.y1 != this.y1) {
-      aVec.y *= -1;
-    }
-    if (attacker.x1 != this.x1 && attacker.y1 != this.y1)
-      aVec.transpose();
-    // Check blocked
-    if (aVec.equals(dVec) && this.canBlock())
-      damage /= 8;*/
 
-    // TODO Check if vectors intersect at a 0 or 90 degree angle
-    //  Parallel or perpendicular
+    if (DEBUG) {
+      console.log(`xP: ${attacker.x1}-${this.x1} == ${dVec.x}-${aVec.x}`);
+      console.log(`yP: ${attacker.y1}-${this.y1} == ${dVec.y}-${aVec.y}`);
+      console.log(`xV: ${aVec.x}*(=x?1:-1) == ${dVec.x}`);
+      console.log(`yV: ${aVec.y}*(=y?1:-1) == ${dVec.y}`);
+    }
+    // Check if direct block based on relative positions
+    //  No real idea how this works.
+    if (Math.sign(attacker.x1 - this.x1) === Math.sign(dVec.x - aVec.x)
+        && Math.sign(attacker.y1 - this.y1) === Math.sign(dVec.y - aVec.y)
+        && ((aVec.x == 0 && dVec.y === 0)
+          || (aVec.y === 0 && dVec.x === 0)
+          || (aVec.x * (attacker.x1 === this.x1 ? 1 : -1) === dVec.x
+            && aVec.y * (attacker.y1 === this.y1 ? 1 : -1) === dVec.y)))
+      damage /= 8;
 
     this._health -= damage;
-    if (DEBUG) console.log(this.type + ' ' + this.id + ' took ' + damage + ' damage.');
+    if (DEBUG) console.log(`${this.type}#${this.id} took ${damage} damage.`);
   }
 
   public giveItem(item: Item): Item {
