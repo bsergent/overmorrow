@@ -10,15 +10,18 @@ import Vector from '../primitives/Vector';
 
 export default abstract class EntityLiving extends Entity {
   // Defines entities with inventory that can use items and engage in combat
+  private   _fatigueTicks: number = 0;
   protected _health: number;
+  protected _stamina: number;
   protected _maxHealth: number;
+  protected _maxStamina: number;
   protected _action: Action = null;
   protected _inventory: Inventory = null;
   protected _speedSprint: number;
-  public direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
-  public itemPrimary: Item = null;
-  public itemSecondary: Item = null;
-  public action: Action = null;
+  public    direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
+  public    itemPrimary: Item = null;
+  public    itemSecondary: Item = null;
+  public    action: Action = null;
 
   public get health(): number {
     return this._health;
@@ -29,15 +32,30 @@ export default abstract class EntityLiving extends Entity {
   public get maxHealth(): number {
     return this._maxHealth;
   }
+  public get stamina(): number {
+    return this._stamina;
+  }
+  public set stamina(value: number) {
+    if (value < this._stamina)
+      this._fatigueTicks = Math.max(value > 0 ? 20 : 100, this._fatigueTicks);
+    if (value > this._maxStamina)
+      value = this._maxStamina;
+    this._stamina = value < 0 ? 0 : value;
+  }
+  public get maxStamina(): number {
+    return this._maxStamina;
+  }
 	public get speedSprint(): number {
 		return this._speedSprint;
   }
 
-  constructor(x: number, y: number, width: number, height: number, type: string, speedWalk: number, speedSprint: number, maxHealth: number) {
+  constructor(x: number, y: number, width: number, height: number, type: string, speedWalk: number, speedSprint: number, maxHealth: number, maxStamina: number) {
     super(x, y, width, height, type, speedWalk);
     this._speedSprint = speedSprint;
     this._maxHealth = maxHealth;
     this._health = this._maxHealth;
+    this._maxStamina = maxStamina;
+    this._stamina = this._maxStamina;
   }
 
   protected die(world: World) {
@@ -53,9 +71,13 @@ export default abstract class EntityLiving extends Entity {
     item.type.action(item, world, this);
   }
 
-  private canBlock(): boolean {
+  public canBlock(): boolean {
     return (this.itemPrimary !== null && this.itemPrimary.type.canBlock)
       || (this.itemSecondary !== null && this.itemSecondary.type.canBlock);
+  }
+
+  public isFatigued(): boolean {
+    return this._fatigueTicks > 20;
   }
 
   public defendAgainst(attacker: EntityLiving, item: Item): void {
@@ -87,6 +109,10 @@ export default abstract class EntityLiving extends Entity {
 
     this._health -= damage;
     if (DEBUG) console.log(`${this.type}#${this.id} took ${damage} damage.`);
+
+    // Cancel defender's action
+    if (this._action !== null && Math.random() < 0.7)
+      this._action = null;
   }
 
   public giveItem(item: Item): Item {
@@ -100,7 +126,16 @@ export default abstract class EntityLiving extends Entity {
   }
 
   public tick(delta: number, world: World): void {
+    if (this.stamina <= 0)
+      this.velIntended.magnitude = Math.min(this.velIntended.magnitude, this._speed);
     super.tick(delta, world);
+
+    if (this.vel.magnitude === this._speedSprint)
+      this.stamina -= 0.05 * delta;
+    else if (this._fatigueTicks <= 0)
+      this.stamina += 0.03 * delta;
+
+    this._fatigueTicks -= delta;
     if (this._health <= 0)
       this.die(world);
   }

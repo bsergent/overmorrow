@@ -11,6 +11,8 @@ export default class Action {
   public facing: Facing;
   public targetEntity: EntityLiving;
   public targetPosition: Vector;
+  public velX: number;
+  public velY: number;
   public state: ActionState = ActionState.WARMUP;
   public warmupTicks: number = 1;
   public actionTicks: number = 1;
@@ -18,6 +20,14 @@ export default class Action {
 
   public Action(type: ActionType) {
     this.type = type;
+    switch (this.type) {
+      case ActionType.NONE:
+        this.state = ActionState.FINISHED;
+        break;
+      case ActionType.MOVE:
+        this.state = ActionState.ACTION;
+        break;
+    }
   }
 
   public tick(delta: number): void {
@@ -40,7 +50,8 @@ export default class Action {
 
 export enum ActionType {
   NONE,
-  MOVE,
+  MOVE,   // Sets velX and vellY
+  MOVETO, // Uses A* pathfinding to navigate to tile/entity
   USEITEM
 }
 export enum ActionState {

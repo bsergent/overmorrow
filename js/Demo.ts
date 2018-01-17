@@ -114,13 +114,13 @@ class Demo {
     darkblade.itemSecondary = new Item('shield_wooden');
     world.addEntity(darkblade);
     setInterval(() => {
-      /*if (Math.random() < 0.5)
+      if (Math.random() < 0.5)
         darkblade.velIntended.x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
       else
         darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
-      darkblade.direction = facingToDirection(darkblade.facing);*/
+      darkblade.direction = facingToDirection(darkblade.facing);
     }, 3000);
-    let gwindor = new EntityPlayer(14, 15, 'Gwindow');
+    let gwindor = new EntityPlayer(14, 15, 'Gwindor');
     gwindor.itemSecondary = new Item('shield_wooden');
     gwindor.facing = Facing.RIGHT;
     gwindor.direction = Direction.NORTHEAST;
@@ -140,6 +140,16 @@ class Demo {
     renderer.addComponent(healthBarBackground, 1);
     renderer.addComponent(healthBarForeground, 1);
     renderer.addComponent(healthBarText, 1);
+
+    let staminaBarBackground = new UIImage(6, renderer.getHeight() - 52, 200, 20, 'assets/health_bg.png');
+    let staminaBarForeground = new UIImage(6, renderer.getHeight() - 52, 200, 20, 'assets/health_fg.png');
+    let staminaBarText = new UILabel(106, renderer.getHeight() - 50, '100/100');
+    staminaBarText.setAlignment('center');
+    staminaBarText.setSize(20);
+    staminaBarText.setColor(Color.white);
+    renderer.addComponent(staminaBarBackground, 1);
+    renderer.addComponent(staminaBarForeground, 1);
+    renderer.addComponent(staminaBarText, 1);
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)
@@ -211,8 +221,10 @@ class Demo {
       $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
       drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
-      healthBarForeground.width = Math.round(player.health) / player.maxHealth * 200;
-      healthBarText.setText(`${player.health} / ${player.maxHealth}`);
+      healthBarForeground.width = player.health / player.maxHealth * 200;
+      healthBarText.setText(`${Math.round(player.health)} / ${player.maxHealth}`);
+      staminaBarForeground.width = player.stamina / player.maxStamina * 200;
+      staminaBarText.setText(`${Math.round(player.stamina)} / ${player.maxStamina}`);
       
       setTimeout(update, timekeep.getTimeToWait());
       // TODO Also handle multiplayer stuff in here somewhere, queuing to world
