@@ -17,6 +17,7 @@ import EntityItem from './overmorrow/classes/EntityItem';
 import Item, { ItemType, ItemRarity } from './overmorrow/classes/Item';
 import EntityLiving from './overmorrow/classes/EntityLiving';
 import Vector from './overmorrow/primitives/Vector';
+import EntitySlime from './overmorrow/classes/EntitySlime';
 
 class Demo {
   public static main(): void {
@@ -83,6 +84,7 @@ class Demo {
       .setShield(true)
       .setPower(1);
     ItemType.addType('torch')
+      .setImage('assets/item_book_of_wynn.png')
       .setMaxQuantity(99);
     ItemType.addType('lantern');
     ItemType.addType('bread')
@@ -125,6 +127,8 @@ class Demo {
     gwindor.facing = Facing.RIGHT;
     gwindor.direction = Direction.NORTHEAST;
     world.addEntity(gwindor);
+    let slime = new EntitySlime(19, 11);
+    world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
@@ -204,6 +208,13 @@ class Demo {
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
         player.useItem(world, player.itemPrimary);
+      });
+    controller.addListener(EventTypes.KEYDOWN)
+      .setKeys([Keys.KEY_M])
+      .setAction(event => {
+        if (world.isTileOccupied(19, 11)) return;
+        let slime = new EntitySlime(19, 11);
+        world.addEntity(slime);
       });
 
     console.log('Initialized');

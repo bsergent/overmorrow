@@ -141,6 +141,17 @@ export default class Renderer {
     this._context.strokeRect(rect.x1, rect.y1, rect.width, rect.height);
   }
 
+  public drawLine(rect: Rectangle, color: Color, lineWidth: number = 1): void {
+    let prevWidth = this._context.lineWidth;
+    this._context.strokeStyle = color.rgba;
+    this._context.lineWidth = lineWidth;
+    this._context.beginPath();
+    this._context.moveTo(rect.x1, rect.y1);
+    this._context.lineTo(rect.x2, rect.y2);
+    this._context.stroke();
+    this._context.lineWidth = prevWidth;
+  }
+
   public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
     if (!this._imageCache.has(url)) {
       this._imageCache.set(url, new Image());
@@ -168,7 +179,7 @@ export default class Renderer {
   }
 
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
-    if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), Color.red);
+    if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), new Color(0, 0, 255, 0.5));
     this._context.beginPath();
     this._context.fillStyle = color.rgba;
     this._context.textAlign = alignment;

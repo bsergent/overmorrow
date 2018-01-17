@@ -134,15 +134,15 @@ export class ItemType {
         // Call defendAgainst() on all the entities within the attack area
 
         // Ahead
-        for (let e of world.getEntitiesAt(user.x1 + directionToVector(user.direction).x, user.y1 + directionToVector(user.direction).y))
+        for (let e of world.getEntitiesAt(user.x1 + directionToVector(user.direction).x + 0.5, user.y1 + directionToVector(user.direction).y + 0.5))
           if (e instanceof EntityLiving)
             (e as EntityLiving).defendAgainst(user, item);
         // Right
-        for (let e of world.getEntitiesAt(user.x1 + directionToVector(degreesToDirection(user.direction + 45)).x, user.y1 + directionToVector(degreesToDirection(user.direction + 45)).y))
+        for (let e of world.getEntitiesAt(user.x1 + directionToVector(degreesToDirection(user.direction + 45)).x + 0.5, user.y1 + directionToVector(degreesToDirection(user.direction + 45)).y + 0.5))
           if (e instanceof EntityLiving)
             (e as EntityLiving).defendAgainst(user, item);
         // Left
-        for (let e of world.getEntitiesAt(user.x1 + directionToVector(degreesToDirection(user.direction - 45)).x, user.y1 + directionToVector(degreesToDirection(user.direction - 45)).y))
+        for (let e of world.getEntitiesAt(user.x1 + directionToVector(degreesToDirection(user.direction - 45)).x + 0.5, user.y1 + directionToVector(degreesToDirection(user.direction - 45)).y + 0.5))
           if (e instanceof EntityLiving)
             (e as EntityLiving).defendAgainst(user, item);
       }

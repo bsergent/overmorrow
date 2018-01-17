@@ -5,6 +5,7 @@ import Color from 'overmorrow/primitives/Color';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Entity from 'overmorrow/classes/Entity';
 import Tile from 'overmorrow/classes/Tile';
+import Vector from '../primitives/Vector';
 
 export default class World implements Tickable {
 	private _name;
@@ -63,7 +64,22 @@ export default class World implements Tickable {
 
 	public getEntitiesByRaycast(x: number, y: number, degrees: number, maxDistance: number, checkCollision: boolean): Entity[] {
 		// Return list of all entities in the specified direction ordered by distance from caster
+		// Possibly take a rectangle as Rectangle(x, y, dirX, dirY) then use directionToVector()
 		throw new Error("Method not implemented.");
+	}
+
+	public getEntitiesInRadius(center: Vector, radius: number, mask: Entity[] = []): Entity[] {
+		// Return list of entities in radius ordered by proximity
+		throw new Error("Method not implemented.");
+	}
+
+	public getEntitiesInRegion(region: Rectangle, mask: Entity[] = []): Entity[] {
+		// Return list of entities in region
+		let entities: Entity[] = [];
+		for (let e of this._entities)
+			if (region.inside(e.x1, e.y1) && mask.indexOf(e) === -1)
+				entities.push(e);
+		return entities;
 	}
 
 	public removeEntity(entity: Entity): boolean {
@@ -82,16 +98,16 @@ export default class World implements Tickable {
 	}
 
 	public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
-		x = Math.floor(x);
-		y = Math.floor(y);
+		let fX = Math.floor(x);
+		let fY = Math.floor(y);
 		return x < 0
 			|| y < 0
 			|| x > this._width
 			|| y > this._height
-			|| this._collision[y][x]
+			|| this._collision[fY][fX]
       || (entityToIgnore !== undefined
-          && this._entityCollision[y][x].length > 1
-          && this._entityCollision[y][x].indexOf(entityToIgnore.id) !== -1);
+          && this._entityCollision[fY][fX].length > 1
+          && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
 	}
 
 	public tick(delta: number): number {

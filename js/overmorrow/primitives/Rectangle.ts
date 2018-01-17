@@ -58,6 +58,11 @@ export default class Rectangle {
     return this.x1 === rect.x1 && this.y1 === rect.y1 && this.x2 === rect.x2 && this.y2 === rect.y2;
   }
 
+  distanceTo(rect: Rectangle): number {
+    // TODO Take the widths and heights into account
+    return Math.sqrt((this.y1 - rect.y1) * (this.y1 - rect.y1) + (this.x1 - rect.x1) * (this.x1 - rect.x1));
+  }
+
   offset(x: number, y: number): Rectangle {
     this.x1 += x;
     this.y1 += y;

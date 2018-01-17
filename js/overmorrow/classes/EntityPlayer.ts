@@ -12,7 +12,7 @@ export default class EntityPlayer extends EntityLiving {
   private _username: string;
   private _aniSheet: AnimationSheet;
 
-  get username(): string {
+  public get username(): string {
     return this._username;
   }
 
@@ -29,26 +29,7 @@ export default class EntityPlayer extends EntityLiving {
   }
 
 	public draw(ui: WorldRenderer): void {
-    // Should already be offset by viewport, so draw relative to world
-    if (DEBUG) {
-      ui.drawRectWire(this, Color.green);
-      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.red);
-      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.green);
-      let vec = directionToVector(this.direction);
-      vec.magnitude = 0.5;
-      ui.drawRect(
-        new Rectangle(
-          this.x1 + this.width / 2 + vec.x - 0.02,
-          this.y1 + this.height / 2 + vec.y - 0.02,
-          0.04,
-          0.04),
-        Color.green
-      );
-      vec = directionToVector(this.direction);
-      ui.drawRectWire(this.clone().offset(vec.x, vec.y), Color.red);
-      ui.drawRectWire(this.clone().offset(directionToVector(degreesToDirection(this.direction + 45)).x, directionToVector(degreesToDirection(this.direction + 45)).y), Color.red);
-      ui.drawRectWire(this.clone().offset(directionToVector(degreesToDirection(this.direction - 45)).x, directionToVector(degreesToDirection(this.direction - 45)).y), Color.red);
-    }
+    super.draw(ui);
     // TODO Render the item in the correct location by decoding the item layer of the AnimationSheet
     if (this.itemPrimary !== null)
       ui.drawImage(this.clone().offset(10 / 16, -3 / 16), this.itemPrimary.image);
