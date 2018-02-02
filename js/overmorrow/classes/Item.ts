@@ -66,6 +66,7 @@ export class ItemType {
   private _description: string;
   private _maxQuantity: number = 1;
   private _rarity: ItemRarity;
+  private _weight: number = 0;
   private _canAttack: boolean = false;
   private _canBlock: boolean = false;
   private _power: number = 0;
@@ -89,6 +90,9 @@ export class ItemType {
   }
   public get rarity(): ItemRarity {
     return this._rarity;
+  }
+  public get weight(): number {
+    return this._weight;
   }
   public get canAttack(): boolean {
     return this._canAttack;
@@ -124,6 +128,10 @@ export class ItemType {
   }
   public setRarity(rarity: ItemRarity): ItemType {
     this._rarity = rarity;
+    return this;
+  }
+  public setWeight(weight: number): ItemType {
+    this._weight = weight;
     return this;
   }
   public setWeapon(isWeapon: boolean): ItemType {

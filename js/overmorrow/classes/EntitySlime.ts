@@ -38,6 +38,7 @@ export default class EntitySlime extends EntityLiving {
       }
     if (target !== null) {
       let speed = this.distanceTo(target) < 3 ? this._speedSprint : this._speed;
+      // TODO Check y before x half the time
       this.velIntended.x = Math.sign(target.x1 - this.x1) * speed;
       if (this.velIntended.x === 0 || world.isTileOccupied(this.x1 + Math.sign(target.x1 - this.x1), this.y1, this)) {
         this.velIntended.x = 0;

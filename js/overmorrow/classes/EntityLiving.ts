@@ -2,7 +2,7 @@ import Entity from 'overmorrow/classes/Entity';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import World from 'overmorrow/classes/World';
 import Inventory from './Inventory';
-import Action from './Action';
+import Action, { ActionState, ActionUseItem } from './Action';
 import Item, { ItemType } from './Item';
 import EntityItem from './EntityItem';
 import { Direction, directionToVector } from '../Utilities';
@@ -23,7 +23,6 @@ export default abstract class EntityLiving extends Entity {
   public    direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
   public    itemPrimary: Item = null;
   public    itemSecondary: Item = null;
-  public    action: Action = null;
 
   public get health(): number {
     return this._health;
@@ -50,6 +49,9 @@ export default abstract class EntityLiving extends Entity {
 	public get speedSprint(): number {
 		return this._speedSprint;
   }
+  public get action(): Action {
+    return this._action;
+  }
 
   constructor(x: number, y: number, width: number, height: number, type: string, speedWalk: number, speedSprint: number, maxHealth: number, maxStamina: number) {
     super(x, y, width, height, type, speedWalk);
@@ -69,8 +71,14 @@ export default abstract class EntityLiving extends Entity {
     world.removeEntity(this);
   }
 
+  public setAction(action: Action): void {
+    if (this._action !== null && this._action.state !== ActionState.COMPLETE) return;
+    if (this._action instanceof ActionUseItem && this.isFatigued()) return;
+    this._action = action;
+  }
+
   public useItem(world: World, item: Item): void {
-    item.type.action(item, world, this);
+    if (item != null) item.type.action(item, world, this);
   }
 
   public canBlock(): boolean {
@@ -83,9 +91,9 @@ export default abstract class EntityLiving extends Entity {
   }
 
   public defendAgainst(attacker: EntityLiving, item: Item): void {
-    //if (attacker.action == null) return;
-    //let damage: number = attacker.action.power; // Strong/weak attack damage is handled by the Action initialization
-    let damage: number = item.power; // Replace once actions are implemented
+    if (attacker.action === null || !(attacker.action instanceof ActionUseItem)) return;
+    let aAction = attacker.action as ActionUseItem;
+    let damage: number = item.power * aAction.force;
     let aVec: Vector = directionToVector(attacker.direction);
     let dVec: Vector = directionToVector(this.direction);
 
@@ -142,6 +150,7 @@ export default abstract class EntityLiving extends Entity {
   public tick(delta: number, world: World): void {
     if (this.stamina <= 0)
       this.velIntended.magnitude = Math.min(this.velIntended.magnitude, this._speed);
+    if (this._action !== null) this._action.tick(delta, world, this);
     super.tick(delta, world);
 
     if (this.vel.magnitude === this._speedSprint)

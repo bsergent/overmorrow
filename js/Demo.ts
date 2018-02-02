@@ -18,6 +18,7 @@ import Item, { ItemType, ItemRarity } from './overmorrow/classes/Item';
 import EntityLiving from './overmorrow/classes/EntityLiving';
 import Vector from './overmorrow/primitives/Vector';
 import EntitySlime from './overmorrow/classes/EntitySlime';
+import { ActionUseItem, ActionMove } from './overmorrow/classes/Action';
 
 class Demo {
   public static main(): void {
@@ -76,7 +77,8 @@ class Demo {
       .setImage('assets/item_sword_obsidian.png')
       .setRarity(ItemRarity.UNCOMMON)
       .setWeapon(true)
-      .setPower(10);
+      .setPower(10)
+      .setWeight(5);
     ItemType.addType('book_of_wynn')
       .setName('Book of Wynn')
       .setImage('assets/item_book_of_wynn.png')
@@ -116,10 +118,13 @@ class Demo {
     darkblade.itemSecondary = new Item('shield_wooden');
     world.addEntity(darkblade);
     setInterval(() => {
+      let x = 0;
+      let y = 0;
       if (Math.random() < 0.5)
-        darkblade.velIntended.x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
+        x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
       else
-        darkblade.velIntended.y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
+        y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
+      darkblade.setAction(new ActionMove(x, y));
       darkblade.direction = facingToDirection(darkblade.facing);
     }, 3000);
     let gwindor = new EntityPlayer(14, 15, 'Gwindor');
@@ -177,26 +182,22 @@ class Demo {
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setAction(event => {
-        player.velIntended.x = 0;
-        player.velIntended.y = -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed);
+        player.setAction(new ActionMove(0, -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setAction(event => {
-        player.velIntended.x = 0;
-        player.velIntended.y = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed;;
+        player.setAction(new ActionMove(0, controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setAction(event => {
-        player.velIntended.x = -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed);
-        player.velIntended.y = 0;
+        player.setAction(new ActionMove(-(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setAction(event => {
-        player.velIntended.x = controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed;
-        player.velIntended.y = 0;
+        player.setAction(new ActionMove(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
       });
     controller.addListener(EventTypes.MOUSEMOVE)
       .setAction((event: InputEvent) => {
@@ -207,7 +208,7 @@ class Demo {
     controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
-        player.useItem(world, player.itemPrimary);
+        player.setAction(new ActionUseItem(player.itemPrimary, controller.isKeyDown(Keys.KEY_CONTROL) ? 2 : 1));
       });
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_M])

@@ -13,11 +13,11 @@ export default abstract class Entity extends Rectangle {
 	private _image: AnimationSheet;
 	protected _speed: number;
 	protected _collidable: boolean = true;
+	protected prevPos: Vector; // Position at beginning of previous tick
 
 	public facing: Facing = Facing.DOWN; // Current facing of sprite
 	public vel: Vector = new Vector(0, 0); // Current velocity
 	public velIntended: Vector = new Vector(0, 0); // Velocity that should be used when aligned and not colliding
-	public prevPos: Vector; // Position at beginning of previous tick
 
 	constructor(x: number, y: number, width: number, height: number, type: string, speed: number) {
 		super(x, y, width, height);
@@ -33,7 +33,7 @@ export default abstract class Entity extends Rectangle {
 		this.prevPos.y = this.y1;
 
     if (this.isAligned()) {
-			this.vel.x = this.velIntended.x;
+			this.vel.x = this.velIntended.x; // TODO Should this be handled by actions?
 			this.vel.y = this.velIntended.y;
 		}
     this.x1 += this.vel.x * delta;
