@@ -205,6 +205,7 @@ class Demo {
         let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
         player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
       });
+    // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
     controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {

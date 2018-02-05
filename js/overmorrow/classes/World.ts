@@ -121,17 +121,19 @@ export default class World implements Tickable {
 			for (let x = 0; x < this._width; x++)
         this._entityCollision[y][x] = [];
 		for (let e of this._entities) {
-			// Track current location to collision map
 			if (e.y1 < 0 || e.y2 > this._height || e.x1 < 0 || e.x2 > this._width)
 				e.revertMovement();
 			if (!e.collidable)
 				continue;
+			// Track new/current location to collision map
 			this._entityCollision[Math.floor(e.y1)][Math.floor(e.x1)].push(e.id);
-			this._entityCollision[Math.ceil(e.y1)][Math.ceil(e.x1)].push(e.id);
+			if (Math.floor(e.y1) !== Math.ceil(e.y1) || Math.floor(e.x1) !== Math.ceil(e.x1))
+				this._entityCollision[Math.ceil(e.y1)][Math.ceil(e.x1)].push(e.id);
     }
 		for (let e of this._entities) {
 			// Check if colliding with something from collision maps
-			if (this.isTileOccupied(e.x1, e.y1, e) || this.isTileOccupied(Math.ceil(e.x1), Math.ceil(e.y1), e))
+			if ((this.isTileOccupied(e.x1, e.y1, e) && (e.vel.x < 0 || e.vel.y < 0)) // Top-left side is occupied and entering
+					|| (this.isTileOccupied(Math.ceil(e.x1), Math.ceil(e.y1), e) && (e.vel.x > 0 || e.vel.y > 0))) // Bottom-right side is occupied and entering
 				e.revertMovement();
 		}
 		return moment().diff(startTime);

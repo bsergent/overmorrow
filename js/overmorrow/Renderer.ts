@@ -70,12 +70,13 @@ export default class Renderer {
 
   private processInput(e: InputEvent): void {
     // Check higher indices first
+    outer:
     for (let c = this._components.length - 1; c >= 0; c--) {
       if (this._components[c] === undefined)
         continue;
       for (let comp of this._components[c]) {
         if (comp.input(this, e))
-          break;
+          break outer;
       }
     }
   }
