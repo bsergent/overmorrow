@@ -2,7 +2,7 @@ import Entity from 'overmorrow/classes/Entity';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import World from 'overmorrow/classes/World';
 import Inventory from './Inventory';
-import Action, { ActionState, ActionUseItem } from './Action';
+import Action, { ActionState, ActionUseItem, ActionMove } from './Action';
 import Item, { ItemType } from './Item';
 import EntityItem from './EntityItem';
 import { Direction, directionToVector } from '../Utilities';
@@ -20,7 +20,7 @@ export default abstract class EntityLiving extends Entity {
   protected _action: Action = null;
   protected _inventory: Inventory = null;
   protected _speedSprint: number;
-  public    direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
+  protected _direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
   public    itemPrimary: Item = null;
   public    itemSecondary: Item = null;
 
@@ -52,6 +52,16 @@ export default abstract class EntityLiving extends Entity {
   public get action(): Action {
     return this._action;
   }
+  public get direction(): Direction {
+    return this._direction;
+  }
+  public set direction(value: Direction) {
+    if (this._action !== null
+        && this._action instanceof ActionUseItem
+        && this._action.state !== ActionState.COMPLETE)
+      return;
+    this._direction = value;
+  }
 
   constructor(x: number, y: number, width: number, height: number, type: string, speedWalk: number, speedSprint: number, maxHealth: number, maxStamina: number) {
     super(x, y, width, height, type, speedWalk);
@@ -72,8 +82,14 @@ export default abstract class EntityLiving extends Entity {
   }
 
   public setAction(action: Action): void {
-    if (this._action !== null && this._action.state !== ActionState.COMPLETE) return;
-    if (this._action instanceof ActionUseItem && this.isFatigued()) return;
+    if (this._action !== null) {
+      if (typeof(this._action) !== typeof(action)) return;
+      if (this._action.state !== ActionState.COMPLETE
+        && !(this._action instanceof ActionMove/* && (this._action as ActionMove).age > 3*/)) return;
+      if (this._action instanceof ActionUseItem
+          && this.isFatigued())
+        return;
+    }
     this._action = action;
   }
 
@@ -123,6 +139,7 @@ export default abstract class EntityLiving extends Entity {
     // Cancel defender's action
     if (this._action !== null && Math.random() < 0.7)
       this._action = null;
+    // TODO Spawn particles upon damage
   }
 
   public giveItem(item: Item): Item {

@@ -32,6 +32,7 @@ export default class Renderer {
       this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
       this._width = this._canvasActive.width();
       this._height = this._canvasActive.height();
+      this._canvasActive.on('contextmenu', function(event) { return false; });
     }
     if (this._canvasBuffer !== null && this._canvasBuffer.length > 0) {
       this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('2d');
@@ -70,12 +71,13 @@ export default class Renderer {
 
   private processInput(e: InputEvent): void {
     // Check higher indices first
+    outer:
     for (let c = this._components.length - 1; c >= 0; c--) {
       if (this._components[c] === undefined)
         continue;
       for (let comp of this._components[c]) {
         if (comp.input(this, e))
-          break;
+          break outer;
       }
     }
   }

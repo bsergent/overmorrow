@@ -11,9 +11,9 @@ export default abstract class Entity extends Rectangle {
 	private _type: string;
 	private _id: number;
 	private _image: AnimationSheet;
+	private _prevPos: Vector; // Position at beginning of previous tick
 	protected _speed: number;
 	protected _collidable: boolean = true;
-	protected prevPos: Vector; // Position at beginning of previous tick
 
 	public facing: Facing = Facing.DOWN; // Current facing of sprite
 	public vel: Vector = new Vector(0, 0); // Current velocity
@@ -21,7 +21,7 @@ export default abstract class Entity extends Rectangle {
 
 	constructor(x: number, y: number, width: number, height: number, type: string, speed: number) {
 		super(x, y, width, height);
-		this.prevPos = new Vector(x, y);
+		this._prevPos = new Vector(x, y);
 		this._type = type;
 		this._speed = speed;
 		this._id = Entity._nextId++;
@@ -29,8 +29,8 @@ export default abstract class Entity extends Rectangle {
 
 	public abstract draw(ui: WorldRenderer): void;
 	public tick(delta: number, world: World): void {
-		this.prevPos.x = this.x1;
-		this.prevPos.y = this.y1;
+		this._prevPos.x = this.x1;
+		this._prevPos.y = this.y1;
 
     if (this.isAligned()) {
 			this.vel.x = this.velIntended.x; // TODO Should this be handled by actions?
@@ -53,13 +53,13 @@ export default abstract class Entity extends Rectangle {
 		// Attempt to align to grid and stop
     if (!this.isAligned() && this.velIntended !== this.vel) {
       // If changed grid boundary in last tick, align to grid
-      if (Math.floor(this.x1) - Math.floor(this.prevPos.x) > 0)
+      if (Math.floor(this.x1) - Math.floor(this._prevPos.x) > 0)
         this.x1 = Math.floor(this.x1);
-      if (Math.ceil(this.x1) - Math.ceil(this.prevPos.x) < 0)
+      if (Math.ceil(this.x1) - Math.ceil(this._prevPos.x) < 0)
         this.x1 = Math.ceil(this.x1);
-      if (Math.floor(this.y1) - Math.floor(this.prevPos.y) > 0)
+      if (Math.floor(this.y1) - Math.floor(this._prevPos.y) > 0)
         this.y1 = Math.floor(this.y1);
-      if (Math.ceil(this.y1) - Math.ceil(this.prevPos.y) < 0)
+      if (Math.ceil(this.y1) - Math.ceil(this._prevPos.y) < 0)
 				this.y1 = Math.ceil(this.y1);
     }
 		this.velIntended.magnitude = 0;
@@ -70,8 +70,8 @@ export default abstract class Entity extends Rectangle {
 	}
 
 	public revertMovement(): void {
-		this.x1 = Math.round(this.prevPos.x);
-		this.y1 = Math.round(this.prevPos.y);
+		this.x1 = Math.round(this._prevPos.x);
+		this.y1 = Math.round(this._prevPos.y);
 		this.vel.magnitude = 0;
 		// TODO Make sure entity is realigned to grid
 	}
@@ -90,5 +90,9 @@ export default abstract class Entity extends Rectangle {
 
 	get collidable(): boolean {
 		return this._collidable;
+	}
+
+	get prevPos(): Vector {
+		return this._prevPos;
 	}
 }

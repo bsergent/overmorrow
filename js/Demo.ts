@@ -103,6 +103,10 @@ class Demo {
           if (e instanceof EntityLiving)
             (e as EntityLiving).defendAgainst(user, item);
       });
+    ItemType.addType('attack_slime')
+      .setWeapon(true)
+      .setPower(10)
+      .setWeight(8);
 
     // Build world
     let world = new WorldTiled('assets/dungeonEntrance.json');
@@ -111,7 +115,6 @@ class Demo {
     let player = new EntityPlayer(12, 19, 'Wake');
     player.itemPrimary = new Item('sword_obsidian');
     world.addEntity(player);
-    player.health -= 70;
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
     darkblade.setEyeColor(Color.brown);
     darkblade.giveItem(new Item('book_of_wynn'));
@@ -181,21 +184,25 @@ class Demo {
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
+      .setDuration(0.1)
       .setAction(event => {
         player.setAction(new ActionMove(0, -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
+      .setDuration(0.1)
       .setAction(event => {
         player.setAction(new ActionMove(0, controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
+      .setDuration(0.1)
       .setAction(event => {
         player.setAction(new ActionMove(-(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
+      .setDuration(0.1)
       .setAction(event => {
         player.setAction(new ActionMove(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
       });
@@ -205,10 +212,16 @@ class Demo {
         let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
         player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
       });
+    // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
     controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, controller.isKeyDown(Keys.KEY_CONTROL) ? 2 : 1));
+        player.setAction(new ActionUseItem(player.itemPrimary, 1));
+      });
+    controller.addListener(EventTypes.MOUSEDOWN)
+      .setKeys([Keys.MOUSE_RIGHT])
+      .setAction(event => {
+        player.setAction(new ActionUseItem(player.itemPrimary, 2));
       });
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_M])
@@ -227,6 +240,16 @@ class Demo {
       timekeep.startUpdate();
       controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta()));
+      if (player.health <= 0) {
+        setTimeout(function() {
+          if (player.health > 0) return;
+          let newPlayer = new EntityPlayer(12, 19, player.username);
+          newPlayer.itemPrimary = player.itemPrimary;
+          world.addEntity(newPlayer);
+          uiworld.setPlayer(newPlayer);
+          player = newPlayer;
+        }, 2500);
+      }
       playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();

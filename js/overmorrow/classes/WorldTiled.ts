@@ -81,6 +81,14 @@ export default class WorldTiled extends World {
 
   public draw(ui: WorldRenderer): void {
     this.drawBG(ui);
+    if (DEBUG) {
+      let area = ui.getVisibleTileArea();
+      for (let y = area.y1; y <= area.y2; y++) {
+        for (let x = area.x1; x <= area.x2; x++) {
+          ui.drawRectWire(new Rectangle(x, y, 1, 1), new Color(255, 255, 255, 0.1));
+        }
+      }
+    }
 		for (let e of this._entities)
 			e.draw(ui);
     this.drawFG(ui);

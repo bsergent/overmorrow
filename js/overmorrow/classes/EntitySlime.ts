@@ -8,6 +8,7 @@ import Item from './Item';
 import Inventory from './Inventory';
 import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../Utilities';
 import EntityPlayer from './EntityPlayer';
+import { ActionMove, ActionUseItem } from './Action';
 
 export default class EntitySlime extends EntityLiving {
 
@@ -28,7 +29,7 @@ export default class EntitySlime extends EntityLiving {
 
   private processAI(world: World) {
     // TODO Use actions instead
-    let nearbyEntities = world.getEntitiesInRegion(new Rectangle(this.x1 - 3, this.y1 - 3, 7, 7), [this]);
+    let nearbyEntities = world.getEntitiesInRegion(new Rectangle(this.x1 - 4, this.y1 - 4, 9, 7), [this]);
     let target: EntityPlayer = null;
     for (let e of nearbyEntities)
       if (e.type === 'player') {
@@ -36,23 +37,30 @@ export default class EntitySlime extends EntityLiving {
         if (DEBUG) console.log(`Targetting ${target.username}#${target.id}`);
         break;
       }
+    let velX = 0;
+    let velY = 0;
     if (target !== null) {
-      let speed = this.distanceTo(target) < 3 ? this._speedSprint : this._speed;
+      let speed = this.distanceTo(target) < 4 && this.distanceTo(target) > 1 ? this._speedSprint : this._speed;
       // TODO Check y before x half the time
-      this.velIntended.x = Math.sign(target.x1 - this.x1) * speed;
-      if (this.velIntended.x === 0 || world.isTileOccupied(this.x1 + Math.sign(target.x1 - this.x1), this.y1, this)) {
-        this.velIntended.x = 0;
-        this.velIntended.y = Math.sign(target.y1 - this.y1) * speed;
+      velX = Math.sign(target.x1 - this.x1) * speed;
+      if (velX === 0 || world.isTileOccupied(this.x1 + Math.sign(target.x1 - this.x1), this.y1, this)) {
+        velX = 0;
+        velY = Math.sign(target.y1 - this.y1) * speed;
       }
       this.direction = degreesToDirection(Math.atan2(target.y1 - this.y1, target.x1 - this.x1) * 180 / Math.PI);
+      if (this.distanceTo(target) <= 1.7) {
+        this.setAction(new ActionUseItem(new Item('attack_slime', 1)));
+      }
     } else {
       if (Math.random() < 0.03) {
         if (Math.random() < 0.5)
-          this.velIntended.x = (Math.floor(Math.random() * 3) - 1) * this._speed;
+          velX = (Math.floor(Math.random() * 3) - 1) * this._speed;
         else
-        this.velIntended.y = (Math.floor(Math.random() * 3) - 1) * this._speed;
+        velY = (Math.floor(Math.random() * 3) - 1) * this._speed;
       }
       this.direction = facingToDirection(this.facing);
     }
+    if (velX !== 0 || velY !== 0)
+      this.setAction(new ActionMove(velX, velY));
   }
 }

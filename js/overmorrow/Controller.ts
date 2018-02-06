@@ -98,6 +98,7 @@ export class Listener {
   private _type: EventTypes;
   private _keys: Keys[];
   private _action: Function;
+  private _duration: number;
 
   constructor(type: EventTypes) {
     this._type = type;
@@ -108,6 +109,10 @@ export class Listener {
   }
   public setAction(action: Function) { // Function will be passed InputEvent
     this._action = action;
+    return this;
+  }
+  public setDuration(seconds: number) { // TODO Implement keyheld not going through until held for duration
+    this._duration = seconds;
     return this;
   }
 
