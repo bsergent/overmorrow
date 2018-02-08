@@ -107,11 +107,11 @@ export class Listener {
     this._keys = keys;
     return this;
   }
-  public setAction(action: Function) { // Function will be passed InputEvent
+  public setAction(action: Function): Listener { // Function will be passed InputEvent
     this._action = action;
     return this;
   }
-  public setDuration(seconds: number) { // TODO Implement keyheld not going through until held for duration
+  public setDuration(seconds: number): Listener { // TODO Implement keyheld not going through until held for duration
     this._duration = seconds;
     return this;
   }

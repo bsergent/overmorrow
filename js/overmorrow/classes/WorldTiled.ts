@@ -117,7 +117,6 @@ export default class WorldTiled extends World {
             tileImg.width,
             tileImg.height),
           tileImg.url,
-          0,
           layer.opacity
         );
       }

@@ -27,7 +27,6 @@ export default class EntityItem extends Entity {
     ui.drawImage(
       this.clone().offset(0, (1 - this._pulseOffset) / 4),
       this.item.image,
-      0,
       this._pulseOpacity); // Opacity can make the canvas laggy, definitely need to convert to WebGL
   }
   

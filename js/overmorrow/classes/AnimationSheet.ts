@@ -76,7 +76,7 @@ export default class AnimationSheet {
     //ui.applyFilters(this._filters);
     //ui.drawSprite(new Rectangle(0, 0, rect.width, rect.height), frame, this._imageUrl);
     //ui.closeTemp(rect.x1, rect.y1);
-    ui.drawSprite(rect, frame, this._imageUrl);
+    ui.drawSprite(rect, frame, this._imageUrl);//, 1, { deg: 90, x: 0.5, y: 0.5 });
   }
 
   public setFrameTag(name: string): AnimationSheet {

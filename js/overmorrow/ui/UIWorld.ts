@@ -133,14 +133,14 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
     this._renderer.drawLine(this.rectToViewPort(rect), color, lineWidth);
   }
 
-  public drawImage(rect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
+  public drawImage(rect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawImage(this.rectToViewPort(rect), url, rotationDeg, opacity);
+    this._renderer.drawImage(this.rectToViewPort(rect), url, opacity, rotation);
   }
 
-  public drawSprite(rect: Rectangle, drect: Rectangle, url: string, rotationDeg: number = 0, opacity: number = 1): void {
+  public drawSprite(rect: Rectangle, drect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawSprite(this.rectToViewPort(rect), drect, url, rotationDeg, opacity);
+    this._renderer.drawSprite(this.rectToViewPort(rect), drect, url, opacity, rotation);
   }
 
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
