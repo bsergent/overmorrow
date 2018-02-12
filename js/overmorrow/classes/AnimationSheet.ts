@@ -18,6 +18,7 @@ export default class AnimationSheet {
   private _durationMultiplier: number = 1;
   private _currentDirectionForward: boolean;
   private _filters: Filter[] = [];
+  public paused: boolean = false;
 
   constructor(urlImage: string) {
     $.ajax({
@@ -50,7 +51,7 @@ export default class AnimationSheet {
     if (this._frames.length <= 0) return;
 
     // Advance frame
-    if (this._lastAnimationTime.clone().add(this._frames[this._currentFrameIndex].duration * this._durationMultiplier, 'ms') < moment()) {
+    if (!this.paused && this._lastAnimationTime.clone().add(this._frames[this._currentFrameIndex].duration * this._durationMultiplier, 'ms') < moment()) {
       // Increment the frame index
       if (this._currentDirectionForward) this._currentFrameIndex++;
       else this._currentFrameIndex--;
@@ -90,6 +91,20 @@ export default class AnimationSheet {
     this._currentDirectionForward = this._currentTag.direction !== 'reverse';
     this._lastAnimationTime = moment();
     return this;
+  }
+
+  public set frameTag(value: string) {
+    this.setFrameTag(value);
+  }
+
+  public get progress(): number {
+    // TODO Support other animation directions
+    return (this._currentFrameIndex - this._currentTag.from) / (this._currentTag.to - this._currentTag.from);
+  }
+
+  public set progress(value: number) {
+    // TODO Support other animation directions
+    this._currentFrameIndex = Math.round(value * (this._currentTag.to - this._currentTag.from) + this._currentTag.from);
   }
 
   public setDurationMultipler(multiplier: number): AnimationSheet {
