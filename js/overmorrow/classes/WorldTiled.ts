@@ -3,13 +3,14 @@ import Tile from "overmorrow/classes/Tile";
 import Color from "overmorrow/primitives/Color";
 import Rectangle from "overmorrow/primitives/Rectangle";
 import { WorldRenderer } from "../ui/UIWorld";
+import Entity from 'overmorrow/classes/Entity';
 
 export default class WorldTiled extends World {
-  private _backgroundColor: Color;
   private _tileKey: Map<number, TileKey> = new Map<number, TileKey>();
   private _objects: object[] = [];
   private _background: Layer[] = [];
   private _foreground: Layer[] = [];
+	private _collision: boolean[][];
   private _tileWidth: number;
   private _tileHeight: number;
 
@@ -33,6 +34,13 @@ export default class WorldTiled extends World {
     let color = new Color();
     color.hex = json.backgroundcolor;
     this._backgroundColor = color;
+
+    this._collision = new Array(this._height);
+    for (let r = 0; r < this._height; r++)
+      this._collision[r] = new Array(this._width);
+    for (let y = 0; y < this._height; y++)
+      for (let x = 0; x < this._width; x++)
+        this._collision[y][x] = false;
 
     // Parse layers
     let parsingBackground: boolean = true;
@@ -138,7 +146,7 @@ export default class WorldTiled extends World {
     }
   }
 
-  public getTileAt(x: number, y: number): Tile {
+  public getTileAt(x: number, y: number): TileKey {
     // Find topmost tile that's not collision and return its key
     var groups = [this._foreground, this._background];
     for (var lg = 0; lg < groups.length; lg++) {
@@ -150,6 +158,19 @@ export default class WorldTiled extends World {
       }
     }
   }
+
+  public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
+		let fX = Math.floor(x);
+		let fY = Math.floor(y);
+		return x < 0
+			|| y < 0
+			|| x > this._width
+			|| y > this._height
+			|| this._collision[fY][fX]
+      || (entityToIgnore !== undefined
+          && this._entityCollision[fY][fX].length > 1
+          && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+	}
 }
 
 interface TileKey {

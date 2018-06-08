@@ -7,12 +7,11 @@ import Entity from 'overmorrow/classes/Entity';
 import Tile from 'overmorrow/classes/Tile';
 import Vector from '../primitives/Vector';
 
-export default class World implements Tickable {
+export default abstract class World implements Tickable {
 	private _name;
+  protected _backgroundColor: Color;
 	protected _entities: Entity[] = []; // TODO Add draw order to entities
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
-	private _tiles: Tile[][]; // Tile information
-	protected _collision: boolean[][];
 	protected _entityCollision: number[][][];
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
 	protected _width: number;
@@ -21,17 +20,6 @@ export default class World implements Tickable {
 	constructor(width: number, height: number) {
 		this._width = width;
     this._height = height;
-    
-		this._tiles = new Array(height);
-    for (let r = 0; r < height; r++)
-      this._tiles[r] = new Array(width);
-
-		this._collision = new Array(height);
-    for (let r = 0; r < height; r++)
-      this._collision[r] = new Array(width);
-    for (let y = 0; y < height; y++)
-      for (let x = 0; x < width; x++)
-        this._collision[y][x] = false;
 
 		this._entityCollision = new Array(height);
     for (let r = 0; r < height; r++)
@@ -93,27 +81,11 @@ export default class World implements Tickable {
 		return false;
 	}
 
-	public getTileAt(x: number, y: number): Tile {
-		return this._tiles[y][x];
-	}
-
-	public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
-		let fX = Math.floor(x);
-		let fY = Math.floor(y);
-		return x < 0
-			|| y < 0
-			|| x > this._width
-			|| y > this._height
-			|| this._collision[fY][fX]
-      || (entityToIgnore !== undefined
-          && this._entityCollision[fY][fX].length > 1
-          && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
-	}
+	public abstract isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean;
 
 	public tick(delta: number): number {
 		let startTime = moment();
 		// Update tiles and entities
-		this._tiles.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
 		for (let e of this._entities)
 			e.tick(delta, this);
 		// Reset entity collision map
@@ -141,14 +113,6 @@ export default class World implements Tickable {
 	}
 
 	public draw(ui: WorldRenderer): void {
-		/*let area = ui.getVisibleTileArea();
-		for (let y = area.y1; y <= area.y2; y++) {
-			for (let x = area.x1; x <= area.x2; x++) {
-				if (this._tiles[y][x] != null)
-					this._tiles[y][x].draw(ui);
-			}
-		}*/
-
 		for (let e of this._entities)
 			e.draw(ui);
 	}
