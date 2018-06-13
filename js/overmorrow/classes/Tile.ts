@@ -6,7 +6,7 @@ import Item from 'overmorrow/classes/Item';
 import EntityItem from 'overmorrow/classes/EntityItem';
 import Rectangle from '../primitives/Rectangle';
 
-export default abstract class Tile implements Tickable {
+export default class Tile implements Tickable {
 	private _type: TileType;
 	private _light: number = 0;
 	private _fog: DiscoveryLevel = DiscoveryLevel.UNKNOWN;
@@ -61,7 +61,8 @@ export enum DiscoveryLevel {
 }
 
 export class TileType {
-  private static _types: Map<string, TileType> = new Map<string, TileType>();
+	private static _types: Map<string, TileType> = new Map<string, TileType>();
+	// TODO Add way to duplicate type, so that multiple stone walls could be created with only the sprite coords changed on the duplicate
   public static addType(type: string): TileType {
     let tileType = new TileType();
     tileType._type = type;
@@ -77,6 +78,7 @@ export class TileType {
 	private _type: string; // Basically the tiletype's id, used for serialization
 	private _name: string;
 	private _image: string;
+	private _sprite: Rectangle = null; // Used for selecting tiles from TileSheets
 	private _description: string = '';
 	private _solid: boolean = true; // This is just for basic collision, might need to add directional collision later
 	private _hardness: number = -1; // -1 for unbreakable
@@ -107,9 +109,10 @@ export class TileType {
 	}
 	public get draw(): Function {
 		return this._draw === null ? function (ui: WorldRenderer, x: number, y: number) {
-			// TODO Should there be draw methods without the rectangle objects? Will these need to be garbage collected?
-			ui.drawImage(new Rectangle(x, y, 1, 1), this._image);
+			if (this._sprite !== null) ui.drawSprite(new Rectangle(x, y, 1, 1), this._sprite, this._image);
+			else ui.drawImage(new Rectangle(x, y, 1, 1), this._image);
 		} : this._draw;
+		// TODO Support varying textures based on world seed
 	}
 	public get tick(): Function {
 		return this._tick === null ? function (delta: number) {} : this._tick;
@@ -135,8 +138,15 @@ export class TileType {
 	 * @returns Self reference for method chaining
 	 */
 	public setImage(image: string): TileType {
-		// TODO Support tilemaps for faster rendering, probably add this when converting to WebGL
 		this._image = image;
+		return this;
+	}
+	/**
+	 * @param rect Location of texture on tilemap (in pixels, not percentage)
+	 * @returns Self reference for method chaining
+	 */
+	public setSpriteCoords(rect: Rectangle): TileType {
+		this._sprite = rect;
 		return this;
 	}
 	/**

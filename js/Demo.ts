@@ -19,6 +19,8 @@ import EntityLiving from './overmorrow/classes/EntityLiving';
 import Vector from './overmorrow/primitives/Vector';
 import EntitySlime from './overmorrow/classes/EntitySlime';
 import { ActionUseItem, ActionMove } from './overmorrow/classes/Action';
+import WorldSandbox from './overmorrow/classes/WorldSandbox';
+import { TileType } from './overmorrow/classes/Tile';
 
 class Demo {
   public static main(): void {
@@ -108,8 +110,24 @@ class Demo {
       .setPower(10)
       .setWeight(8);
 
+    TileType.addType('dirt')
+      .setImage('assets/f1_terrain.png')
+      .setSpriteCoords(new Rectangle(0, 16, 16, 16))
+      .setSolid(false);
+    TileType.addType('wall')
+      .setImage('assets/f1_terrain.png')
+      .setSpriteCoords(new Rectangle(0, 0, 16, 16));
+    TileType.addType('wall_moss')
+      .setImage('assets/f1_terrain.png')
+      .setSpriteCoords(new Rectangle(16, 0, 16, 16));
+
     // Build world
-    let world = new WorldTiled('assets/dungeonEntrance.json');
+    //let world = new WorldTiled('assets/dungeonEntrance.json');
+    let world = new WorldSandbox(50, 50, 'dirt');
+    for (let i = 8; i < 16; i++)
+      world.setTile(i, 18, 'wall');
+    world.setTile(14, 18, 'wall_moss');
+    world.setTile(9, 18, 'wall_moss');
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(12, 19, 'Wake');

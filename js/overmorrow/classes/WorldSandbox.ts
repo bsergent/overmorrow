@@ -1,6 +1,6 @@
 import * as moment from '../../../node_modules/moment/moment';
 import World from "overmorrow/classes/World";
-import Tile from "overmorrow/classes/Tile";
+import Tile, { TileType } from "overmorrow/classes/Tile";
 import Entity from 'overmorrow/classes/Entity';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 
@@ -11,12 +11,18 @@ export default class WorldSandbox extends World {
   //  be uncollidable and unbreakable
   
   private _tiles: Tile[][]; // Tile information
+  private _seed: string;
   
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, defaultTileType: string, seed: string = '') {
     super(width, height);
 		this._tiles = new Array(height);
-    for (let r = 0; r < height; r++)
+    for (let r = 0; r < height; r++) {
       this._tiles[r] = new Array(width);
+      for (let c = 0; c < width; c++)
+        this._tiles[r][c] = new Tile(defaultTileType);
+    }
+    this._seed = seed === '' ? Math.random().toString(36).substring(2, 10) : seed;
+    console.log(`seed: ${this._seed}`);
   }
 
   public tick(delta: number): number {
@@ -28,17 +34,22 @@ export default class WorldSandbox extends World {
 
   public draw(ui: WorldRenderer): void {
     let area = ui.getVisibleTileArea();
+    // TODO Render crash on border
 		for (let y = area.y1; y <= area.y2; y++) {
 			for (let x = area.x1; x <= area.x2; x++) {
-				if (this._tiles[y][x] != null)
+				if (this._tiles[y][x] !== null)
 					this._tiles[y][x].draw(ui, x, y);
 			}
     }
     super.draw(ui);
   }
 
-	public getTileAt(x: number, y: number): Tile {
+	public getTile(x: number, y: number): Tile {
 		return this._tiles[y][x];
+  }
+
+  public setTile(x: number, y: number, type: string): void {
+    this._tiles[y][x].type = TileType.getType(type);
   }
 
   public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
