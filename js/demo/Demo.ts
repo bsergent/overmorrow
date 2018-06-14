@@ -10,17 +10,17 @@ import UIWorld from 'overmorrow/ui/UIWorld';
 import World from 'overmorrow/classes/World';
 import WorldTiled from 'overmorrow/classes/WorldTiled';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
-import UIImage from './overmorrow/ui/UIImage';
-import Rectangle from './overmorrow/primitives/Rectangle';
-import AnimationSheet from './overmorrow/classes/AnimationSheet';
-import EntityItem from './overmorrow/classes/EntityItem';
-import Item, { ItemType, ItemRarity } from './overmorrow/classes/Item';
-import EntityLiving from './overmorrow/classes/EntityLiving';
-import Vector from './overmorrow/primitives/Vector';
-import EntitySlime from './overmorrow/classes/EntitySlime';
-import { ActionUseItem, ActionMove } from './overmorrow/classes/Action';
-import WorldSandbox from './overmorrow/classes/WorldSandbox';
-import { TileType } from './overmorrow/classes/Tile';
+import UIImage from 'overmorrow/ui/UIImage';
+import Rectangle from 'overmorrow/primitives/Rectangle';
+import AnimationSheet from 'overmorrow/classes/AnimationSheet';
+import EntityItem from 'overmorrow/classes/EntityItem';
+import Item, { ItemType, ItemRarity } from 'overmorrow/classes/Item';
+import EntityLiving from 'overmorrow/classes/EntityLiving';
+import Vector from 'overmorrow/primitives/Vector';
+import EntitySlime from 'overmorrow/classes/EntitySlime';
+import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
+import WorldSandbox from 'overmorrow/classes/WorldSandbox';
+import { TileType } from 'overmorrow/classes/Tile';
 
 class Demo {
   public static main(): void {
@@ -116,7 +116,7 @@ class Demo {
       .setSolid(false);
     TileType.addType('wall')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(0, 0, 16, 16));
+      .setSpriteCoords(new Rectangle(64, 0, 16, 16));
     TileType.addType('wall_moss')
       .setImage('assets/f1_terrain.png')
       .setSpriteCoords(new Rectangle(16, 0, 16, 16));
@@ -268,6 +268,7 @@ class Demo {
           player = newPlayer;
         }, 2500);
       }
+      world.discover(player.x1, player.y1, 3);
       playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();

@@ -110,11 +110,13 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   public getVisibleTileArea(): Rectangle {
     if (this.world === null)
       return new Rectangle(0, 0, 0, 0);
-    return new Rectangle(
+    let area = new Rectangle(
       Math.floor(Math.max(this.viewport.x1 / this.tileScale, 0)),
       Math.floor(Math.max(this.viewport.y1 / this.tileScale, 0)),
-      Math.ceil(Math.min(this.viewport.x2 / this.tileScale, this.world.width)),
-      Math.ceil(Math.min(this.viewport.y2 / this.tileScale, this.world.height)));
+      0, 0);
+    area.x2 = Math.ceil(Math.min(this.viewport.x2 / this.tileScale, this.world.width-1));
+    area.y2 = Math.ceil(Math.min(this.viewport.y2 / this.tileScale, this.world.height-1));
+    return area;
   }
 
   public drawRect(rect: Rectangle, color: Color): void {

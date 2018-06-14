@@ -5,10 +5,11 @@ import { toTitleCase } from "../Utilities";
 import Item from 'overmorrow/classes/Item';
 import EntityItem from 'overmorrow/classes/EntityItem';
 import Rectangle from '../primitives/Rectangle';
+import Color from '../primitives/Color';
 
 export default class Tile implements Tickable {
 	private _type: TileType;
-	private _light: number = 0;
+	private _light: number = 1;
 	private _fog: DiscoveryLevel = DiscoveryLevel.UNKNOWN;
 	private _durability: number = 1; // Number of ticks of mining left without modifier
 
@@ -47,6 +48,10 @@ export default class Tile implements Tickable {
 	}
 
 	public draw(ui: WorldRenderer, x: number, y: number): void {
+		if (this._light <= 0 || this._fog === DiscoveryLevel.UNKNOWN) {
+			ui.drawRect(new Rectangle(x, y, 1, 1), Color.black);
+			return;
+		}
 		this._type.draw(ui, x, y);
 	}
 	public tick(delta: number): void {

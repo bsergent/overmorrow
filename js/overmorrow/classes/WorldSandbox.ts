@@ -1,8 +1,11 @@
 import * as moment from '../../../node_modules/moment/moment';
 import World from "overmorrow/classes/World";
-import Tile, { TileType } from "overmorrow/classes/Tile";
+import Tile, { TileType, DiscoveryLevel } from "overmorrow/classes/Tile";
 import Entity from 'overmorrow/classes/Entity';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
+import Rectangle from '../primitives/Rectangle';
+import Color from '../primitives/Color';
+declare var DEBUG;
 
 export default class WorldSandbox extends World {
   // Will there need to be two layers of tiles? One for collidable foreground and one for the floor/background?
@@ -34,22 +37,44 @@ export default class WorldSandbox extends World {
 
   public draw(ui: WorldRenderer): void {
     let area = ui.getVisibleTileArea();
-    // TODO Render crash on border
+    // Tiles
 		for (let y = area.y1; y <= area.y2; y++) {
 			for (let x = area.x1; x <= area.x2; x++) {
-				if (this._tiles[y][x] !== null)
-					this._tiles[y][x].draw(ui, x, y);
+				if (this._tiles[y][x] !== null) {
+          if (this._tiles[y][x] === undefined) console.log(area);
+          this._tiles[y][x].draw(ui, x, y);
+        }
 			}
     }
-    super.draw(ui);
+    // Entities
+    for (let e of this._entities)
+      if (this.getTile(e.x1, e.y1).light > 0 && this.getTile(e.x1, e.y1).fog === DiscoveryLevel.VISIBLE  || DEBUG)
+        e.draw(ui);
+    // Vision
+    for (let y = area.y1; y <= area.y2; y++) {
+      for (let x = area.x1; x <= area.x2; x++) {
+        if (this._tiles[y][x] !== null && this._tiles[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
+          ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
+      }
+    }
+  }
+
+  public discover(x: number, y: number, radius: number): void {
+    for (let r = 0; r < this._width; r++)
+      for (let c = 0; c < this._width; c++)
+        if (this._tiles[r][c].fog === DiscoveryLevel.VISIBLE)
+          this._tiles[r][c].fog = DiscoveryLevel.DISCOVERED;
+    for (let r = Math.floor(Math.max(y + 0.5 - radius, 0)); r < Math.ceil(Math.min(y + 0.5 + radius, this._height)); r++)
+      for (let c = Math.floor(Math.max(x + 0.5 - radius, 0)); c < Math.ceil(Math.min(x + 0.5 + radius, this._width)); c++)
+        this._tiles[r][c].fog = DiscoveryLevel.VISIBLE;
   }
 
 	public getTile(x: number, y: number): Tile {
-		return this._tiles[y][x];
+		return this._tiles[Math.floor(y)][Math.floor(x)];
   }
 
   public setTile(x: number, y: number, type: string): void {
-    this._tiles[y][x].type = TileType.getType(type);
+    this._tiles[Math.floor(y)][Math.floor(x)].type = TileType.getType(type);
   }
 
   public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {

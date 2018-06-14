@@ -10,6 +10,13 @@ export default class Color {
   private g:number; // 0-255
   private b:number; // 0-255
   private a:number; // 0-1
+  /**
+   * 
+   * @param r Red component (0-255)
+   * @param g Green component (0-255)
+   * @param b Blue component (0-255)
+   * @param a Alpha component (0-1)
+   */
   constructor(r:number = 0, g:number = 0, b:number = 0, a:number = 1) {
     this.r = r;
     this.g = g;
