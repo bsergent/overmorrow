@@ -1,22 +1,18 @@
 import * as moment from '../../../node_modules/moment/moment';
-import World from "overmorrow/classes/World";
-import Tile, { TileType, DiscoveryLevel } from "overmorrow/classes/Tile";
+import World from 'overmorrow/classes/World';
+import Tile, { TileType, DiscoveryLevel } from 'overmorrow/classes/Tile';
 import Entity from 'overmorrow/classes/Entity';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Rectangle from '../primitives/Rectangle';
 import Color from '../primitives/Color';
+import { Perlin } from '../Utilities';
 declare var DEBUG;
 
 export default class WorldSandbox extends World {
-  // Will there need to be two layers of tiles? One for collidable foreground and one for the floor/background?
-  // Don't want a single color/texture for the floor, so I guess there will have to be ground tiles that just
-  //  aren't collidable, but that will make breaking tiles slightly more complicated. Guess ground tiles will
-  //  be uncollidable and unbreakable
+  protected _tiles: Tile[][];
+  private _seed: number;
   
-  private _tiles: Tile[][]; // Tile information
-  private _seed: string;
-  
-  constructor(width: number, height: number, defaultTileType: string, seed: string = '') {
+  constructor(width: number, height: number, defaultTileType: string, seed: number = -1) {
     super(width, height);
 		this._tiles = new Array(height);
     for (let r = 0; r < height; r++) {
@@ -24,8 +20,15 @@ export default class WorldSandbox extends World {
       for (let c = 0; c < width; c++)
         this._tiles[r][c] = new Tile(defaultTileType);
     }
-    this._seed = seed === '' ? Math.random().toString(36).substring(2, 10) : seed;
-    console.log(`seed: ${this._seed}`);
+    this._seed = seed === -1 ? Date.now() : seed;
+    console.log(`Seed: ${this._seed}`);
+    this.generate();
+  }
+
+  protected generate(): void {}
+  
+  public get seed(): number {
+    return this._seed;
   }
 
   public tick(delta: number): number {
@@ -88,5 +91,5 @@ export default class WorldSandbox extends World {
       || (entityToIgnore !== undefined
           && this._entityCollision[fY][fX].length > 1
           && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
-	}
+  }
 }

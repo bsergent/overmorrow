@@ -21,6 +21,7 @@ import EntitySlime from 'overmorrow/classes/EntitySlime';
 import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import { TileType } from 'overmorrow/classes/Tile';
+import WorldDungeon from './WorldDungeon';
 
 class Demo {
   public static main(): void {
@@ -123,7 +124,7 @@ class Demo {
 
     // Build world
     //let world = new WorldTiled('assets/dungeonEntrance.json');
-    let world = new WorldSandbox(50, 50, 'dirt');
+    let world = new WorldDungeon(50, 50, 'dirt', 5);
     for (let i = 8; i < 16; i++)
       world.setTile(i, 18, 'wall');
     world.setTile(14, 18, 'wall_moss');
