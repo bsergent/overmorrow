@@ -34,7 +34,7 @@ export default class EntityPlayer extends EntityLiving {
     if (this.itemPrimary !== null)
       ui.drawImage(this.clone().offset(10 / 16, -3 / 16), this.itemPrimary.image, 1, { deg: 10, x: 0.1, y: 0.9});
     this._aniSheet.draw(ui, this);
-    ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this._username} [${this.id}]`: this._username, 'Courier', 12, Color.white, 'center');
+    ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this._username} [${this.id}]`: this._username, 'Courier', 12, Color.WHITE, 'center');
   }
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);

@@ -27,14 +27,14 @@ class Demo {
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
-    tpsLabel.setAlignment('right').setColor(Color.white);
+    tpsLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(tpsLabel, 10);
     let drawLabel = new UILabel(renderer.getWidth() - 2, 20, '1');
-    drawLabel.setAlignment('right').setColor(Color.white);
+    drawLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(drawLabel, 10);
     
     let playerPosLabel = new UILabel(0, 0, '0,0');
-    playerPosLabel.setAlignment('left').setColor(Color.white);
+    playerPosLabel.setAlignment('left').setColor(Color.WHITE);
     renderer.addComponent(playerPosLabel, 10);
 
 
@@ -42,7 +42,7 @@ class Demo {
     panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
 
     let testLabel = new UILabel(0, 0, 'Title');
-    testLabel.setSize(24).setColor(Color.white);
+    testLabel.setSize(24).setColor(Color.WHITE);
     panel.addComponent(testLabel, 0);
 
     let testImage = new UIImage(0, 42, 32, 32, 'assets/collision.png');
@@ -54,7 +54,7 @@ class Demo {
 
     let testAnimation = new UIImage(64, 48, 32, 32);
     let testAniSheet = new AnimationSheet('assets/player.png');
-    testAniSheet.setFrameTag('idle_0').replaceColor(new Color(99, 129, 215), Color.white);
+    testAniSheet.setFrameTag('idle_0').replaceColor(new Color(99, 129, 215), Color.WHITE);
     testAnimation.setAnimationSheet(testAniSheet);
     panel.addComponent(testAnimation, 0);
 
@@ -116,7 +116,7 @@ class Demo {
     player.itemPrimary = new Item('sword_obsidian');
     world.addEntity(player);
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
-    darkblade.setEyeColor(Color.brown);
+    darkblade.setEyeColor(Color.BROWN);
     darkblade.giveItem(new Item('book_of_wynn'));
     darkblade.itemSecondary = new Item('shield_wooden');
     world.addEntity(darkblade);
@@ -147,7 +147,7 @@ class Demo {
     let healthBarText = new UILabel(106, renderer.getHeight() - 24, '100/100');
     healthBarText.setAlignment('center');
     healthBarText.setSize(20);
-    healthBarText.setColor(Color.white);
+    healthBarText.setColor(Color.WHITE);
     renderer.addComponent(healthBarBorder, 1);
     renderer.addComponent(healthBarBackground, 1);
     renderer.addComponent(healthBarForeground, 1);
@@ -158,7 +158,7 @@ class Demo {
     let staminaBarText = new UILabel(106, renderer.getHeight() - 50, '100/100');
     staminaBarText.setAlignment('center');
     staminaBarText.setSize(20);
-    staminaBarText.setColor(Color.white);
+    staminaBarText.setColor(Color.WHITE);
     renderer.addComponent(staminaBarBackground, 1);
     renderer.addComponent(staminaBarForeground, 1);
     renderer.addComponent(staminaBarText, 1);

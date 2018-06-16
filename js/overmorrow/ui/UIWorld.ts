@@ -66,8 +66,8 @@ export default class UIWorld extends UIComponent {
   public draw(ui: Renderer): void {
     if (this._player !== null) {
       if (this._player.health <= 0) {
-        ui.drawRect(this, Color.black);
-        ui.drawText(new Rectangle(this.width / 2, this.height / 2 - 36, 0, 0), 'You died.', 'Comic Sans', 72, Color.red, 'center');
+        ui.drawRect(this, Color.BLACK);
+        ui.drawText(new Rectangle(this.width / 2, this.height / 2 - 36, 0, 0), 'You died.', 'Comic Sans', 72, Color.RED, 'center');
         return;
       }
       this.centerViewPort(this._player.x1, this._player.y1);

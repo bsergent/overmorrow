@@ -58,7 +58,7 @@ export default class Renderer {
 
   public draw(): number {
     let startTime = moment();
-    this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.black);
+    this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.BLACK);
     for (let componentArray of this._components) {
       if (componentArray === undefined)
         continue;
@@ -171,7 +171,7 @@ export default class Renderer {
       this._context.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
     }
     this._context.globalAlpha = 1;
-    if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.red);
+    if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);
   }
 
   public drawSprite(rect: Rectangle, drect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
@@ -196,7 +196,7 @@ export default class Renderer {
         this._context.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);
     }
     // TODO Implement colorization and color replacement
-    if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.red);
+    if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);
   }
 
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {

@@ -8,8 +8,8 @@ export default class UIButton extends UIComponent {
     private _text: string;
     private _font: string = 'Times New Roman';
     private _size: number = 16;
-    private _colorBG: Color = Color.black;
-    private _colorFG: Color = Color.white;
+    private _colorBG: Color = Color.BLACK;
+    private _colorFG: Color = Color.WHITE;
 		private _alignment: 'left'|'center'|'right' = 'left';
 		private _hovered: boolean = false;
 		private _action: Function;

@@ -7,7 +7,7 @@ export default class UILabel extends UIComponent {
     private _text: string;
     private _font: string = 'Times New Roman';
     private _size: number = 16;
-    private _color: Color = Color.black;
+    private _color: Color = Color.BLACK;
     private _alignment: 'left'|'center'|'right' = 'left';
   
     constructor(x: number, y: number, text: string) {

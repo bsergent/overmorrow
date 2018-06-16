@@ -154,13 +154,13 @@ export default abstract class EntityLiving extends Entity {
   
 	public draw(ui: WorldRenderer): void {
     if (DEBUG) {
-      ui.drawRectWire(this, this.isFatigued() ? Color.white : Color.green);
-      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.red);
-      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.green);
-      if (this.type !== 'player') ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this.type} [${this.id}]`: this.type, 'Courier', 12, Color.white, 'center');
+      ui.drawRectWire(this, this.isFatigued() ? Color.WHITE : Color.GREEN);
+      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.RED);
+      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.GREEN);
+      if (this.type !== 'player') ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this.type} [${this.id}]`: this.type, 'Courier', 12, Color.WHITE, 'center');
       let vec = directionToVector(this.direction);
       vec.magnitude = 1;
-      ui.drawLine(new Rectangle(this.x1 + 0.5, this.y1 + 0.5, vec.x, vec.y), Color.red, 3);
+      ui.drawLine(new Rectangle(this.x1 + 0.5, this.y1 + 0.5, vec.x, vec.y), Color.RED, 3);
     }
   }
 

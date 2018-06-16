@@ -1,11 +1,11 @@
 export default class Color {
-  public static black = new Color();
-  public static white = new Color(255,255,255);
-  public static red = new Color(255,0,0);
-  public static green = new Color(0,255,0);
-  public static blue = new Color(0,0,255);
-  public static brown = new Color(76,55,24);
-  public static transparent = new Color(0,0,0,0);
+  public static BLACK = new Color();
+  public static WHITE = new Color(255,255,255);
+  public static RED = new Color(255,0,0);
+  public static GREEN = new Color(0,255,0);
+  public static BLUE = new Color(0,0,255);
+  public static BROWN = new Color(76,55,24);
+  public static TRANSPARENT = new Color(0,0,0,0);
   private r:number; // 0-255
   private g:number; // 0-255
   private b:number; // 0-255

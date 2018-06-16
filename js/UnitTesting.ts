@@ -171,28 +171,28 @@ class UnitTesting {
       'Unit Test Results',
       'Courier New',
       32,
-      Color.white,
+      Color.WHITE,
       'center');
     renderer.drawText(
       new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2 - 72, 0, 0),
       `Passed: ${passed}`,
       'Courier New',
       72,
-      Color.white,
+      Color.WHITE,
       'center');
     renderer.drawText(
       new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2, 0, 0),
       `Failed: ${failed}`,
       'Courier New',
       72,
-      Color.white,
+      Color.WHITE,
       'center');
     renderer.drawText(
       new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2 + 72, 0, 0),
       `Time Elapsed: ${endTime.diff(startTime)}ms`,
       'Courier New',
       32,
-      Color.white,
+      Color.WHITE,
       'center');
     renderer.drawBuffer();
 

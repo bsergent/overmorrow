@@ -22,7 +22,7 @@ export default class UIPanel extends UIComponent {
     private _draggable: boolean = true;
     constructor(x: number, y: number, width: number, height: number) {
       super(x, y, width, height);
-      this.setSkin('assets/borderPatch.png', 1, Color.blue);
+      this.setSkin('assets/borderPatch.png', 1, Color.BLUE);
     }
     public setTitle(title: string): UIPanel {
       this._title = title;

@@ -23,7 +23,7 @@ export default class EntityItem extends Entity {
 
   public draw(ui: WorldRenderer): void {
     if (DEBUG)
-      ui.drawRectWire(this.clone().offset(0, (1 - this._pulseOffset) / 4), this._pulseSpeed < Math.PI * 4 / 16 ? Color.green : Color.red);
+      ui.drawRectWire(this.clone().offset(0, (1 - this._pulseOffset) / 4), this._pulseSpeed < Math.PI * 4 / 16 ? Color.GREEN : Color.RED);
     ui.drawImage(
       this.clone().offset(0, (1 - this._pulseOffset) / 4),
       this.item.image,
