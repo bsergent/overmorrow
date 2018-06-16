@@ -107,11 +107,11 @@ export default class Renderer {
     return false;
   }
 
-  public getWidth(): number {
+  public get width(): number {
     return this._width;
   }
 
-  public getHeight(): number {
+  public get height(): number {
     return this._height;
   }
 

@@ -83,17 +83,18 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   private _renderer: Renderer;
 
   constructor(renderer: Renderer, viewport: Rectangle, tileScale: number = 16) {
-    super(null, null, null, null); // Ignore own rrender functions and just call them on the given Renderer with needed transformations
+    super(null, null, null, null); // Ignore own render functions and just call them on the given Renderer with needed transformations
     this._renderer = renderer;
     this.viewport = viewport;
     this.tileScale = tileScale;
   }
 
   private isOnScreen(rect: Rectangle): boolean {
-    return rect.x1 * this.tileScale < this.viewport.x2
-      && rect.y1 * this.tileScale < this.viewport.y2
-      && rect.x2 * this.tileScale > this.viewport.x1
-      && rect.y2 * this.tileScale > this.viewport.y1;
+    // Returns true if either corner is visible
+    return (rect.x1 * this.tileScale < this.viewport.x2
+        && rect.y1 * this.tileScale < this.viewport.y2)
+      || (rect.x2 * this.tileScale > this.viewport.x1
+        && rect.y2 * this.tileScale > this.viewport.y1);
   }
 
   private rectToViewPort(rect: Rectangle): Rectangle {
@@ -148,5 +149,9 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
     if (!this.isOnScreen(rect)) return;
     this._renderer.drawText(this.rectToViewPort(rect), text, font, size, color, alignment);
+  }
+
+  public get rendererAbsolute(): Renderer {
+    return this._renderer;
   }
 }

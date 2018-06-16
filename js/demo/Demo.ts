@@ -29,10 +29,10 @@ class Demo {
     var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
 
     // Set up UI
-    let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
+    let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
     tpsLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(tpsLabel, 10);
-    let drawLabel = new UILabel(renderer.getWidth() - 2, 20, '1');
+    let drawLabel = new UILabel(renderer.width - 2, 20, '1');
     drawLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(drawLabel, 10);
     
@@ -124,46 +124,47 @@ class Demo {
 
     // Build world
     //let world = new WorldTiled('assets/dungeonEntrance.json');
-    let world = new WorldDungeon(50, 50, 'dirt', 5);
-    for (let i = 8; i < 16; i++)
-      world.setTile(i, 18, 'wall');
-    world.setTile(14, 18, 'wall_moss');
-    world.setTile(9, 18, 'wall_moss');
-    world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
-    world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
-    let player = new EntityPlayer(12, 19, 'Wake');
+    let world = new WorldDungeon('wall', 1025);
+    world.setTile(Math.floor(world.width/2), Math.floor(world.height/2), 'dirt');
+    // for (let i = 8; i < 16; i++)
+    //   world.setTile(i, 18, 'wall');
+    // world.setTile(14, 18, 'wall_moss');
+    // world.setTile(9, 18, 'wall_moss');
+    // world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
+    // world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
+    let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
     player.itemPrimary = new Item('sword_obsidian');
     world.addEntity(player);
-    let darkblade = new EntityPlayer(11, 16, 'Raesan');
-    darkblade.setEyeColor(Color.brown);
-    darkblade.giveItem(new Item('book_of_wynn'));
-    darkblade.itemSecondary = new Item('shield_wooden');
-    world.addEntity(darkblade);
-    setInterval(() => {
-      let x = 0;
-      let y = 0;
-      if (Math.random() < 0.5)
-        x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
-      else
-        y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
-      darkblade.setAction(new ActionMove(x, y));
-      darkblade.direction = facingToDirection(darkblade.facing);
-    }, 3000);
-    let gwindor = new EntityPlayer(14, 15, 'Gwindor');
-    gwindor.itemSecondary = new Item('shield_wooden');
-    gwindor.facing = Facing.RIGHT;
-    gwindor.direction = Direction.NORTHEAST;
-    world.addEntity(gwindor);
-    let slime = new EntitySlime(19, 11);
-    world.addEntity(slime);
-    let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
+    // let darkblade = new EntityPlayer(11, 16, 'Raesan');
+    // darkblade.setEyeColor(Color.brown);
+    // darkblade.giveItem(new Item('book_of_wynn'));
+    // darkblade.itemSecondary = new Item('shield_wooden');
+    // world.addEntity(darkblade);
+    // setInterval(() => {
+    //   let x = 0;
+    //   let y = 0;
+    //   if (Math.random() < 0.5)
+    //     x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
+    //   else
+    //     y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
+    //   darkblade.setAction(new ActionMove(x, y));
+    //   darkblade.direction = facingToDirection(darkblade.facing);
+    // }, 3000);
+    // let gwindor = new EntityPlayer(14, 15, 'Gwindor');
+    // gwindor.itemSecondary = new Item('shield_wooden');
+    // gwindor.facing = Facing.RIGHT;
+    // gwindor.direction = Direction.NORTHEAST;
+    // world.addEntity(gwindor);
+    // let slime = new EntitySlime(19, 11);
+    // world.addEntity(slime);
+    let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
 
-    let healthBarBorder = new UIImage(0, renderer.getHeight() - 32, 212, 32, 'assets/health_bd.png');
-    let healthBarBackground = new UIImage(6, renderer.getHeight() - 26, 200, 20, 'assets/health_bg.png');
-    let healthBarForeground = new UIImage(6, renderer.getHeight() - 26, 200, 20, 'assets/health_fg.png');
-    let healthBarText = new UILabel(106, renderer.getHeight() - 24, '100/100');
+    let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
+    let healthBarBackground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_bg.png');
+    let healthBarForeground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_fg.png');
+    let healthBarText = new UILabel(106, renderer.height - 24, '100/100');
     healthBarText.setAlignment('center');
     healthBarText.setSize(20);
     healthBarText.setColor(Color.white);
@@ -172,9 +173,9 @@ class Demo {
     renderer.addComponent(healthBarForeground, 1);
     renderer.addComponent(healthBarText, 1);
 
-    let staminaBarBackground = new UIImage(6, renderer.getHeight() - 52, 200, 20, 'assets/health_bg.png');
-    let staminaBarForeground = new UIImage(6, renderer.getHeight() - 52, 200, 20, 'assets/health_fg.png');
-    let staminaBarText = new UILabel(106, renderer.getHeight() - 50, '100/100');
+    let staminaBarBackground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_bg.png');
+    let staminaBarForeground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_fg.png');
+    let staminaBarText = new UILabel(106, renderer.height - 50, '100/100');
     staminaBarText.setAlignment('center');
     staminaBarText.setSize(20);
     staminaBarText.setColor(Color.white);

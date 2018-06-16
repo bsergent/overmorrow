@@ -5,7 +5,14 @@ export default class Rectangle {
   private _y1: number;
   public x2: number;
   public y2: number;
-  
+
+  constructor(x: number, y: number, width: number, height: number) {
+    this._x1 = x;
+    this._y1 = y;
+    this.x2 = x + width;
+    this.y2 = y + height;
+  }
+
   get x1(): number {
     return this._x1;
   }
@@ -35,41 +42,53 @@ export default class Rectangle {
     this.y2 += (value - this.height);
   }
 
-  constructor(x: number, y: number, width: number, height: number) {
-    this._x1 = x;
-    this._y1 = y;
-    this.x2 = x + width;
-    this.y2 = y + height;
+  get center(): Vector {
+    return new Vector((this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2);
+  }
+  set center(center: Vector) {
+    this.x1 = center.x - (this.width / 2);
+    this.y1 = center.y - (this.height / 2);
   }
 
-  intersects(rect: Rectangle): boolean {
+  public intersects(rect: Rectangle): boolean {
     return this._x1 < rect.x2 && this.x2 > rect._x1 && this._y1 < rect.y2 && this.y2 > rect._y1;
   }
 
-  inside(x: number, y: number): boolean {
+  public inside(x: number, y: number): boolean {
     return x < this.x2 && x >= this.x1 && y < this.y2 && y >= this.y1;
   }
 
-  clone(): Rectangle {
+  public contains(x: number, y: number): boolean {
+    return x > this.x1 && x <= this.x2 && y > this.y1 && y <= this.y2;
+  }
+
+  public clone(): Rectangle {
     return new Rectangle(this._x1, this._y1, this.width, this.height);
   }
 
-  equals(rect: Rectangle): boolean {
+  public equals(rect: Rectangle): boolean {
     return this.x1 === rect.x1 && this.y1 === rect.y1 && this.x2 === rect.x2 && this.y2 === rect.y2;
   }
 
-  distanceTo(rect: Rectangle): number {
-    // TODO Take the widths and heights into account
-    return Math.sqrt((this.y1 - rect.y1) * (this.y1 - rect.y1) + (this.x1 - rect.x1) * (this.x1 - rect.x1));
+  public displacementBetweenCenters(rect: Rectangle): Vector {
+    let c1 = this.center;
+    let c2 = rect.center;
+    return new Vector(c1.x - c2.x, c1.y - c2.y);
   }
 
-  offset(x: number, y: number): Rectangle {
+  public distanceBetweenCenters(rect: Rectangle): number {
+    let c1 = this.center;
+    let c2 = rect.center;
+    return Math.sqrt((c1.y - c2.y) * (c1.y - c2.y) + (c1.x - c2.x) * (c1.x - c2.x));
+  }
+
+  public offset(x: number, y: number): Rectangle {
     this.x1 += x;
     this.y1 += y;
     return this;
   }
 
-  offsetByVector(vec: Vector): Rectangle {
+  public offsetByVector(vec: Vector): Rectangle {
     this.x1 += vec.x;
     this.y1 += vec.y;
     return this;

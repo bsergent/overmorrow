@@ -132,7 +132,7 @@ export default class WorldTiled extends World {
   }
 
   drawBG(ui: WorldRenderer): void {
-    ui.drawRect(new Rectangle(0, 0, ui.getWidth(), ui.getHeight()), this._backgroundColor);
+    ui.drawRect(new Rectangle(0, 0, ui.width, ui.height), this._backgroundColor);
     for (var l = 0; l < this._background.length; l++) {
       if (!this._background[l].visible) continue;
       this.drawLayer(ui, this._background[l]);

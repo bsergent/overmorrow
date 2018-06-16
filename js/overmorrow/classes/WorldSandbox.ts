@@ -10,6 +10,7 @@ declare var DEBUG;
 
 export default class WorldSandbox extends World {
   protected _tiles: Tile[][];
+  protected _defaultTileType: string;
   private _seed: number;
   
   constructor(width: number, height: number, defaultTileType: string, seed: number = -1) {
@@ -20,12 +21,10 @@ export default class WorldSandbox extends World {
       for (let c = 0; c < width; c++)
         this._tiles[r][c] = new Tile(defaultTileType);
     }
+    this._defaultTileType = defaultTileType;
     this._seed = seed === -1 ? Date.now() : seed;
     console.log(`Seed: ${this._seed}`);
-    this.generate();
   }
-
-  protected generate(): void {}
   
   public get seed(): number {
     return this._seed;
@@ -43,10 +42,7 @@ export default class WorldSandbox extends World {
     // Tiles
 		for (let y = area.y1; y <= area.y2; y++) {
 			for (let x = area.x1; x <= area.x2; x++) {
-				if (this._tiles[y][x] !== null) {
-          if (this._tiles[y][x] === undefined) console.log(area);
-          this._tiles[y][x].draw(ui, x, y);
-        }
+        this._tiles[y][x].draw(ui, x, y);
 			}
     }
     // Entities
@@ -56,7 +52,7 @@ export default class WorldSandbox extends World {
     // Vision
     for (let y = area.y1; y <= area.y2; y++) {
       for (let x = area.x1; x <= area.x2; x++) {
-        if (this._tiles[y][x] !== null && this._tiles[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
+        if (this._tiles[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
           ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
       }
     }
@@ -78,6 +74,14 @@ export default class WorldSandbox extends World {
 
   public setTile(x: number, y: number, type: string): void {
     this._tiles[Math.floor(y)][Math.floor(x)].type = TileType.getType(type);
+  }
+
+  public setTiles(rect: Rectangle, type: string): void {
+    let worldBoundaries: Rectangle = new Rectangle(-1, -1, this.width-1, this.height-1);
+    for (let y = rect.y1; y < rect.y2; y++)
+      for (let x = rect.x1; x < rect.x2; x++)
+        if (worldBoundaries.contains(x, y))
+          this._tiles[y][x].type = TileType.getType(type);
   }
 
   public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {

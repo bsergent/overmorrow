@@ -40,7 +40,7 @@ export default class EntitySlime extends EntityLiving {
     let velX = 0;
     let velY = 0;
     if (target !== null) {
-      let speed = this.distanceTo(target) < 4 && this.distanceTo(target) > 1 ? this._speedSprint : this._speed;
+      let speed = this.distanceBetweenCenters(target) < 4 && this.distanceBetweenCenters(target) > 1 ? this._speedSprint : this._speed;
       // TODO Check y before x half the time
       velX = Math.sign(target.x1 - this.x1) * speed;
       if (velX === 0 || world.isTileOccupied(this.x1 + Math.sign(target.x1 - this.x1), this.y1, this)) {
@@ -48,7 +48,7 @@ export default class EntitySlime extends EntityLiving {
         velY = Math.sign(target.y1 - this.y1) * speed;
       }
       this.direction = degreesToDirection(Math.atan2(target.y1 - this.y1, target.x1 - this.x1) * 180 / Math.PI);
-      if (this.distanceTo(target) <= 1.7) {
+      if (this.distanceBetweenCenters(target) <= 1.7) {
         this.setAction(new ActionUseItem(new Item('attack_slime', 1)));
       }
     } else {

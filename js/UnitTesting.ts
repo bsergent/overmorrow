@@ -164,31 +164,31 @@ class UnitTesting {
     let endTime: moment.Moment = moment();
 
     renderer.drawRect(
-      new Rectangle(0, 0, renderer.getWidth(), renderer.getHeight()),
+      new Rectangle(0, 0, renderer.width, renderer.height),
       failed > 0 ? new Color(100,0,0) : new Color(0,100,0));
     renderer.drawText(
-      new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2 - 104, 0, 0),
+      new Rectangle(renderer.width /  2, renderer.height / 2 - 104, 0, 0),
       'Unit Test Results',
       'Courier New',
       32,
       Color.white,
       'center');
     renderer.drawText(
-      new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2 - 72, 0, 0),
+      new Rectangle(renderer.width /  2, renderer.height / 2 - 72, 0, 0),
       `Passed: ${passed}`,
       'Courier New',
       72,
       Color.white,
       'center');
     renderer.drawText(
-      new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2, 0, 0),
+      new Rectangle(renderer.width /  2, renderer.height / 2, 0, 0),
       `Failed: ${failed}`,
       'Courier New',
       72,
       Color.white,
       'center');
     renderer.drawText(
-      new Rectangle(renderer.getWidth() /  2, renderer.getHeight() / 2 + 72, 0, 0),
+      new Rectangle(renderer.width /  2, renderer.height / 2 + 72, 0, 0),
       `Time Elapsed: ${endTime.diff(startTime)}ms`,
       'Courier New',
       32,

@@ -295,14 +295,14 @@ export class SeededRandom {
     return this._s[this._p] = t - (this._c = t | 0);
   }
 
-  public seed(seed: string) {
+  private seed(seed: string) {
     if (typeof seed === 'undefined' || seed === null)
       seed = Math.random().toString();
     this.initState();
     this.hashString(seed);
   }
 
-  public initState() {
+  private initState() {
     this.mash(); // pass a null arg to force mash hash to init
     for (let i = 0; i < this._o; i++) {
       this._s[i] = this.mash(' '); // fill the array with initial mash hash values
@@ -311,7 +311,7 @@ export class SeededRandom {
     this._p = this._o; // init our phase
   };
   
-  public hashString(inStr) {
+  private hashString(inStr) {
     inStr = this.cleanString(inStr);
     this.mash(inStr); // use the string to evolve the 'mash' state
     for (let i = 0; i < inStr.length; i++) { // scan through the characters in our string
@@ -324,7 +324,7 @@ export class SeededRandom {
     }
   }
 
-  public cleanString(inStr) {
+  private cleanString(inStr) {
     inStr = inStr.replace(/(^\s*)|(\s*$)/gi, ''); // remove any/all leading spaces
     inStr = inStr.replace(/[\x00-\x1F]/gi, ''); // remove any/all control characters
     inStr = inStr.replace(/\n /, '\n'); // remove any/all trailing spaces
@@ -356,10 +356,17 @@ export class SeededRandom {
    * @returns Random integer between min (inclusive) and max (inclusive)
    */
   public intBetween(min, max) {
+    if (min > max) swap(min, max);
     return Math.floor(this.random() * (max - min + 1)) + min;
   };
 }
 
 export function toTitleCase(str: string): string {
     return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+}
+
+export function swap(x: any, y: any): void {
+  x = x ^ y;
+  y = x ^ y;
+  x = x ^ y;
 }
