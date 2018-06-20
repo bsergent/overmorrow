@@ -54,15 +54,15 @@ export default class UIButton extends UIComponent {
 		}
 		
 		public input(ui: Renderer, e: InputEvent): boolean {
-      if (e.type === EventTypes.MOUSEDOWN && this.inside(e.x, e.y)) {
+      if (e.type === EventTypes.MOUSEDOWN && this.contains(e.x, e.y)) {
         ui.selectComponent(this);
         return true;
-      } else if (e.type === EventTypes.MOUSEUP && this.inside(e.x, e.y)) {
+      } else if (e.type === EventTypes.MOUSEUP && this.contains(e.x, e.y)) {
 				this._action();
         ui.selectComponent(null);
         return true;
       } else if (e.type === EventTypes.MOUSEMOVE) {
-        this._hovered = this.inside(e.x, e.y);
+        this._hovered = this.contains(e.x, e.y);
         return false;
       }
       return false;

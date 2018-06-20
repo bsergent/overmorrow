@@ -61,18 +61,18 @@ class Demo {
     testAnimation.setAnimationSheet(testAniSheet);
     panel.addComponent(testAnimation, 0);
 
-    let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
-    testButton.setAction(() => {
-      console.log('Clicked test button');
-      testButton.setText(Math.random().toString(16).substr(2, 5));
-    });
-    panel.addComponent(testButton, 0);
-    let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
-    closeButton.setAction(() => {
-      renderer.removeComponent(panel);
-    });
-    panel.addComponent(closeButton, 0);
-    renderer.addComponent(panel, 2);
+    // let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
+    // testButton.setAction(() => {
+    //   console.log('Clicked test button');
+    //   testButton.setText(Math.random().toString(16).substr(2, 5));
+    // });
+    // panel.addComponent(testButton, 0);
+    // let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
+    // closeButton.setAction(() => {
+    //   renderer.removeComponent(panel);
+    // });
+    // panel.addComponent(closeButton, 0);
+    // renderer.addComponent(panel, 2);
 
     // Compile item types
     ItemType.addType('sword_obsidian')
@@ -121,20 +121,24 @@ class Demo {
     TileType.addType('wall_moss')
       .setImage('assets/f1_terrain.png')
       .setSpriteCoords(new Rectangle(16, 0, 16, 16));
+    TileType.addType('door')
+      .setImage('assets/f1_terrain.png')
+      .setSpriteCoords(new Rectangle(48, 0, 16, 16))
+      .setSolid(false);
 
     // Build world
     //let world = new WorldTiled('assets/dungeonEntrance.json');
     let world = new WorldDungeon('wall', 1025);
-    world.setTile(Math.floor(world.width/2), Math.floor(world.height/2), 'dirt');
+    //world.setTile(Math.floor(world.width/2), Math.floor(world.height/2), 'dirt');
     // for (let i = 8; i < 16; i++)
     //   world.setTile(i, 18, 'wall');
     // world.setTile(14, 18, 'wall_moss');
     // world.setTile(9, 18, 'wall_moss');
     // world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     // world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
-    let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
-    player.itemPrimary = new Item('sword_obsidian');
-    world.addEntity(player);
+    // let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
+    // player.itemPrimary = new Item('sword_obsidian');
+    // world.addEntity(player);
     // let darkblade = new EntityPlayer(11, 16, 'Raesan');
     // darkblade.setEyeColor(Color.brown);
     // darkblade.giveItem(new Item('book_of_wynn'));
@@ -158,7 +162,8 @@ class Demo {
     // let slime = new EntitySlime(19, 11);
     // world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
-    uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
+    uiworld.setWorld(world);//.setPlayer(player).setTileScale(128 - 32);
+    uiworld.centerViewPort(11, 11).setTileScale(8);
     renderer.addComponent(uiworld, 0);
 
     let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
@@ -202,54 +207,54 @@ class Demo {
         uiworld.tileScale -= 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYHELD)
-      .setKeys([Keys.KEY_W])
-      .setDuration(0.1)
-      .setAction(event => {
-        player.setAction(new ActionMove(0, -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
-      });
-    controller.addListener(EventTypes.KEYHELD)
-      .setKeys([Keys.KEY_S])
-      .setDuration(0.1)
-      .setAction(event => {
-        player.setAction(new ActionMove(0, controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
-      });
-    controller.addListener(EventTypes.KEYHELD)
-      .setKeys([Keys.KEY_A])
-      .setDuration(0.1)
-      .setAction(event => {
-        player.setAction(new ActionMove(-(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
-      });
-    controller.addListener(EventTypes.KEYHELD)
-      .setKeys([Keys.KEY_D])
-      .setDuration(0.1)
-      .setAction(event => {
-        player.setAction(new ActionMove(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
-      });
-    controller.addListener(EventTypes.MOUSEMOVE)
-      .setAction((event: InputEvent) => {
-        let px = (player.x1 + 0.5) * uiworld.tileScale - uiworld.viewport.x1;
-        let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
-        player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
-      });
-    // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
-    controller.addListener(EventTypes.MOUSEDOWN)
-      .setKeys([Keys.MOUSE_LEFT])
-      .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, 1));
-      });
-    controller.addListener(EventTypes.MOUSEDOWN)
-      .setKeys([Keys.MOUSE_RIGHT])
-      .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, 2));
-      });
-    controller.addListener(EventTypes.KEYDOWN)
-      .setKeys([Keys.KEY_M])
-      .setAction(event => {
-        if (world.isTileOccupied(19, 11)) return;
-        let slime = new EntitySlime(19, 11);
-        world.addEntity(slime);
-      });
+    // controller.addListener(EventTypes.KEYHELD)
+    //   .setKeys([Keys.KEY_W])
+    //   .setDuration(0.1)
+    //   .setAction(event => {
+    //     player.setAction(new ActionMove(0, -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
+    //   });
+    // controller.addListener(EventTypes.KEYHELD)
+    //   .setKeys([Keys.KEY_S])
+    //   .setDuration(0.1)
+    //   .setAction(event => {
+    //     player.setAction(new ActionMove(0, controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
+    //   });
+    // controller.addListener(EventTypes.KEYHELD)
+    //   .setKeys([Keys.KEY_A])
+    //   .setDuration(0.1)
+    //   .setAction(event => {
+    //     player.setAction(new ActionMove(-(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
+    //   });
+    // controller.addListener(EventTypes.KEYHELD)
+    //   .setKeys([Keys.KEY_D])
+    //   .setDuration(0.1)
+    //   .setAction(event => {
+    //     player.setAction(new ActionMove(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
+    //   });
+    // controller.addListener(EventTypes.MOUSEMOVE)
+    //   .setAction((event: InputEvent) => {
+    //     let px = (player.x1 + 0.5) * uiworld.tileScale - uiworld.viewport.x1;
+    //     let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
+    //     player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
+    //   });
+    // // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
+    // controller.addListener(EventTypes.MOUSEDOWN)
+    //   .setKeys([Keys.MOUSE_LEFT])
+    //   .setAction(event => {
+    //     player.setAction(new ActionUseItem(player.itemPrimary, 1));
+    //   });
+    // controller.addListener(EventTypes.MOUSEDOWN)
+    //   .setKeys([Keys.MOUSE_RIGHT])
+    //   .setAction(event => {
+    //     player.setAction(new ActionUseItem(player.itemPrimary, 2));
+    //   });
+    // controller.addListener(EventTypes.KEYDOWN)
+    //   .setKeys([Keys.KEY_M])
+    //   .setAction(event => {
+    //     if (world.isTileOccupied(19, 11)) return;
+    //     let slime = new EntitySlime(19, 11);
+    //     world.addEntity(slime);
+    //   });
 
     console.log('Initialized');
 
@@ -260,27 +265,27 @@ class Demo {
       timekeep.startUpdate();
       controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta()));
-      if (player.health <= 0) {
-        setTimeout(function() {
-          if (player.health > 0) return;
-          let newPlayer = new EntityPlayer(12, 19, player.username);
-          newPlayer.itemPrimary = player.itemPrimary;
-          world.addEntity(newPlayer);
-          uiworld.setPlayer(newPlayer);
-          player = newPlayer;
-        }, 2500);
-      }
-      world.discover(player.x1, player.y1, 3);
-      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
+      // if (player.health <= 0) {
+      //   setTimeout(function() {
+      //     if (player.health > 0) return;
+      //     let newPlayer = new EntityPlayer(12, 19, player.username);
+      //     newPlayer.itemPrimary = player.itemPrimary;
+      //     world.addEntity(newPlayer);
+      //     uiworld.setPlayer(newPlayer);
+      //     player = newPlayer;
+      //   }, 2500);
+      // }
+      //world.discover(player.x1, player.y1, 3);
+      // playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
       drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
-      healthBarForeground.width = player.health / player.maxHealth * 200;
-      healthBarText.setText(`${Math.round(player.health)} / ${player.maxHealth}`);
-      staminaBarForeground.width = player.stamina / player.maxStamina * 200;
-      staminaBarText.setText(`${Math.round(player.stamina)} / ${player.maxStamina}`);
+      // healthBarForeground.width = player.health / player.maxHealth * 200;
+      // healthBarText.setText(`${Math.round(player.health)} / ${player.maxHealth}`);
+      // staminaBarForeground.width = player.stamina / player.maxStamina * 200;
+      // staminaBarText.setText(`${Math.round(player.stamina)} / ${player.maxStamina}`);
       
       setTimeout(update, timekeep.getTimeToWait());
       // TODO Also handle multiplayer stuff in here somewhere, queuing to world

@@ -6,15 +6,18 @@ import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Rectangle from '../primitives/Rectangle';
 import Color from '../primitives/Color';
 import { Perlin } from '../Utilities';
+import Vector from '../primitives/Vector';
 declare var DEBUG;
 
 export default class WorldSandbox extends World {
   protected _tiles: Tile[][];
   protected _defaultTileType: string;
+  protected _bounds: Rectangle;
   private _seed: number;
   
   constructor(width: number, height: number, defaultTileType: string, seed: number = -1) {
     super(width, height);
+    this._bounds = new Rectangle(0, 0, width, height);
 		this._tiles = new Array(height);
     for (let r = 0; r < height; r++) {
       this._tiles[r] = new Array(width);
@@ -69,6 +72,8 @@ export default class WorldSandbox extends World {
   }
 
 	public getTile(x: number, y: number): Tile {
+    if (!this._bounds.contains(x, y))
+      return null;
 		return this._tiles[Math.floor(y)][Math.floor(x)];
   }
 
@@ -77,10 +82,9 @@ export default class WorldSandbox extends World {
   }
 
   public setTiles(rect: Rectangle, type: string): void {
-    let worldBoundaries: Rectangle = new Rectangle(-1, -1, this.width-1, this.height-1);
-    for (let y = rect.y1; y < rect.y2; y++)
-      for (let x = rect.x1; x < rect.x2; x++)
-        if (worldBoundaries.contains(x, y))
+    for (let y = Math.min(rect.y1, rect.y2); y < Math.max(rect.y1, rect.y2); y++)
+      for (let x = Math.min(rect.x1, rect.x2); x < Math.max(rect.x1, rect.x2); x++)
+        if (this._bounds.contains(x, y))
           this._tiles[y][x].type = TileType.getType(type);
   }
 
@@ -95,5 +99,45 @@ export default class WorldSandbox extends World {
       || (entityToIgnore !== undefined
           && this._entityCollision[fY][fX].length > 1
           && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+  }
+
+  protected countTileTypesInArea(area: Rectangle): Map<TileType, number> {
+    let counts: Map<TileType, number> = new Map();
+    let tile: Tile;
+    for (let y = Math.min(area.y1, area.y2); y < Math.max(area.y1, area.y2); y++) {
+      for (let x = Math.min(area.x1, area.x2); x < Math.max(area.x1, area.x2); x++) {
+        tile = this.getTile(x, y)
+        if (tile === null) continue;
+        if (!counts.has(tile.type)) counts.set(tile.type, 1);
+        else counts.set(tile.type, counts.get(tile.type)+1);
+      }
+    }
+    return counts;
+  }
+
+  protected countSurroundingTiles(x: number, y: number, type: string): number {
+    let directions: Vector[] = new Array<Vector>(
+      new Vector(-1,  0),
+      new Vector( 1,  0),
+      new Vector( 0, -1),
+      new Vector( 0,  1));
+    let count: number = 0;
+    let next: Vector, current: Vector = new Vector(x, y);
+    let tileType: TileType = TileType.getType(type);
+    for (let d = 0; d < directions.length; d++) {
+      next = current.add(directions[d]);
+      if (this.getTile(next.x, next.y) !== null
+          && this.getTile(next.x, next.y).type === tileType)
+        count++;
+    }
+    return count;
+  }
+
+  protected checkOppositeTiles(x: number, y: number, type: string): boolean {
+    let tileType: TileType = TileType.getType(type);
+    return (this.getTile(x+1, y) !== null && this.getTile(x+1, y).type === tileType
+        && this.getTile(x-1, y) !== null && this.getTile(x-1, y).type === tileType)
+      || (this.getTile(x, y+1) !== null && this.getTile(x, y+1).type === tileType
+        && this.getTile(x, y-1) !== null && this.getTile(x, y-1).type === tileType);
   }
 }

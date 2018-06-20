@@ -45,7 +45,7 @@ export default abstract class World implements Tickable {
 	public getEntitiesAt(x: number, y: number): Entity[] {
 		let entities: Entity[] = [];
 		for (let e of this._entities)
-			if (e.inside(x, y))
+			if (e.contains(x, y))
 				entities.push(e);
 		return entities;
 	}
@@ -65,7 +65,7 @@ export default abstract class World implements Tickable {
 		// Return list of entities in region
 		let entities: Entity[] = [];
 		for (let e of this._entities)
-			if (region.inside(e.x1, e.y1) && mask.indexOf(e) === -1)
+			if (region.contains(e.x1, e.y1) && mask.indexOf(e) === -1)
 				entities.push(e);
 		return entities;
 	}

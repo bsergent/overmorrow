@@ -355,18 +355,41 @@ export class SeededRandom {
   /**
    * @returns Random integer between min (inclusive) and max (inclusive)
    */
-  public intBetween(min, max) {
-    if (min > max) swap(min, max);
+  public intBetween(min, max): number {
+    if (min > max) {
+      min = min ^ max;
+      max = min ^ max;
+      min = min ^ max;
+    }
     return Math.floor(this.random() * (max - min + 1)) + min;
   };
+
+  /**
+   * @returns Random boolean
+   */
+  public bool(): boolean {
+    return this.range(2) === 0;
+  }
 }
 
 export function toTitleCase(str: string): string {
     return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
-export function swap(x: any, y: any): void {
-  x = x ^ y;
-  y = x ^ y;
-  x = x ^ y;
+// So there's not such thing as output parameters in JavaScript/TypeScript
+// export function swap(x: any, y: any): void {
+//   x = x ^ y;
+//   y = x ^ y;
+//   x = x ^ y;
+// }
+
+export function shuffle<T>(list: T[], randomFunc: Function = Math.random): T[] {
+  let temp: any;
+  for (let i = list.length - 1; i >= 0; i--) {
+    let k = Math.floor(randomFunc()*(list.length-i));
+    temp = list[k];
+    list[k] = list[i];
+    list[i] = temp;
+  }
+  return list;
 }
