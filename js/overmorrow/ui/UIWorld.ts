@@ -116,8 +116,8 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
       Math.floor(Math.max(this.viewport.x1 / this.tileScale, 0)),
       Math.floor(Math.max(this.viewport.y1 / this.tileScale, 0)),
       0, 0);
-    area.x2 = Math.ceil(Math.min(this.viewport.x2 / this.tileScale, this.world.width-1));
-    area.y2 = Math.ceil(Math.min(this.viewport.y2 / this.tileScale, this.world.height-1));
+    area.x2 = Math.ceil(Math.min(this.viewport.x2 / this.tileScale, this.world.width));
+    area.y2 = Math.ceil(Math.min(this.viewport.y2 / this.tileScale, this.world.height));
     return area;
   }
 

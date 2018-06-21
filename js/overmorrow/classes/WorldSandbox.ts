@@ -15,8 +15,8 @@ export default class WorldSandbox extends World {
   protected _bounds: Rectangle;
   private _seed: number;
   
-  constructor(width: number, height: number, defaultTileType: string, seed: number = -1) {
-    super(width, height);
+  constructor(name: string, width: number, height: number, defaultTileType: string, seed: number = -1) {
+    super(name, width, height);
     this._bounds = new Rectangle(0, 0, width, height);
 		this._tiles = new Array(height);
     for (let r = 0; r < height; r++) {
@@ -43,8 +43,8 @@ export default class WorldSandbox extends World {
   public draw(ui: WorldRenderer): void {
     let area = ui.getVisibleTileArea();
     // Tiles
-		for (let y = area.y1; y <= area.y2; y++) {
-			for (let x = area.x1; x <= area.x2; x++) {
+		for (let y = area.y1; y < area.y2; y++) {
+			for (let x = area.x1; x < area.x2; x++) {
         this._tiles[y][x].draw(ui, x, y);
 			}
     }
@@ -53,8 +53,8 @@ export default class WorldSandbox extends World {
       if (this.getTile(e.x1, e.y1).light > 0 && this.getTile(e.x1, e.y1).fog === DiscoveryLevel.VISIBLE  || DEBUG)
         e.draw(ui);
     // Vision
-    for (let y = area.y1; y <= area.y2; y++) {
-      for (let x = area.x1; x <= area.x2; x++) {
+    for (let y = area.y1; y < area.y2; y++) {
+      for (let x = area.x1; x < area.x2; x++) {
         if (this._tiles[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
           ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
       }

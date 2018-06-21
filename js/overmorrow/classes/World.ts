@@ -6,6 +6,7 @@ import Rectangle from 'overmorrow/primitives/Rectangle';
 import Entity from 'overmorrow/classes/Entity';
 import Tile from 'overmorrow/classes/Tile';
 import Vector from '../primitives/Vector';
+import Passage from './Passage';
 
 export default abstract class World implements Tickable {
 	private _name;
@@ -16,8 +17,10 @@ export default abstract class World implements Tickable {
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
 	protected _width: number;
 	protected _height: number;
+	protected _passages: Passage[];
 
-	constructor(width: number, height: number) {
+	constructor(name: string, width: number, height: number) {
+		this._name = name;
 		this._width = width;
     this._height = height;
 
@@ -36,6 +39,9 @@ export default abstract class World implements Tickable {
 	}
 	get height(): number {
 		return this._height;
+	}
+	get name(): string {
+		return this._name;
 	}
 
 	public addEntity(entity: Entity) {
@@ -82,6 +88,7 @@ export default abstract class World implements Tickable {
 	}
 
 	public abstract isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean;
+	public abstract discover(x: number, y: number, radius: number): void;
 
 	public tick(delta: number): number {
 		let startTime = moment();

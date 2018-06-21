@@ -13,8 +13,8 @@ export default class Dungeon extends WorldSandbox {
   private _rooms: Rectangle[];
   private _rand: SeededRandom;
 
-  constructor(defaultTileType: string, seed?: number) {
-    super(0, 0, defaultTileType, seed);
+  constructor(name: string, defaultTileType: string, seed?: number) {
+    super(name, 0, 0, defaultTileType, seed);
     this._rooms = new Array<Rectangle>();
     this._rand = new SeededRandom(this.seed.toString());
     this.generate2();

@@ -1,5 +1,5 @@
 import World from "overmorrow/classes/World";
-import Tile from "overmorrow/classes/Tile";
+import Tile, { DiscoveryLevel } from "overmorrow/classes/Tile";
 import Color from "overmorrow/primitives/Color";
 import Rectangle from "overmorrow/primitives/Rectangle";
 import { WorldRenderer } from "../ui/UIWorld";
@@ -10,12 +10,17 @@ export default class WorldTiled extends World {
   private _objects: object[] = [];
   private _background: Layer[] = [];
   private _foreground: Layer[] = [];
-	private _collision: boolean[][];
+  private _collision: boolean[][];
+  private _fog: DiscoveryLevel[][];
   private _tileWidth: number;
   private _tileHeight: number;
 
   constructor(jsonUrl: string) {
-    super(0, 0);
+    super('', 0, 0);
+    let name: any = jsonUrl.split('/');
+    name = name[name.length-1];
+    name = (name as string).substr(0, name.length-5);
+    this.setName(name);
     // Load json
     let json: RawJson;
     $.ajax({
@@ -41,6 +46,13 @@ export default class WorldTiled extends World {
     for (let y = 0; y < this._height; y++)
       for (let x = 0; x < this._width; x++)
         this._collision[y][x] = false;
+
+    this._fog = new Array(this._height);
+    for (let r = 0; r < this._height; r++)
+      this._fog[r] = new Array(this._width);
+    for (let y = 0; y < this._height; y++)
+      for (let x = 0; x < this._width; x++)
+        this._fog[y][x] = DiscoveryLevel.UNKNOWN;
 
     // Parse layers
     let parsingBackground: boolean = true;
@@ -89,17 +101,32 @@ export default class WorldTiled extends World {
 
   public draw(ui: WorldRenderer): void {
     this.drawBG(ui);
-    if (DEBUG) {
-      let area = ui.getVisibleTileArea();
-      for (let y = area.y1; y <= area.y2; y++) {
-        for (let x = area.x1; x <= area.x2; x++) {
+
+    let area = ui.getVisibleTileArea();
+    if (DEBUG)
+      for (let y = area.y1; y < area.y2; y++)
+        for (let x = area.x1; x < area.x2; x++)
           ui.drawRectWire(new Rectangle(x, y, 1, 1), new Color(255, 255, 255, 0.1));
+
+    for (let e of this._entities)
+      if (this._fog[Math.floor(e.y1)][Math.floor(e.x1)] === DiscoveryLevel.VISIBLE  || DEBUG)
+        e.draw(ui);
+
+    this.drawFG(ui);
+
+    // Fog
+    let fogAtTile: DiscoveryLevel;
+    if (!DEBUG) {
+      for (let y = area.y1; y < area.y2; y++) {
+        for (let x = area.x1; x < area.x2; x++) {
+          fogAtTile = this._fog[y][x];
+          if (fogAtTile === DiscoveryLevel.UNKNOWN)
+            ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 1.0));
+          else if (fogAtTile === DiscoveryLevel.DISCOVERED)
+          ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
         }
       }
     }
-		for (let e of this._entities)
-			e.draw(ui);
-    this.drawFG(ui);
 	}
 
   drawLayer(ui: WorldRenderer, layer: Layer): void {
@@ -170,7 +197,17 @@ export default class WorldTiled extends World {
       || (entityToIgnore !== undefined
           && this._entityCollision[fY][fX].length > 1
           && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
-	}
+  }
+  
+  public discover(x: number, y: number, radius: number): void {
+    for (let r = 0; r < this._width; r++)
+      for (let c = 0; c < this._width; c++)
+        if (this._fog[r][c] === DiscoveryLevel.VISIBLE)
+          this._fog[r][c] = DiscoveryLevel.DISCOVERED;
+    for (let r = Math.floor(Math.max(y + 0.5 - radius, 0)); r < Math.ceil(Math.min(y + 0.5 + radius, this._height)); r++)
+      for (let c = Math.floor(Math.max(x + 0.5 - radius, 0)); c < Math.ceil(Math.min(x + 0.5 + radius, this._width)); c++)
+        this._fog[r][c] = DiscoveryLevel.VISIBLE;
+  }
 }
 
 interface TileKey {
