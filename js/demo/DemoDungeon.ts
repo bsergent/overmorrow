@@ -36,80 +36,9 @@ class Demo {
     drawLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(drawLabel, 10);
     
-    let playerPosLabel = new UILabel(0, 0, '0,0');
+    let playerPosLabel = new UILabel(0, 0, 'Unknown:0,0');
     playerPosLabel.setAlignment('left').setColor(Color.white);
     renderer.addComponent(playerPosLabel, 10);
-
-
-    let panel = new UIPanel(10, 10, 250, 250);
-    panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
-
-    let testLabel = new UILabel(0, 0, 'Title');
-    testLabel.setSize(24).setColor(Color.white);
-    panel.addComponent(testLabel, 0);
-
-    let testImage = new UIImage(0, 42, 32, 32, 'assets/collision.png');
-    panel.addComponent(testImage, 0);
-
-    let testSprite = new UIImage(64, 0, 32, 32, 'assets/f1_terrain.png');
-    testSprite.setSpriteCoords(new Rectangle(48, 0, 16, 16));
-    panel.addComponent(testSprite, 0);
-
-    let testAnimation = new UIImage(64, 48, 32, 32);
-    let testAniSheet = new AnimationSheet('assets/player.png');
-    testAniSheet.setFrameTag('idle_0').replaceColor(new Color(99, 129, 215), Color.white);
-    testAnimation.setAnimationSheet(testAniSheet);
-    panel.addComponent(testAnimation, 0);
-
-    // let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
-    // testButton.setAction(() => {
-    //   console.log('Clicked test button');
-    //   testButton.setText(Math.random().toString(16).substr(2, 5));
-    // });
-    // panel.addComponent(testButton, 0);
-    // let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
-    // closeButton.setAction(() => {
-    //   renderer.removeComponent(panel);
-    // });
-    // panel.addComponent(closeButton, 0);
-    // renderer.addComponent(panel, 2);
-
-    // Compile item types
-    ItemType.addType('sword_obsidian')
-      .setName('Obsidian Sword')
-      .setImage('assets/item_sword_obsidian.png')
-      .setRarity(ItemRarity.UNCOMMON)
-      .setWeapon(true)
-      .setPower(10)
-      .setWeight(5);
-    ItemType.addType('book_of_wynn')
-      .setName('Book of Wynn')
-      .setImage('assets/item_book_of_wynn.png')
-      .setRarity(ItemRarity.MYTHIC)
-      .setShield(true)
-      .setPower(1);
-    ItemType.addType('torch')
-      .setImage('assets/item_book_of_wynn.png')
-      .setMaxQuantity(99);
-    ItemType.addType('lantern');
-    ItemType.addType('bread')
-      .setMaxQuantity(99);
-    ItemType.addType('shield_wooden')
-      .setName('Wooden Shield')
-      .setShield(true);
-    ItemType.addType('bow')
-      .setWeapon(true)
-      .setPower(5)
-      .setRange(4)
-      .setAction(function (item: Item, world: World, user: EntityLiving) {
-        for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.direction, item.type.range, true))
-          if (e instanceof EntityLiving)
-            (e as EntityLiving).defendAgainst(user, item);
-      });
-    ItemType.addType('attack_slime')
-      .setWeapon(true)
-      .setPower(10)
-      .setWeight(8);
 
     TileType.addType('dirt')
       .setImage('assets/f1_terrain.png')
@@ -127,32 +56,12 @@ class Demo {
       .setSolid(false);
 
     // Build world
-    let world = new WorldDungeon('F1', 'wall', 1025);
+    let worldGenType: string = 'SpreadMinTree';
+    let world = new WorldDungeon(worldGenType, 'wall', 1025); //1529552122944
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
-    uiworld.setWorld(world).centerViewPort(11, 11).setTileScale(8);
+    uiworld.setWorld(world).setViewport(new Rectangle(0, 0, 800, 600)).setTileScale(8);
     renderer.addComponent(uiworld, 0);
-
-    let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
-    let healthBarBackground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_bg.png');
-    let healthBarForeground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_fg.png');
-    let healthBarText = new UILabel(106, renderer.height - 24, '100/100');
-    healthBarText.setAlignment('center');
-    healthBarText.setSize(20);
-    healthBarText.setColor(Color.white);
-    renderer.addComponent(healthBarBorder, 1);
-    renderer.addComponent(healthBarBackground, 1);
-    renderer.addComponent(healthBarForeground, 1);
-    renderer.addComponent(healthBarText, 1);
-
-    let staminaBarBackground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_bg.png');
-    let staminaBarForeground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_fg.png');
-    let staminaBarText = new UILabel(106, renderer.height - 50, '100/100');
-    staminaBarText.setAlignment('center');
-    staminaBarText.setSize(20);
-    staminaBarText.setColor(Color.white);
-    renderer.addComponent(staminaBarBackground, 1);
-    renderer.addComponent(staminaBarForeground, 1);
-    renderer.addComponent(staminaBarText, 1);
+    DEBUG = true;
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)
@@ -164,20 +73,59 @@ class Demo {
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_EQUALS])
       .setAction(event => {
-        uiworld.tileScale += 16;
+        uiworld.tileScale += 4;
         console.log('tileScale=' + uiworld.tileScale);
       });
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_MINUS])
       .setAction(event => {
-        uiworld.tileScale -= 16;
+        uiworld.tileScale -= 4;
         console.log('tileScale=' + uiworld.tileScale);
       });
+    controller.addListener(EventTypes.KEYHELD)
+      .setKeys([Keys.KEY_W])
+      .setDuration(0.1)
+      .setAction(event => {
+        uiworld.viewport.y1 -= 4;
+      });
+    controller.addListener(EventTypes.KEYHELD)
+      .setKeys([Keys.KEY_S])
+      .setDuration(0.1)
+      .setAction(event => {
+        uiworld.viewport.y1 += 4;
+      });
+    controller.addListener(EventTypes.KEYHELD)
+      .setKeys([Keys.KEY_A])
+      .setDuration(0.1)
+      .setAction(event => {
+        uiworld.viewport.x1 -= 4;
+      });
+    controller.addListener(EventTypes.KEYHELD)
+      .setKeys([Keys.KEY_D])
+      .setDuration(0.1)
+      .setAction(event => {
+        uiworld.viewport.x1 += 4;
+      });
+    controller.addListener(EventTypes.KEYUP)
+    .setKeys([Keys.KEY_1])
+    .setAction(event => {
+      worldGenType = 'SpreadMinTree';
+      world = new WorldDungeon(worldGenType, 'wall');
+      uiworld.setWorld(world);
+    });
+    controller.addListener(EventTypes.KEYUP)
+    .setKeys([Keys.KEY_2])
+    .setAction(event => {
+      worldGenType = 'PerfectSparsen';
+      world = new WorldDungeon(worldGenType, 'wall');
+      uiworld.setWorld(world);
+    });
 
     console.log('Initialized');
 
     // Main game loop
     var timekeep = new TimeKeep();
+    timekeep.setMinFrameTime(5);
     var $tps = $('#tps');
     function update() {
       timekeep.startUpdate();
@@ -191,7 +139,6 @@ class Demo {
       drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
       
       setTimeout(update, timekeep.getTimeToWait());
-      // TODO Also handle multiplayer stuff in here somewhere, queuing to world
     }
     update();
   }

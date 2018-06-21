@@ -54,6 +54,9 @@ export class TimeKeep {
     if (this._index > 20)
       this._index = 0;
   }
+  public setMinFrameTime(milliseconds: number = 50): void {
+    this._minFrameTime = milliseconds;
+  }
 }
 
 export enum Facing {

@@ -48,19 +48,21 @@ export default class UIWorld extends UIComponent {
     this._player = player;
     return this;
   }
-  public centerViewPort(x: number, y: number): UIWorld {
+  public centerViewPort(x: number, y: number, obeyBorders: boolean = true): UIWorld {
     // Center on the middle of the given world coordinates
     this._worldRenderer.viewport.x1 = x * this.tileScale - (this._worldRenderer.viewport.width / 2) + (this.tileScale / 2);
     this._worldRenderer.viewport.y1 = y * this.tileScale - (this._worldRenderer.viewport.height / 2) + (this.tileScale / 2);
     // Account for world boundaries
-    if (this._worldRenderer.viewport.x1 <= 0)
-      this._worldRenderer.viewport.x1 = 0;
-    if (this._worldRenderer.viewport.y1 <= 0)
-      this._worldRenderer.viewport.y1 = 0;
-    if (this._worldRenderer.viewport.x2 >= this._world.width * this.tileScale)
-      this._worldRenderer.viewport.x1 = this._world.width * this.tileScale - this._worldRenderer.viewport.width;
-    if (this._worldRenderer.viewport.y2 >= this._world.height * this.tileScale)
-      this._worldRenderer.viewport.y1 = this._world.height * this.tileScale - this._worldRenderer.viewport.height;
+    if (obeyBorders) {
+      if (this._worldRenderer.viewport.x1 <= 0)
+        this._worldRenderer.viewport.x1 = 0;
+      if (this._worldRenderer.viewport.y1 <= 0)
+        this._worldRenderer.viewport.y1 = 0;
+      if (this._worldRenderer.viewport.x2 >= this._world.width * this.tileScale)
+        this._worldRenderer.viewport.x1 = this._world.width * this.tileScale - this._worldRenderer.viewport.width;
+      if (this._worldRenderer.viewport.y2 >= this._world.height * this.tileScale)
+        this._worldRenderer.viewport.y1 = this._world.height * this.tileScale - this._worldRenderer.viewport.height;
+    }
     return this;
   }
 

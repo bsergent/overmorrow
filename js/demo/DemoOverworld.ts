@@ -36,7 +36,7 @@ class Demo {
     drawLabel.setAlignment('right').setColor(Color.white);
     renderer.addComponent(drawLabel, 10);
     
-    let playerPosLabel = new UILabel(0, 0, '0,0');
+    let playerPosLabel = new UILabel(0, 0, 'Unknown:0,0');
     playerPosLabel.setAlignment('left').setColor(Color.white);
     renderer.addComponent(playerPosLabel, 10);
 
