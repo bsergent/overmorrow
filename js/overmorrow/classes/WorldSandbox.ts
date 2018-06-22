@@ -5,28 +5,40 @@ import Entity from 'overmorrow/classes/Entity';
 import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Rectangle from '../primitives/Rectangle';
 import Color from '../primitives/Color';
-import { Perlin } from '../Utilities';
+import { Perlin, SeededRandom } from '../Utilities';
 import Vector from '../primitives/Vector';
 declare var DEBUG;
 
 export default class WorldSandbox extends World {
-  protected _tiles: Tile[][];
-  protected _defaultTileType: string;
+  protected _tilesFG: Tile[][];
+  protected _tilesBG: Tile[][];
+  protected _defaultTileTypeFG: string;
+  protected _defaultTileTypeBG: string;
   protected _bounds: Rectangle;
+  protected _rand: SeededRandom;
   private _seed: number;
   
-  constructor(name: string, width: number, height: number, defaultTileType: string, seed: number = -1) {
+  constructor(name: string, width: number, height: number, backgroundTileType: string, foregroundTileType: string, seed: number = -1) {
     super(name, width, height);
     this._bounds = new Rectangle(0, 0, width, height);
-		this._tiles = new Array(height);
-    for (let r = 0; r < height; r++) {
-      this._tiles[r] = new Array(width);
-      for (let c = 0; c < width; c++)
-        this._tiles[r][c] = new Tile(defaultTileType);
-    }
-    this._defaultTileType = defaultTileType;
     this._seed = seed === -1 ? Date.now() : seed;
     console.log(`Seed: ${this._seed}`);
+    this._rand = new SeededRandom(this.seed.toString());
+
+    this._defaultTileTypeFG = foregroundTileType;
+    this._defaultTileTypeBG = backgroundTileType;
+		this._tilesFG = new Array(height);
+    for (let r = 0; r < height; r++) {
+      this._tilesFG[r] = new Array(width);
+      for (let c = 0; c < width; c++)
+        this._tilesFG[r][c] = new Tile(foregroundTileType, this._rand.random());
+    }
+		this._tilesBG = new Array(height);
+    for (let r = 0; r < height; r++) {
+      this._tilesBG[r] = new Array(width);
+      for (let c = 0; c < width; c++)
+        this._tilesBG[r][c] = new Tile(backgroundTileType, this._rand.random());
+    }
   }
   
   public get seed(): number {
@@ -35,57 +47,65 @@ export default class WorldSandbox extends World {
 
   public tick(delta: number): number {
     let startTime = moment();
-		this._tiles.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
+		this._tilesFG.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
     super.tick(delta);
 		return moment().diff(startTime);
   }
 
   public draw(ui: WorldRenderer): void {
     let area = ui.getVisibleTileArea();
-    // Tiles
-		for (let y = area.y1; y < area.y2; y++) {
-			for (let x = area.x1; x < area.x2; x++) {
-        this._tiles[y][x].draw(ui, x, y);
-			}
-    }
+
+    // Background Tiles
+		for (let y = area.y1; y < area.y2; y++)
+			for (let x = area.x1; x < area.x2; x++)
+        if (this._tilesFG[y][x].type.transparent)
+          this._tilesBG[y][x].draw(ui, x, y);
+
     // Entities
     for (let e of this._entities)
       if (this.getTile(e.x1, e.y1).light > 0 && this.getTile(e.x1, e.y1).fog === DiscoveryLevel.VISIBLE  || DEBUG)
         e.draw(ui);
+    
+    // Foreground Tiles
+		for (let y = area.y1; y < area.y2; y++)
+			for (let x = area.x1; x < area.x2; x++)
+        this._tilesFG[y][x].draw(ui, x, y);
+
     // Vision
-    for (let y = area.y1; y < area.y2; y++) {
-      for (let x = area.x1; x < area.x2; x++) {
-        if (this._tiles[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
+    for (let y = area.y1; y < area.y2; y++)
+      for (let x = area.x1; x < area.x2; x++)
+        if (this._tilesFG[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
           ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
-      }
-    }
   }
 
   public discover(x: number, y: number, radius: number): void {
     for (let r = 0; r < this._width; r++)
       for (let c = 0; c < this._width; c++)
-        if (this._tiles[r][c].fog === DiscoveryLevel.VISIBLE)
-          this._tiles[r][c].fog = DiscoveryLevel.DISCOVERED;
+        if (this._tilesFG[r][c].fog === DiscoveryLevel.VISIBLE)
+          this._tilesFG[r][c].fog = DiscoveryLevel.DISCOVERED;
     for (let r = Math.floor(Math.max(y + 0.5 - radius, 0)); r < Math.ceil(Math.min(y + 0.5 + radius, this._height)); r++)
       for (let c = Math.floor(Math.max(x + 0.5 - radius, 0)); c < Math.ceil(Math.min(x + 0.5 + radius, this._width)); c++)
-        this._tiles[r][c].fog = DiscoveryLevel.VISIBLE;
+        this._tilesFG[r][c].fog = DiscoveryLevel.VISIBLE;
   }
 
 	public getTile(x: number, y: number): Tile {
     if (!this._bounds.contains(x, y))
       return null;
-		return this._tiles[Math.floor(y)][Math.floor(x)];
+		return this._tilesFG[Math.floor(y)][Math.floor(x)];
   }
 
-  public setTile(x: number, y: number, type: string): void {
-    this._tiles[Math.floor(y)][Math.floor(x)].type = TileType.getType(type);
+  public setTile(x: number, y: number, type: string, foreground: boolean = true): void {
+    if (!this._bounds.contains(x, y)) return;
+    if (foreground)
+      this._tilesFG[Math.floor(y)][Math.floor(x)].type = TileType.getType(type);
+    else
+      this._tilesBG[Math.floor(y)][Math.floor(x)].type = TileType.getType(type);
   }
 
-  public setTiles(rect: Rectangle, type: string): void {
+  public setTiles(rect: Rectangle, type: string, foreground: boolean = true): void {
     for (let y = Math.min(rect.y1, rect.y2); y < Math.max(rect.y1, rect.y2); y++)
       for (let x = Math.min(rect.x1, rect.x2); x < Math.max(rect.x1, rect.x2); x++)
-        if (this._bounds.contains(x, y))
-          this._tiles[y][x].type = TileType.getType(type);
+        this.setTile(x, y, type, foreground);
   }
 
   public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
@@ -95,7 +115,7 @@ export default class WorldSandbox extends World {
 			|| y < 0
 			|| x > this._width
 			|| y > this._height
-			|| this._tiles[fY][fX].type.solid
+			|| this._tilesFG[fY][fX].type.solid
       || (entityToIgnore !== undefined
           && this._entityCollision[fY][fX].length > 1
           && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);

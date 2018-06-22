@@ -113,17 +113,17 @@ class Demo {
 
     TileType.addType('dirt')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(0, 16, 16, 16))
+      .addSpriteCoords(new Rectangle(0, 16, 16, 16))
       .setSolid(false);
     TileType.addType('wall')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(64, 0, 16, 16));
+      .addSpriteCoords(new Rectangle(64, 0, 16, 16));
     TileType.addType('wall_moss')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(16, 0, 16, 16));
+      .addSpriteCoords(new Rectangle(16, 0, 16, 16));
     TileType.addType('door')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(48, 0, 16, 16))
+      .addSpriteCoords(new Rectangle(48, 0, 16, 16))
       .setSolid(false);
 
     // Build world

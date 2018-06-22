@@ -11,12 +11,10 @@ import Matrix from '../overmorrow/primitives/Matrix';
 
 export default class Dungeon extends WorldSandbox {
   private _rooms: Rectangle[];
-  private _rand: SeededRandom;
 
-  constructor(name: string, defaultTileType: string, seed?: number) {
-    super(name, 0, 0, defaultTileType, seed);
+  constructor(name: string, backgroundTileType: string, foregroundTileType: string, seed?: number) {
+    super(name, 0, 0, backgroundTileType, foregroundTileType, seed);
     this._rooms = new Array<Rectangle>();
-    this._rand = new SeededRandom(this.seed.toString());
   }
 
   /**
@@ -32,17 +30,27 @@ export default class Dungeon extends WorldSandbox {
     for (let r = 0; r < height; r++)
       this._entityCollision[r] = new Array(width);
 
-		this._tiles = new Array(height);
+		this._tilesFG = new Array(height);
     for (let r = 0; r < height; r++) {
-      this._tiles[r] = new Array(width);
+      this._tilesFG[r] = new Array(width);
       for (let c = 0; c < width; c++)
-        this._tiles[r][c] = new Tile(this._defaultTileType);
+        this._tilesFG[r][c] = new Tile(this._defaultTileTypeFG, this._rand.random());
+    }
+        
+		this._tilesBG = new Array(height);
+    for (let r = 0; r < height; r++) {
+      this._tilesBG[r] = new Array(width);
+      for (let c = 0; c < width; c++)
+        this._tilesBG[r][c] = new Tile(this._defaultTileTypeBG, this._rand.random());
     }
 
     // TODO Remove when finished debugging
     for (let r = 0; r < this._height; r++)
       for (let c = 0; c < this._width; c++)
-        this._tiles[r][c].fog = DiscoveryLevel.VISIBLE;
+        this._tilesFG[r][c].fog = DiscoveryLevel.VISIBLE;
+    for (let r = 0; r < this._height; r++)
+      for (let c = 0; c < this._width; c++)
+        this._tilesBG[r][c].fog = DiscoveryLevel.VISIBLE;
 
     console.log(`World dimensions changed to x${width}, y${height}. All tile data lost. `);
   }
@@ -202,7 +210,7 @@ export default class Dungeon extends WorldSandbox {
 
         // Carve rooms into tilemap
         for (let r = 0; r < this._rooms.length; r++)
-          this.setTiles(this._rooms[r], 'dirt');
+          this.setTiles(this._rooms[r], 'air');
         this._gen1State = Gen1State.MIN_TREE;
         break;
 
@@ -216,8 +224,8 @@ export default class Dungeon extends WorldSandbox {
           let vert: Rectangle = new Rectangle(horz.x2, horz.y1, 1, 1);
           vert.y2 = Math.floor(r2.center.y);
           //console.log(horz, vert);
-          this.setTiles(horz, 'dirt');
-          this.setTiles(vert, 'dirt');
+          this.setTiles(horz, 'air');
+          this.setTiles(vert, 'air');
         }
         // TODO Carve passages in a maze-like manner based off the minimum spanning tree
         this._gen1State = Gen1State.DECORATE;
@@ -226,16 +234,16 @@ export default class Dungeon extends WorldSandbox {
 
       case Gen1State.DECORATE:
         let stone = TileType.getType('stone');
-        let dirt = TileType.getType('dirt');
+        let air = TileType.getType('air');
         for (let r = 1; r < this.height; r++)
           for (let c = 0; c < this.width; c++)
             if (this.getTile(c, r-1).type === stone
-                && this.getTile(c, r).type === dirt)
-              this.setTile(c, r-1, c%3==0?'wall_support':'wall');
+                && this.getTile(c, r).type === air)
+              this.setTile(c, r-1, 'wall');
         for (let r = 0; r < this.height-1; r++)
           for (let c = 0; c < this.width; c++)
             if (this.getTile(c, r+1).type === stone
-                && this.getTile(c, r).type === dirt)
+                && this.getTile(c, r).type === air)
               this.setTile(c, r+1, 'wall_bottom');
         this._gen1State = Gen1State.COMPLETE;
         break;
@@ -276,7 +284,7 @@ export default class Dungeon extends WorldSandbox {
         // Carve maze
         for (let r = 1; r < this.height; r += 2)
           for (let c = 1; c < this.width; c += 2)
-            this.setTile(c, r, 'dirt');
+            this.setTile(c, r, 'air');
         break;
 
       case Gen2State.PERFECT:
@@ -295,7 +303,7 @@ export default class Dungeon extends WorldSandbox {
               // Make connection
               let edge: Rectangle = new Rectangle(current.x, current.y, this._gen2Directions[d].x, this._gen2Directions[d].y);
               this._gen2Edges.push(edge);
-              this.setTile((edge.x1) * 2 + edge.width + 1, (edge.y1) * 2 + edge.height + 1, 'dirt');
+              this.setTile((edge.x1) * 2 + edge.width + 1, (edge.y1) * 2 + edge.height + 1, 'air');
               this._gen2Active.push(next);
               break;
             }
@@ -310,7 +318,7 @@ export default class Dungeon extends WorldSandbox {
         // Find what to carve
         for (let r = 0; r < this.height; r++) {
           for (let c = 0; c < this.width; c++) {
-            if (this.getTile(c, r).type == TileType.getType('dirt')
+            if (this.getTile(c, r).type == TileType.getType('air')
                 && this.countSurroundingTiles(c, r, 'stone') >= 3) {
               toFill.set(c, r, true);
               this._gen2DirtFilled++;
@@ -329,11 +337,13 @@ export default class Dungeon extends WorldSandbox {
         for (let r = 0; r < this.height; r++) {
           for (let c = 0; c < this.width; c++) {
             if (this.getTile(c, r).type == TileType.getType('stone')
-                && this.checkOppositeTiles(c, r, 'dirt')
-                && this.countSurroundingTiles(c, r, 'dirt') === 2
+                && this.checkOppositeTiles(c, r, 'air')
+                && this.countSurroundingTiles(c, r, 'air') === 2
                 && this._rand.range(60) === 0) {
-              console.log(`Opened ${c}x, ${r}y.`);
+              let opened: boolean = this._rand.bool();
+              console.log(`Door at ${c}x, ${r}y with state ${opened?'open':'closed'}.`);
               this.setTile(c, r, 'door');
+              this.getTile(c, r).meta['open'] = opened;
             }
           }
         }
@@ -388,7 +398,7 @@ export default class Dungeon extends WorldSandbox {
           room.width -= 2;
           room.height -= 2;
           this._rooms.push(room);
-          this.setTiles(room, 'dirt');
+          this.setTiles(room, 'air');
         }
         if (this._rooms.length >= this._gen2RoomCount) this._gen2State = Gen2State.CONNECT_ROOMS;
         break;
@@ -402,20 +412,20 @@ export default class Dungeon extends WorldSandbox {
           l1.x2 = Math.floor(r2.center.x);
           let l2: Rectangle = new Rectangle(l1.x2, l1.y1, 1, 1);
           l2.y2 = Math.floor(r2.center.y);
-          this.setTiles(l1, 'dirt');
-          this.setTiles(l2, 'dirt');
+          this.setTiles(l1, 'air');
+          this.setTiles(l2, 'air');
         }
         this._gen2State = Gen2State.DECORATE;
         break;
 
       case Gen2State.DECORATE:
         let stone = TileType.getType('stone');
-        let dirt = TileType.getType('dirt');
+        let air = TileType.getType('air');
         for (let r = 1; r < this.height; r++)
           for (let c = 0; c < this.width; c++)
             if (this.getTile(c, r-1).type === stone
-                && this.getTile(c, r).type === dirt)
-              this.setTile(c, r-1, c%3==0?'wall_support':'wall');
+                && this.getTile(c, r).type === air)
+              this.setTile(c, r-1, 'wall');
         break;
     }
   }

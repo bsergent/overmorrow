@@ -12,10 +12,16 @@ export default class Tile implements Tickable {
 	private _light: number = 1;
 	private _fog: DiscoveryLevel = DiscoveryLevel.UNKNOWN;
 	private _durability: number = 1; // Number of ticks of mining left without modifier
+	private _skinValue: number = 0;
+	private _meta: Map<string, any>;
 
-	constructor(type: string) {
-		this._type = TileType.getType(type);
-		this._durability = this._type.hardness;
+	/**
+	 * @param type name TileType to be used
+	 * @param skinValue variation of texture to be used (if applicable)
+	 */
+	constructor(type: string, skinValue: number = 0) {
+		this.type = TileType.getType(type);
+		this._skinValue = skinValue;
 	}
 	public get type(): TileType {
 		return this._type;
@@ -23,6 +29,10 @@ export default class Tile implements Tickable {
 	public set type(type: TileType) {
 		this._type = type;
 		this._durability = type.hardness;
+		let newMeta: Map<string, any> = new Map<string, any>();
+		for (let i in type.defaultMeta)
+			newMeta[i] = type.defaultMeta[i];
+		this._meta = newMeta;
 	}
 	public get light(): number {
 		return this._light;
@@ -46,13 +56,19 @@ export default class Tile implements Tickable {
 		//for (let item of this._type)
     //  world.addEntity(new EntityItem(this.x1, this.y1, item, 30));
 	}
+	public get skinValue(): number {
+		return this._skinValue;
+	}
+	public get meta(): Map<string, any> {
+		return this._meta;
+	}
 
 	public draw(ui: WorldRenderer, x: number, y: number): void {
 		if (this._light <= 0 || this._fog === DiscoveryLevel.UNKNOWN) {
 			ui.drawRect(new Rectangle(x, y, 1, 1), Color.black);
 			return;
 		}
-		this._type.draw(ui, x, y);
+		this._type.draw(ui, x, y, this);
 	}
 	public tick(delta: number): void {
 		this._type.tick(delta);
@@ -83,11 +99,13 @@ export class TileType {
 	private _type: string; // Basically the tiletype's id, used for serialization
 	private _name: string;
 	private _image: string = '';
-	private _sprite: Rectangle = null; // Used for selecting tiles from TileSheets
+	private _sprites: Rectangle[] = []; // Used for selecting tiles from TileSheets
 	private _description: string = '';
 	private _solid: boolean = true; // This is just for basic collision, might need to add directional collision later
 	private _hardness: number = -1; // -1 for unbreakable
 	private _mapColor: Color = Color.black; // Color on map shards and minimaps
+	private _transparent: boolean = false;
+	private _defaultMeta: Map<string, any>;
 	private _draw: Function = null; // Allow for override of regular draw function that uses the _image property
 	private _tick: Function = null; // Allow for implementation of tick function
 	private _drop: Function = null; // Allow for override of basic drop method, such as letting a tile drop a random number of items
@@ -101,6 +119,12 @@ export class TileType {
 	public get image(): string {
 		return this._image;
 	}
+	public get sprite(): Rectangle {
+		return this._sprites[0];
+	}
+	public get sprites(): Rectangle[] {
+		return this._sprites;
+	}
 	public get description(): string {
 		return this._description;
 	}
@@ -110,16 +134,26 @@ export class TileType {
 	public get hardness(): number {
 		return this._hardness;
 	}
+	public get mapColor(): Color {
+		return this._mapColor;
+	}
+	public get transparent(): boolean {
+		return this._transparent;
+	}
+	public get defaultMeta(): Map<string, any> {
+		return this._defaultMeta;
+	}
 	public get canBreak(): boolean {
 		return this._hardness !== -1;
 	}
 	public get draw(): Function {
-		return this._draw === null ? function (ui: WorldRenderer, x: number, y: number) {
+		return this._draw === null ? function (ui: WorldRenderer, x: number, y: number, self: Tile) {
 			if (this._image === '') return;
-			if (this._sprite !== null) ui.drawSprite(new Rectangle(x, y, 1, 1), this._sprite, this._image);
-			else ui.drawImage(new Rectangle(x, y, 1, 1), this._image);
+			if (this._sprites.length > 0)
+				ui.drawSprite(new Rectangle(x, y, 1, 1), this._sprites[Math.floor(self.skinValue*this._sprites.length)], this._image);
+			else
+				ui.drawImage(new Rectangle(x, y, 1, 1), this._image);
 		} : this._draw;
-		// TODO Support varying textures based on world seed
 	}
 	public get tick(): Function {
 		return this._tick === null ? function (delta: number) {} : this._tick;
@@ -150,10 +184,12 @@ export class TileType {
 	}
 	/**
 	 * @param rect Location of texture on tilemap (in pixels, not percentage)
+	 * @param probability Relative probability of this sprite vs. others. Actual probability can be computed as the parameter divided by the sum of the probabilities of all other sprites added
 	 * @returns Self reference for method chaining
 	 */
-	public setSpriteCoords(rect: Rectangle): TileType {
-		this._sprite = rect;
+	public addSpriteCoords(rect: Rectangle, probability: number = 1): TileType {
+		for (let i = 0; i < probability; i++)
+			this._sprites.push(rect);
 		return this;
 	}
 	/**
@@ -178,6 +214,30 @@ export class TileType {
 	 */
 	public setHardness(hardness: number): TileType {
 		this._hardness = hardness;
+		return this;
+	}
+	/**
+	 * @param mapColor Color used for map shards and minimaps, single color to represent tile
+	 * @returns Self reference for method chaining
+	 */
+	public setMapColor(mapColor: Color): TileType {
+		this._mapColor = mapColor;
+		return this;
+	}
+	/**
+	 * @param transparent Whether or not the texture has transparency, used to prevent rendering unseen textures
+	 * @returns Self reference for method chaining
+	 */
+	public setTransparent(transparent: boolean): TileType {
+		this._transparent = transparent;
+		return this;
+	}
+	/**
+	 * @param defaultMeta Default meta information map
+	 * @returns Self reference for method chaining
+	 */
+	public setDefaultMeta(defaultMeta: Map<string, any>): TileType {
+		this._defaultMeta = defaultMeta;
 		return this;
 	}
 	/**

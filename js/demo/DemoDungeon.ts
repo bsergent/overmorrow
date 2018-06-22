@@ -6,7 +6,7 @@ import Color from 'overmorrow/primitives/Color';
 import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
 import UIButton from 'overmorrow/ui/UIButton';
-import UIWorld from 'overmorrow/ui/UIWorld';
+import UIWorld, { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import World from 'overmorrow/classes/World';
 import WorldTiled from 'overmorrow/classes/WorldTiled';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
@@ -20,7 +20,7 @@ import Vector from 'overmorrow/primitives/Vector';
 import EntitySlime from 'overmorrow/classes/EntitySlime';
 import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
-import { TileType } from 'overmorrow/classes/Tile';
+import Tile, { TileType } from 'overmorrow/classes/Tile';
 import WorldDungeon from './WorldDungeon';
 
 class Demo {
@@ -42,30 +42,44 @@ class Demo {
 
     TileType.addType('dirt')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(0, 32, 16, 16))
+      .addSpriteCoords(new Rectangle(0, 32, 16, 16), 15) // Standard
+      .addSpriteCoords(new Rectangle(16, 32, 16, 16), 5) // Mossy
+      .addSpriteCoords(new Rectangle(32, 32, 16, 16), 15) // Large stone
+      .addSpriteCoords(new Rectangle(48, 32, 16, 16)) // Puddle
       .setSolid(false);
     TileType.addType('stone')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(64, 0, 16, 16));
+      .addSpriteCoords(new Rectangle(64, 0, 16, 16));
     TileType.addType('wall_bottom')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(48, 0, 16, 16));
+      .addSpriteCoords(new Rectangle(48, 0, 16, 16));
     TileType.addType('wall')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(0, 16, 16, 16));
-    TileType.addType('wall_support')
-      .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(48, 16, 16, 16));
+      .addSpriteCoords(new Rectangle(0, 16, 16, 16))
+      .setDraw((ui: WorldRenderer, x: number, y: number, self: Tile) => {
+        let sprite = self.type.sprite.clone();
+        if (x%3===0) sprite.offset(48, 0);
+        ui.drawSprite(new Rectangle(x, y, 1, 1), sprite, self.type.image);
+      });
     TileType.addType('door')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(64, 16, 16, 16))
-      .setSolid(false);
+      .addSpriteCoords(new Rectangle(64, 16, 16, 16))
+      .addSpriteCoords(new Rectangle(64, 32, 16, 16))
+      .setTransparent(true)
+      .setSolid(false)
+      .setDraw((ui: WorldRenderer, x: number, y: number, self: Tile) => {
+        ui.drawSprite(new Rectangle(x, y, 1, 1), self.type.sprites[0], self.type.image);
+        if (!self.meta['open'])
+          ui.drawSprite(new Rectangle(x, y, 1, 1), self.type.sprites[1], self.type.image);
+      })
+      .setDefaultMeta(new Map<string, any>([['open', false]]));
     TileType.addType('air')
+      .setTransparent(true)
       .setSolid(false);
 
     // Build world
     let worldGenType: string = 'SpreadMinTree';
-    let world = new WorldDungeon(worldGenType, 'stone', 1025); //1529552122944
+    let world = new WorldDungeon(worldGenType, 'dirt', 'stone', 1025); //1529552122944
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setViewport(new Rectangle(0, 0, 800, 600)).setTileScale(8);
     renderer.addComponent(uiworld, 0);
@@ -118,14 +132,14 @@ class Demo {
     .setKeys([Keys.KEY_1])
     .setAction(event => {
       worldGenType = 'SpreadMinTree';
-      world = new WorldDungeon(worldGenType, 'stone');
+      world = new WorldDungeon(worldGenType, 'dirt', 'stone');
       uiworld.setWorld(world);
     });
     controller.addListener(EventTypes.KEYUP)
     .setKeys([Keys.KEY_2])
     .setAction(event => {
       worldGenType = 'PerfectSparsen';
-      world = new WorldDungeon(worldGenType, 'stone');
+      world = new WorldDungeon(worldGenType, 'dirt', 'stone');
       uiworld.setWorld(world);
     });
 
