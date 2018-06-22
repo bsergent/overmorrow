@@ -82,11 +82,12 @@ export class TileType {
 	
 	private _type: string; // Basically the tiletype's id, used for serialization
 	private _name: string;
-	private _image: string;
+	private _image: string = '';
 	private _sprite: Rectangle = null; // Used for selecting tiles from TileSheets
 	private _description: string = '';
 	private _solid: boolean = true; // This is just for basic collision, might need to add directional collision later
 	private _hardness: number = -1; // -1 for unbreakable
+	private _mapColor: Color = Color.black; // Color on map shards and minimaps
 	private _draw: Function = null; // Allow for override of regular draw function that uses the _image property
 	private _tick: Function = null; // Allow for implementation of tick function
 	private _drop: Function = null; // Allow for override of basic drop method, such as letting a tile drop a random number of items
@@ -114,6 +115,7 @@ export class TileType {
 	}
 	public get draw(): Function {
 		return this._draw === null ? function (ui: WorldRenderer, x: number, y: number) {
+			if (this._image === '') return;
 			if (this._sprite !== null) ui.drawSprite(new Rectangle(x, y, 1, 1), this._sprite, this._image);
 			else ui.drawImage(new Rectangle(x, y, 1, 1), this._image);
 		} : this._draw;

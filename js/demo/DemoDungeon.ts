@@ -42,22 +42,30 @@ class Demo {
 
     TileType.addType('dirt')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(0, 16, 16, 16))
+      .setSpriteCoords(new Rectangle(0, 32, 16, 16))
       .setSolid(false);
-    TileType.addType('wall')
+    TileType.addType('stone')
       .setImage('assets/f1_terrain.png')
       .setSpriteCoords(new Rectangle(64, 0, 16, 16));
-    TileType.addType('wall_moss')
+    TileType.addType('wall_bottom')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(16, 0, 16, 16));
+      .setSpriteCoords(new Rectangle(48, 0, 16, 16));
+    TileType.addType('wall')
+      .setImage('assets/f1_terrain.png')
+      .setSpriteCoords(new Rectangle(0, 16, 16, 16));
+    TileType.addType('wall_support')
+      .setImage('assets/f1_terrain.png')
+      .setSpriteCoords(new Rectangle(48, 16, 16, 16));
     TileType.addType('door')
       .setImage('assets/f1_terrain.png')
-      .setSpriteCoords(new Rectangle(48, 0, 16, 16))
+      .setSpriteCoords(new Rectangle(64, 16, 16, 16))
+      .setSolid(false);
+    TileType.addType('air')
       .setSolid(false);
 
     // Build world
     let worldGenType: string = 'SpreadMinTree';
-    let world = new WorldDungeon(worldGenType, 'wall', 1025); //1529552122944
+    let world = new WorldDungeon(worldGenType, 'stone', 1025); //1529552122944
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setViewport(new Rectangle(0, 0, 800, 600)).setTileScale(8);
     renderer.addComponent(uiworld, 0);
@@ -110,14 +118,14 @@ class Demo {
     .setKeys([Keys.KEY_1])
     .setAction(event => {
       worldGenType = 'SpreadMinTree';
-      world = new WorldDungeon(worldGenType, 'wall');
+      world = new WorldDungeon(worldGenType, 'stone');
       uiworld.setWorld(world);
     });
     controller.addListener(EventTypes.KEYUP)
     .setKeys([Keys.KEY_2])
     .setAction(event => {
       worldGenType = 'PerfectSparsen';
-      world = new WorldDungeon(worldGenType, 'wall');
+      world = new WorldDungeon(worldGenType, 'stone');
       uiworld.setWorld(world);
     });
 
