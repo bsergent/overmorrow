@@ -1,58 +1,52 @@
 import Vector from "./Vector";
+import Line from "./Line";
 
-export default class Rectangle {
-  private _x1: number;
-  private _y1: number;
-  private _x2: number;
-  private _y2: number;
-
+export default class Rectangle extends Line {
+  
   constructor(x: number, y: number, width: number, height: number) {
-    this._x1 = x;
-    this._y1 = y;
-    this.x2 = x + width;
-    this.y2 = y + height;
+    super(new Vector(x, y), new Vector(x + width, y + height));
   }
 
   get x1(): number {
-    return this._x1;
+    return this.a.x;
   }
   set x1(value: number) { // Move instead of resizing for x1 and y1
-    this._x2 += (value - this._x1);
-    this._x1 = value;
+    this.b.x += (value - this.a.x);
+    this.a.x = value;
     //if (value > this._x2) this.swapCorners();
   }
   get y1(): number {
-    return this._y1;
+    return this.a.y;
   }
   set y1(value: number) {
-    this._y2 += (value - this._y1);
-    this._y1 = value;
+    this.b.y += (value - this.a.y);
+    this.a.y = value;
     //if (value > this._y2) this.swapCorners();
   }
   get x2(): number {
-    return this._x2;
+    return this.b.x;
   }
   set x2(value: number) {
-    this._x2 = value;
+    this.b.x = value;
     //if (value < this._x1) this.swapCorners();
   }
   get y2(): number {
-    return this._y2;
+    return this.b.y;
   }
   set y2(value: number) {
-    this._y2 = value;
+    this.b.y = value;
     //if (value < this._y1) this.swapCorners();
   }
 
   get width(): number {
-    return this.x2 - this._x1;
+    return this.x2 - this.a.x;
   }
   set width(value: number) {
     this.x2 += (value - this.width);
   }
 
   get height(): number {
-    return this.y2 - this._y1;
+    return this.y2 - this.a.y;
   }
   set height(value: number) {
     this.y2 += (value - this.height);
@@ -67,7 +61,7 @@ export default class Rectangle {
   }
 
   public intersects(rect: Rectangle): boolean {
-    return this._x1 < rect.x2 && this.x2 > rect._x1 && this._y1 < rect.y2 && this.y2 > rect._y1;
+    return this.a.x < rect.x2 && this.x2 > rect.a.x && this.a.y < rect.y2 && this.y2 > rect.a.y;
   }
 
   /**
@@ -81,7 +75,7 @@ export default class Rectangle {
   }
 
   public clone(): Rectangle {
-    return new Rectangle(this._x1, this._y1, this.width, this.height);
+    return new Rectangle(this.a.x, this.a.y, this.width, this.height);
   }
 
   public equals(rect: Rectangle): boolean {
@@ -113,13 +107,13 @@ export default class Rectangle {
   }
 
   private swapCorners(): void {
-    this._x1 = this._x1 ^ this._x2;
-    this._x2 = this._x1 ^ this._x2;
-    this._x1 = this._x1 ^ this._x2;
+    this.a.x = this.a.x ^ this.b.x;
+    this.b.x = this.a.x ^ this.b.x;
+    this.a.x = this.a.x ^ this.b.x;
 
-    this._y1 = this._y1 ^ this._y2;
-    this._y2 = this._y1 ^ this._y2;
-    this._y1 = this._y1 ^ this._y2;
+    this.a.y = this.a.y ^ this.b.y;
+    this.b.y = this.a.y ^ this.b.y;
+    this.a.y = this.a.y ^ this.b.y;
 
     // TODO Ensure the first point is top-left and second is bottom-right, but in a way that actually works
   }

@@ -1,4 +1,5 @@
 import Vector from "./Vector";
+import Line from "./Line";
 
 export default class Triangle {
   private _a: Vector;
@@ -22,6 +23,9 @@ export default class Triangle {
   }
   get points(): Vector[] {
     return [ this._a, this._b, this._c ];
+  }
+  get edges(): Line[] {
+    return [ new Line(this._a, this._b), new Line(this._b, this._c), new Line(this._a, this._c) ];
   }
   get angAB(): number {
     throw "Not yet implemented.";
@@ -94,7 +98,14 @@ export default class Triangle {
     return new Triangle(this._a, this._b, this._c);
   }
 
-  public equals(tri: Triangle): boolean {
-    return this._a === tri.a && this._b === tri.b && this._c === tri.c;
+  public equals(tri: Triangle, checkOrder: boolean = true): boolean {
+    if (!checkOrder) {
+      let equalCount: number = 0;
+      for (let v1 of this.points)
+        for (let v2 of tri.points)
+          if (v1.equals(v2))
+            equalCount++;
+      return equalCount >= 6; // 6, not 3, bc t1.a=t2.b and t2.b=t1.a
+    } else return this._a === tri.a && this._b === tri.b && this._c === tri.c;
   }
 }

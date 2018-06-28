@@ -1,12 +1,13 @@
 import Vector from "./Vector";
 import Triangle from "./Triangle";
 import Circle from "./Circle";
+import Line from "./Line";
 
 let EPSILON: number = 1.0 / 1048576.0;
 
 export class Graph {
-  private _vertexes: Vector[];
-  private _edges: Edge[];
+  private _vertexes: Vector[] = [];
+  private _edges: Edge[] = [];
   private _type: GraphType;
 
   constructor(type: GraphType) {
@@ -36,11 +37,16 @@ export class Graph {
   public addEdge(vertexA: Vector, vertexB: Vector): void {
     if (!this.hasVertex(vertexA)) throw "Vertex A not found in Graph.";
     if (!this.hasVertex(vertexB)) throw "Vertex A not found in Graph.";
-    this._edges.push({ a: vertexA, b: vertexB });
+    if (this.hasEdge(vertexA, vertexB)) return;
+    this._edges.push(new Edge(vertexA, vertexB));
   }
   public hasEdge(vertexA: Vector, vertexB: Vector): boolean {
     // Edges will need to be matched based on type, e.g. a,b will match b,a only in an undirected graph
-    throw "Not yet implemented.";
+    for (let edge of this._edges) {
+      if (edge.a.equals(vertexA) && edge.b.equals(vertexB)) return true;
+      if (this._type === GraphType.UNDIRECTED && edge.a.equals(vertexB) && edge.b.equals(vertexA)) return true;
+    }
+    return false;
   }
   public clear(): void {
     this._edges = [];
@@ -49,29 +55,34 @@ export class Graph {
   public clearEdges(): void {
     this._edges = [];
   }
-  public removeVertex(indexOrVector: number | Vector): boolean {
-    if (indexOrVector instanceof Vector) {
-      for (let i = 0; i < this._vertexes.length; i++) {
-        if (this._vertexes[i].equals(indexOrVector)) {
-          indexOrVector = i;
-          break;
-        }
+  public removeVertex(vertex: Vector): boolean {
+    let index: number = -1;
+    for (let i = 0; i < this._vertexes.length; i++) {
+      if (this._vertexes[i].equals(vertex)) {
+        index = i;
+        break;
       }
     }
-    if (indexOrVector instanceof Vector || indexOrVector < 0 || indexOrVector >= this._vertexes.length)
-      return false;
-    this._vertexes.splice(indexOrVector as number, 1);
+    if (index == -1) return false;
+    for (let e = 0; e < this._edges.length; e++) {
+      if (this._edges[e].a.equals(vertex) || this._edges[e].b.equals(vertex)) {
+        this._edges.splice(e, 1);
+        e--;
+      }
+    }
+    this._vertexes.splice(index as number, 1);
     return true;
   }
-  public removeEdge(indexOrVectorA: number | Vector, vectorB: Vector = null): boolean {
-    if (indexOrVectorA instanceof Vector) {
-      if (this.hasEdge(indexOrVectorA, vectorB)) return false;
-      // TODO Get index of edge, matching based on graph type
-    } else {
-      if (indexOrVectorA < 0 || indexOrVectorA >= this._edges.length) return false;
+  public removeEdge(vertexA: Vector, vertexB: Vector = null): boolean {
+    for (let e = 0; e < this._edges.length; e++) {
+      let edge: Edge = this._edges[e];
+      if ((edge.a.equals(vertexA as Vector) && edge.b.equals(vertexB))
+          || (this._type === GraphType.UNDIRECTED && edge.a.equals(vertexB) && edge.b.equals(vertexA as Vector))) {
+        this._edges.splice(e, 1);
+        return true;
+      }
     }
-    // Edges will need to be matched based on type, e.g. a,b will match b,a only in an undirected graph
-    throw "Not yet implemented.";
+    return false;
   }
 
   // Delauny Triangulation
@@ -110,8 +121,8 @@ export class Graph {
     let absy1y2: number = Math.abs(vertexA.y - vertexB.y);
     let absy2y3: number = Math.abs(vertexB.y - vertexC.y);
 
-    if (absy1y2 < EPSILON && absy2y3 < EPSILON)
-      throw "Circumcircle could not be calculated because points coincide.";
+    // if (absy1y2 < EPSILON && absy2y3 < EPSILON)
+    //   throw "Circumcircle could not be calculated because points coincide.";
 
     if (absy1y2 < EPSILON) {
       m2  = -((vertexC.x - vertexB.x) / (vertexC.y - vertexB.y));
@@ -140,10 +151,7 @@ export class Graph {
 
     let dx: number = vertexB.x - center.x;
     let dy: number = vertexB.y - center.y;
-    return new Circle(center.x, center.y, dx * dx + dy * dy);
-  }
-  private del_removeDuplicateEdges(edges: Edge[]): void {
-    throw "Not yet implemented.";
+    return new Circle(center.x, center.y, Math.sqrt(dx * dx + dy * dy));
   }
   /**
    * The triangulation for a given set P such that no point is inside the circumcircle of any triangle in P,
@@ -158,23 +166,74 @@ export class Graph {
     let result: Graph = this.clone();
     result.clearEdges();
 
-    let indices: number[] = new Array<number>(this.vertexes.length);
-    for (let i = this.vertexes.length; i--; )
-      indices[i] = i;
-    indices.sort((i: number, j: number) => {
-      let diff = this.vertexes[j].x - this.vertexes[i].x;
-      return diff !== 0 ? diff : i - j;
+    // Sort the vertex array by x value
+    result.vertexes.sort((i: Vector, j: Vector) => {
+      return j.x - i.x;
     });
 
+    // Surround everything in a bigger triangle
     let st = this.del_superTriangle(result.vertexes);
     for (let p of st.points)
       result.addVertex(p);
 
-    let open: Circle[] = [ this.del_circumCircle(st.a, st.b, st.c) ];
-    let closed: Circle[];
-    let edges: Edge[];
+    // Triangulation result as a bunch of triangles to be mapped to the result graph
+    let resultTri: Triangle[] = [ st ];
 
-    // TODO Finish implementation
+    for (let v of result.vertexes) {
+      let badTriangles: Triangle[] = [];
+      let badIndexes: number[] = [];
+
+      // Find triangles invalidated by vertex insertion
+      for (let t = 0; t < resultTri.length; t++) {
+        let tri = resultTri[t];
+        if (this.del_circumCircle(tri.a, tri.b, tri.c).contains(v)) {
+          badTriangles.push(tri);
+          badIndexes.push(t);
+        }
+      }
+
+      // Find the boundary of the polygonal hole
+      let polygon: Line[] = [];
+      for (let t of badTriangles) {
+        for (let e of t.edges) {
+          let shared: boolean = false;
+          sharedCheck:
+          for (let t2 of badTriangles) {
+            if (t.equals(t2)) continue;
+            for (let e2 of t2.edges) {
+              if (e.equals(e2)) {
+                shared = true;
+                break sharedCheck;
+              }
+            }
+          }
+          if (!shared)
+            polygon.push(e);
+        }
+      }
+
+      // Remove from triangulation
+      let offset: number = 0;
+      badIndexes.sort();
+      for (let t of badIndexes) {
+        resultTri.splice(t + offset, 1);
+        offset--;
+      }
+
+      // Add a new triangle for each edge
+      for (let e of polygon)
+        resultTri.push(new Triangle(v, e.a, e.b));
+    }
+
+    // Map triangles to result graph
+    for (let t of resultTri)
+      for (let e of t.edges)
+        result.addEdge(e.a, e.b);
+
+    // Remove any triangles sharing a vertex with the supertriangle
+    result.removeVertex(st.a);
+    result.removeVertex(st.b);
+    result.removeVertex(st.c);
 
     return result;
   }
@@ -194,8 +253,16 @@ export enum GraphType {
   UNDIRECTED,
   WEIGHTED
 }
-export interface Edge {
-  a: Vector;
-  b: Vector;
-  w?: number; // Weight
+
+export class Edge extends Line {
+  public weight: number;
+  
+  constructor(a: Vector, b: Vector, weight: number = 0) {
+    super(a, b);
+    this.weight = weight;
+  }
+
+  public equals(e: Edge, directed: boolean = false): boolean {
+    return super.equals(e) && this.weight === e.weight;
+  }
 }

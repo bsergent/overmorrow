@@ -8,6 +8,7 @@ import Renderer from 'overmorrow/Renderer';
 import Vector from 'overmorrow/primitives/Vector';
 import Color from 'overmorrow/primitives/Color';
 import Matrix from '../overmorrow/primitives/Matrix';
+import { Graph, GraphType } from '../overmorrow/primitives/Graph';
 
 export default class Dungeon extends WorldSandbox {
   private _rooms: Rectangle[];
@@ -69,8 +70,16 @@ export default class Dungeon extends WorldSandbox {
         l1.x2 = r2.center.x;
         let l2: Rectangle = new Rectangle(l1.x2, l1.y1, 0, 0);
         l2.y2 = r2.center.y;
-        ui.drawLine(l1, new Color(100, 50, 150));
-        ui.drawLine(l2, new Color(100, 100, 255));
+        //ui.drawLine(l1, new Color(100, 50, 150));
+        //ui.drawLine(l2, new Color(100, 100, 255));
+      }
+      if (this._gen1DelTri !== null) {
+        for (let edge of this._gen1DelTri.edges) {
+          let r: Rectangle = new Rectangle(edge.a.x, edge.a.y, 0, 0);
+          r.x2 = edge.b.x;
+          r.y2 = edge.b.y;
+          ui.drawLine(r, new Color(100, 50, 255));
+        }
       }
     }
   }
@@ -91,6 +100,7 @@ export default class Dungeon extends WorldSandbox {
   private _gen1RoomSquareness: number = 2;
   private _gen1CurrentRoomIndex: number = 0;
   private _gen1RoomOffset: Vector = new Vector(0, 0);
+  private _gen1DelTri: Graph = null;
   private _tick1(delta: number): void {
     let prevState: Gen1State = this._gen1State;
     switch (this._gen1State) {
@@ -228,6 +238,12 @@ export default class Dungeon extends WorldSandbox {
           this.setTiles(vert, 'air');
         }
         // TODO Carve passages in a maze-like manner based off the minimum spanning tree
+
+        let g: Graph = new Graph(GraphType.UNDIRECTED);
+        for (let r of this._rooms)
+          g.addVertex(r.center);
+        this._gen1DelTri = g.delaunay();
+
         this._gen1State = Gen1State.DECORATE;
         
         break;

@@ -8,6 +8,7 @@ import UIComponent from 'overmorrow/ui/UIComponent';
 import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
 import { Filter } from './primitives/Filter';
+import Line from './primitives/Line';
 declare var DEBUG;
 
 export default class Renderer {
@@ -143,13 +144,13 @@ export default class Renderer {
     this._context.strokeRect(rect.x1, rect.y1, rect.width, rect.height);
   }
 
-  public drawLine(rect: Rectangle, color: Color, lineWidth: number = 1): void {
+  public drawLine(line: Line, color: Color, lineWidth: number = 1): void {
     let prevWidth = this._context.lineWidth;
     this._context.strokeStyle = color.rgba;
     this._context.lineWidth = lineWidth;
     this._context.beginPath();
-    this._context.moveTo(rect.x1, rect.y1);
-    this._context.lineTo(rect.x2, rect.y2);
+    this._context.moveTo(line.a.x, line.a.y);
+    this._context.lineTo(line.b.x, line.b.y);
     this._context.stroke();
     this._context.lineWidth = prevWidth;
   }
