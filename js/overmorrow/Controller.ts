@@ -16,6 +16,8 @@ export class Controller {
       let mouseEvent = new InputEvent(event);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
+      if (this.pressedKeys.indexOf(event.which as Keys) === -1)
+        this.pressedKeys.push(event.which as Keys);
       this.queueInput(mouseEvent);
       return false;
     });
@@ -23,6 +25,9 @@ export class Controller {
       let mouseEvent = new InputEvent(event);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
+      let i = this.pressedKeys.indexOf(event.which as Keys)
+      if (i !== -1)
+        this.pressedKeys.splice(i, 1);
       this.queueInput(mouseEvent);
     });
     $(document).keydown(event => {
@@ -56,6 +61,15 @@ export class Controller {
       this.mousePosY = event.clientY;
       this.queueInput(mouseEvent);
     });
+    canvas.on('mousewheel', event => {
+      let mouseEvent = new InputEvent(event, EventTypes.SCROLL);
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
+      mouseEvent.dx = (event.originalEvent as any).wheelDeltaX;
+      mouseEvent.dy = (event.originalEvent as any).wheelDeltaY;
+      event.preventDefault();
+      this.queueInput(mouseEvent);
+    })
   }
 
   public queueInput(event: InputEvent): void {
@@ -134,10 +148,11 @@ export class InputEvent {
   y: number;
   dx: number;
   dy: number;
-  constructor(event: JQuery.Event) {
+  get d(): number { return this.dx + this.dy; }
+  constructor(event: JQuery.Event, type: EventTypes = null) {
     if (event === null) return;
     this.key = event.which;
-    this.type = EventTypes[event.type.toUpperCase()];
+    this.type = type === null ? EventTypes[event.type.toUpperCase()] : type;
   }
 }
 
@@ -212,6 +227,7 @@ export enum EventTypes {
   MOUSEMOVE,
   MOUSEDOWN,
   MOUSEUP,
+  SCROLL,
   KEYDOWN,
   KEYUP,
   KEYHELD,

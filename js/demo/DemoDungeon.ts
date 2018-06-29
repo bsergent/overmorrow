@@ -88,59 +88,71 @@ class Demo {
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_ENTER])
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         DEBUG = !DEBUG;
         console.log('DEBUG=' + DEBUG);
       });
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_EQUALS])
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         uiworld.tileScale += 4;
-        console.log('tileScale=' + uiworld.tileScale);
+        if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
       });
     controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_MINUS])
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         uiworld.tileScale -= 4;
-        console.log('tileScale=' + uiworld.tileScale);
+        if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         uiworld.viewport.y1 -= 4;
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         uiworld.viewport.y1 += 4;
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         uiworld.viewport.x1 -= 4;
       });
     controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
-      .setAction(event => {
+      .setAction((event: InputEvent) => {
         uiworld.viewport.x1 += 4;
       });
     controller.addListener(EventTypes.KEYUP)
     .setKeys([Keys.KEY_1])
-    .setAction(event => {
+    .setAction((event: InputEvent) => {
       worldGenType = 'SpreadMinTree';
       world = new WorldDungeon(worldGenType, 'dirt', 'stone');
       uiworld.setWorld(world);
     });
     controller.addListener(EventTypes.KEYUP)
     .setKeys([Keys.KEY_2])
-    .setAction(event => {
+    .setAction((event: InputEvent) => {
       worldGenType = 'PerfectSparsen';
       world = new WorldDungeon(worldGenType, 'dirt', 'stone');
       uiworld.setWorld(world);
+    });
+    controller.addListener(EventTypes.MOUSEMOVE)
+    .setAction((event: InputEvent) => {
+      if (controller.isKeyDown(Keys.MOUSE_LEFT)) {
+        uiworld.viewport.x1 += event.dx;
+        uiworld.viewport.y1 += event.dy;
+      }
+    });
+    controller.addListener(EventTypes.SCROLL)
+    .setAction((event: InputEvent) => {
+      uiworld.tileScale += Math.sign(event.d);
+      if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
     });
 
     console.log('Initialized');
