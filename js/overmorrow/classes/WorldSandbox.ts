@@ -63,7 +63,7 @@ export default class WorldSandbox extends World {
 
     // Entities
     for (let e of this._entities)
-      if (this.getTile(e.x1, e.y1).light > 0 && this.getTile(e.x1, e.y1).fog === DiscoveryLevel.VISIBLE  || DEBUG)
+      if (this.getTile(e.x1, e.y1).light > 0 && this.getTile(e.x1, e.y1).fog === DiscoveryLevel.VISIBLE || DEBUG)
         e.draw(ui);
     
     // Foreground Tiles
@@ -72,10 +72,19 @@ export default class WorldSandbox extends World {
         this._tilesFG[y][x].draw(ui, x, y);
 
     // Vision
+    let fogRect: Rectangle = Rectangle.new(0, 0, 1, 1);
+    let fogCol: Color = Color.new(5, 5, 5, 0.7);
     for (let y = area.y1; y < area.y2; y++)
       for (let x = area.x1; x < area.x2; x++)
-        if (this._tilesFG[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG)
-          ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
+        if (this._tilesFG[y][x].fog === DiscoveryLevel.DISCOVERED && !DEBUG) {
+          fogRect.x1 = x;
+          fogRect.y1 = y;
+          ui.drawRect(fogRect, fogCol);
+        }
+    fogRect.dispose();
+    fogCol.dispose();
+    
+    area.dispose();
   }
 
   public discover(x: number, y: number, radius: number): void {
@@ -142,14 +151,16 @@ export default class WorldSandbox extends World {
       new Vector( 0, -1),
       new Vector( 0,  1));
     let count: number = 0;
-    let next: Vector, current: Vector = new Vector(x, y);
+    let next: Vector, current: Vector = Vector.new(x, y);
     let tileType: TileType = TileType.getType(type);
     for (let d = 0; d < directions.length; d++) {
       next = current.add(directions[d]);
       if (this.getTile(next.x, next.y) !== null
           && this.getTile(next.x, next.y).type === tileType)
         count++;
+      next.dispose();
     }
+    current.dispose();
     return count;
   }
 

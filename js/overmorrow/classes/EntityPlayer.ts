@@ -24,7 +24,7 @@ export default class EntityPlayer extends EntityLiving {
   }
 
   public setEyeColor(color: Color): EntityPlayer {
-    this._aniSheet.replaceColor(new Color(99, 129, 215), color);
+    this._aniSheet.replaceColor(Color.new(99, 129, 215), color);
     return this;
   }
 

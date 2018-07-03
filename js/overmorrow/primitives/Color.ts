@@ -11,6 +11,17 @@ export default class Color {
   private g: number; // 0-255
   private b: number; // 0-255
   private a: number; // 0-1
+
+  private static _heap: Color[] = [];
+  public static new(r: number = 0, g: number = 0, b: number = 0, a: number = 1): Color {
+    if (this._heap.length <= 0) return new Color(r, g, b, a);
+    let col = this._heap.pop();
+    col.r = r;
+    col.g = g;
+    col.b = b;
+    col.a = a;
+    return col;
+  }
   /**
    * @param r Red component (0-255)
    * @param g Green component (0-255)
@@ -23,12 +34,10 @@ export default class Color {
     this.b = b;
     this.a = a;
   }
-  public equals(color: Color): boolean {
-    return color.r === this.r
-      && color.g === this.g
-      && color.b === this.b
-      && color.a === this.a;
+  public dispose(): void {
+    Color._heap.push(this);
   }
+
   get hex(): string {
     return '#'
       + ('0' + this.r.toString(16)).slice(-2)
@@ -81,10 +90,17 @@ export default class Color {
   set opacity(newA: number) {
     this.a = newA;
   }
+  
+  public equals(color: Color): boolean {
+    return color.r === this.r
+      && color.g === this.g
+      && color.b === this.b
+      && color.a === this.a;
+  }
 }
 
 export function hexToRgb(hex: string): any {
-  var c = new Color();
+  var c = Color.new();
   c.hex = hex;
   return c.rgbaObject;
 }

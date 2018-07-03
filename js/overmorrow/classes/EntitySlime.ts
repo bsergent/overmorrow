@@ -29,7 +29,9 @@ export default class EntitySlime extends EntityLiving {
 
   private processAI(world: World) {
     // TODO Use actions instead
-    let nearbyEntities = world.getEntitiesInRegion(new Rectangle(this.x1 - 4, this.y1 - 4, 9, 7), [this]);
+    let entitySearchRect: Rectangle = Rectangle.new(this.x1 - 4, this.y1 - 4, 9, 7);
+    let nearbyEntities = world.getEntitiesInRegion(entitySearchRect, [this]);
+    entitySearchRect.dispose();
     let target: EntityPlayer = null;
     for (let e of nearbyEntities)
       if (e.type === 'player') {

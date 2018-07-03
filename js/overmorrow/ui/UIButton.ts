@@ -50,7 +50,9 @@ export default class UIButton extends UIComponent {
     public draw(ui: Renderer): void {
 			// TODO Add some more robust button rendering with a border patch, as well as hover and select skins
       ui.drawRect(this, this._colorBG);
-			ui.drawText(new Rectangle(this.x1 + this.width / 2, this.y1 + 2, 0, 0), this._text, this._font, this._size, this._colorFG, 'center');
+      let textRect: Rectangle = Rectangle.new(this.x1 + this.width / 2, this.y1 + 2, 0, 0);
+      ui.drawText(textRect, this._text, this._font, this._size, this._colorFG, 'center');
+      textRect.dispose();
 		}
 		
 		public input(ui: Renderer, e: InputEvent): boolean {

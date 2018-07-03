@@ -114,7 +114,7 @@ export function facingToDirection(facing: Facing): Direction {
 
 export function directionToVector(dir: Direction): Vector {
   // Returns unit vector in the direction
-  let vec = new Vector(0, 0);
+  let vec = Vector.new(0, 0);
   switch (dir) {
     case Direction.SOUTH:
       vec.y = 1;

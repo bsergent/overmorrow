@@ -1,10 +1,23 @@
 export default class Vector {
   x: number;
   y: number;
+
+  private static _heap: Vector[] = [];
+  public static new(x: number, y: number): Vector {
+    if (this._heap.length <= 0) return new Vector(x, y);
+    let vec = this._heap.pop();
+    vec.x = x;
+    vec.y = y;
+    return vec;
+  }
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
+  public dispose(): void {
+    Vector._heap.push(this);
+  }
+
   get magnitude(): number {
     return Math.sqrt(this.x*this.x + this.y*this.y);
   }
@@ -42,7 +55,7 @@ export default class Vector {
   }
 
   public clone(): Vector {
-    return new Vector(this.x, this.y);
+    return Vector.new(this.x, this.y);
   }
   public equals(vec: Vector): boolean {
     return this.x === vec.x && this.y === vec.y;

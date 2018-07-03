@@ -65,7 +65,9 @@ export default class Tile implements Tickable {
 
 	public draw(ui: WorldRenderer, x: number, y: number): void {
 		if (this._light <= 0 || this._fog === DiscoveryLevel.UNKNOWN) {
-			ui.drawRect(new Rectangle(x, y, 1, 1), Color.black);
+			let deepShadow: Rectangle = Rectangle.new(x, y, 1, 1);
+			ui.drawRect(deepShadow, Color.black);
+			deepShadow.dispose();
 			return;
 		}
 		this._type.draw(ui, x, y, this);
@@ -149,10 +151,12 @@ export class TileType {
 	public get draw(): Function {
 		return this._draw === null ? function (ui: WorldRenderer, x: number, y: number, self: Tile) {
 			if (this._image === '') return;
+			let tileRect: Rectangle = Rectangle.new(x, y, 1, 1);
 			if (this._sprites.length > 0)
-				ui.drawSprite(new Rectangle(x, y, 1, 1), this._sprites[Math.floor(self.skinValue*this._sprites.length)], this._image);
+				ui.drawSprite(tileRect, this._sprites[Math.floor(self.skinValue*this._sprites.length)], this._image);
 			else
-				ui.drawImage(new Rectangle(x, y, 1, 1), this._image);
+				ui.drawImage(tileRect, this._image);
+			tileRect.dispose();
 		} : this._draw;
 	}
 	public get tick(): Function {

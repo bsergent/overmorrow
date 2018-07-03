@@ -63,7 +63,7 @@ export class ActionMove extends Action {
 
   constructor(x: number, y: number) {
     super(0, 0);
-    this.velocity = new Vector(x, y);
+    this.velocity = Vector.new(x, y);
   }
 
   public act(world: World, entity: EntityLiving): void {

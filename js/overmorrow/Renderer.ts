@@ -59,7 +59,8 @@ export default class Renderer {
 
   public draw(): number {
     let startTime = moment();
-    this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.black);
+    let bufferRect: Rectangle = Rectangle.new(0, 0, this._width, this._height);
+    this.drawRect(bufferRect, Color.black);
     for (let componentArray of this._components) {
       if (componentArray === undefined)
         continue;

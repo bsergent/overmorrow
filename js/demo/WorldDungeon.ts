@@ -78,7 +78,9 @@ export default class Dungeon extends WorldSandbox {
           let r: Rectangle = new Rectangle(edge.a.x, edge.a.y, 0, 0);
           r.x2 = edge.b.x;
           r.y2 = edge.b.y;
-          ui.drawLine(r, new Color(100, 50, 255));
+          let blue: Color = Color.new(100, 50, 255);
+          ui.drawLine(r, blue);
+          blue.dispose();
         }
       }
     }

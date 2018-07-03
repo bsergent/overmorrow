@@ -2,9 +2,22 @@ import Vector from "./Vector";
 import Line from "./Line";
 
 export default class Rectangle extends Line {
-  
+
+  private static _heap: Rectangle[] = [];
+  public static new(x: number, y: number, width: number, height: number): Rectangle {
+    if (this._heap.length <= 0) return new Rectangle(x, y, width, height);
+    let rect = this._heap.pop();
+    rect.x1 = x;
+    rect.y1 = y;
+    rect.width = width;
+    rect.height = height;
+    return rect;
+  }
   constructor(x: number, y: number, width: number, height: number) {
-    super(new Vector(x, y), new Vector(x + width, y + height));
+    super(Vector.new(x, y), Vector.new(x + width, y + height));
+  }
+  public dispose(): void {
+    Rectangle._heap.push(this);
   }
 
   get x1(): number {
@@ -53,7 +66,7 @@ export default class Rectangle extends Line {
   }
 
   get center(): Vector {
-    return new Vector((this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2);
+    return Vector.new((this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2);
   }
   set center(center: Vector) {
     this.x1 = center.x - (this.width / 2);
@@ -75,7 +88,7 @@ export default class Rectangle extends Line {
   }
 
   public clone(): Rectangle {
-    return new Rectangle(this.a.x, this.a.y, this.width, this.height);
+    return Rectangle.new(this.a.x, this.a.y, this.width, this.height);
   }
 
   public equals(rect: Rectangle): boolean {
@@ -85,7 +98,7 @@ export default class Rectangle extends Line {
   public displacementBetweenCenters(rect: Rectangle): Vector {
     let c1 = this.center;
     let c2 = rect.center;
-    return new Vector(c1.x - c2.x, c1.y - c2.y);
+    return Vector.new(c1.x - c2.x, c1.y - c2.y);
   }
 
   public distanceBetweenCenters(rect: Rectangle): number {

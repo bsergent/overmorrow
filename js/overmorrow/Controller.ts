@@ -10,10 +10,10 @@ export class Controller {
   constructor(canvas: JQuery) {
     this.$canvas = canvas;
     canvas.click(event => {
-      this.queueInput(new InputEvent(event));
+      this.queueInput(InputEvent.new(event));
     });
     canvas.mousedown(event => {
-      let mouseEvent = new InputEvent(event);
+      let mouseEvent = InputEvent.new(event);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       if (this.pressedKeys.indexOf(event.which as Keys) === -1)
@@ -22,7 +22,7 @@ export class Controller {
       return false;
     });
     canvas.mouseup(event => {
-      let mouseEvent = new InputEvent(event);
+      let mouseEvent = InputEvent.new(event);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       let i = this.pressedKeys.indexOf(event.which as Keys)
@@ -34,7 +34,7 @@ export class Controller {
       canvas.focus();
       if (this.pressedKeys.indexOf(event.which as Keys) === -1)
         this.pressedKeys.push(event.which as Keys);
-      this.queueInput(new InputEvent(event));
+      this.queueInput(InputEvent.new(event));
       if ([9].indexOf(event.which) !== -1) { // Disabled tab key
         event.preventDefault();
         return false;
@@ -45,14 +45,14 @@ export class Controller {
       let i = this.pressedKeys.indexOf(event.which as Keys)
       if (i !== -1)
         this.pressedKeys.splice(i, 1);
-      this.queueInput(new InputEvent(event));
+      this.queueInput(InputEvent.new(event));
       if ([9].indexOf(event.which) !== -1) { // Disabled tab key
         event.preventDefault();
         return false;
       }
     });
     canvas.mousemove(event => {
-      let mouseEvent = new InputEvent(event);
+      let mouseEvent = InputEvent.new(event);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       mouseEvent.dx = this.mousePosX - event.clientX;
@@ -62,7 +62,7 @@ export class Controller {
       this.queueInput(mouseEvent);
     });
     canvas.on('mousewheel', event => {
-      let mouseEvent = new InputEvent(event, EventTypes.SCROLL);
+      let mouseEvent = InputEvent.new(event, EventTypes.SCROLL);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
       mouseEvent.dx = (event.originalEvent as any).wheelDeltaX;
@@ -83,15 +83,17 @@ export class Controller {
           l.action(e);
         }
       }
+      e.dispose();
     }
     this.inputQueue = [];
     for (let k of this.pressedKeys) {
       for (let l of this.listeners) {
         if (l.type === EventTypes.ALL || (l.type === EventTypes.KEYHELD && l.keys.indexOf(k) !== -1)) {
-          let keyheldEvent = new InputEvent(null);
+          let keyheldEvent = InputEvent.new(null);
           keyheldEvent.type = EventTypes.KEYHELD;
           keyheldEvent.key = k;
           l.action(keyheldEvent);
+          keyheldEvent.dispose();
         }
       }
     }
@@ -148,12 +150,26 @@ export class InputEvent {
   y: number;
   dx: number;
   dy: number;
-  get d(): number { return this.dx + this.dy; }
+
+  private static _heap: InputEvent[] = [];
+  public static new(event: JQuery.Event, type: EventTypes = null): InputEvent {
+    if (this._heap.length <= 0) return new InputEvent(event, type);
+    let e = this._heap.pop();
+    if (event === null) return e;
+    e.key = event.which;
+    e.type = type === null ? EventTypes[event.type.toUpperCase()] : type;
+    return e;
+  }
   constructor(event: JQuery.Event, type: EventTypes = null) {
     if (event === null) return;
     this.key = event.which;
     this.type = type === null ? EventTypes[event.type.toUpperCase()] : type;
   }
+  public dispose(): void {
+    InputEvent._heap.push(this);
+  }
+
+  get d(): number { return this.dx + this.dy; }
 }
 
 export enum Keys {

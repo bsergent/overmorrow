@@ -44,6 +44,8 @@ export default class Matrix<T> {
           this._data[y][x] = value;
   }
   public clear(): void {
-    this.setArea(new Rectangle(0, 0, this._width, this._height), this._defaultValue);
+    let clearRect: Rectangle = Rectangle.new(0, 0, this._width, this._height);
+    this.setArea(clearRect, this._defaultValue);
+    clearRect.dispose();
   }
 }

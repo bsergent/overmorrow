@@ -127,6 +127,8 @@ export default class WorldTiled extends World {
         }
       }
     }
+
+    area.dispose();
 	}
 
   drawLayer(ui: WorldRenderer, layer: Layer): void {
@@ -156,6 +158,8 @@ export default class WorldTiled extends World {
         );
       }
     }
+
+    vArea.dispose();
   }
 
   drawBG(ui: WorldRenderer): void {

@@ -13,7 +13,7 @@ export default class UIWorld extends UIComponent {
 
   constructor(x: number, y: number, width: number, height: number, renderer: Renderer) {
     super(x, y, width, height);
-    this._worldRenderer = new WorldRenderer(renderer, new Rectangle(0, 0, width, height));
+    this._worldRenderer = new WorldRenderer(renderer, Rectangle.new(0, 0, width, height));
   }
 
   public setViewport(viewport: Rectangle): UIWorld {
@@ -70,7 +70,9 @@ export default class UIWorld extends UIComponent {
     if (this._player !== null) {
       if (this._player.health <= 0) {
         ui.drawRect(this, Color.black);
-        ui.drawText(new Rectangle(this.width / 2, this.height / 2 - 36, 0, 0), 'You died.', 'Comic Sans', 72, Color.red, 'center');
+        let deathRect: Rectangle = Rectangle.new(this.width / 2, this.height / 2 - 36, 0, 0);
+        ui.drawText(deathRect, 'You died.', 'Comic Sans', 72, Color.red, 'center');
+        deathRect.dispose();
         return;
       }
       this.centerViewPort(this._player.x1, this._player.y1);
@@ -111,13 +113,15 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
     return rect2;
   }
   
+  /**
+   * @returns Tile area to be rendered, needs disposal
+   */
   public getVisibleTileArea(): Rectangle {
+    let area: Rectangle = Rectangle.new(0, 0, 0, 0);
     if (this.world === null)
-      return new Rectangle(0, 0, 0, 0);
-    let area = new Rectangle(
-      Math.floor(Math.max(this.viewport.x1 / this.tileScale, 0)),
-      Math.floor(Math.max(this.viewport.y1 / this.tileScale, 0)),
-      0, 0);
+      return area;
+    area.x1 = Math.floor(Math.max(this.viewport.x1 / this.tileScale, 0));
+    area.y1 = Math.floor(Math.max(this.viewport.y1 / this.tileScale, 0));
     area.x2 = Math.ceil(Math.min(this.viewport.x2 / this.tileScale, this.world.width));
     area.y2 = Math.ceil(Math.min(this.viewport.y2 / this.tileScale, this.world.height));
     return area;
