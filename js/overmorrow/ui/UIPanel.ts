@@ -218,7 +218,7 @@ export default class UIPanel extends UIComponent {
 			}
 			
 			// Process panel events such as dragging
-      if (e.type === EventTypes.MOUSEDOWN && this.inside(e.x, e.y)) {
+      if (e.type === EventTypes.MOUSEDOWN && this.contains(e.x, e.y)) {
         ui.selectComponent(this);
         return true;
       } else if (e.type === EventTypes.MOUSEUP) {

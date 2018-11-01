@@ -33,6 +33,13 @@ export default class Vector {
     this.x *= -1;
     this.y *= -1;
   }
+  public add(vec: Vector): Vector {
+    if (vec === undefined) throw "Cannot add undefined to vector.";
+    let result = this.clone();
+    result.x += vec.x;
+    result.y += vec.y;
+    return result;
+  }
 
   public clone(): Vector {
     return new Vector(this.x, this.y);

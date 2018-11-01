@@ -1,3 +1,5 @@
+import Vector from "./Vector";
+
 export default class Circle {
   x: number;
   y: number;
@@ -17,9 +19,13 @@ export default class Circle {
     this.r = r;
   }
 
-  intersects(cir: Circle): boolean {
+  public intersects(cir: Circle): boolean {
     return (this.x - cir.x) * (this.x - cir.x)
          + (this.y - cir.y) * (this.y + cir.y)
         <= (this.r + cir.r) * (this.r + cir.r);
   }
+
+  public contains(v: Vector): boolean {
+    return (v.x - this.x) * (v.x - this.x) + (v.y - this.y) * (v.y - this.y) < this.r * this.r;
+  } 
 }

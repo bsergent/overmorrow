@@ -29,7 +29,7 @@ export default class Item {
   }
 
   constructor(type: string, quantity: number = 1) {
-    this.type = ItemType.types.get(type);
+    this.type = ItemType.getType(type);
     this.quantity = quantity;
   }
 
@@ -50,15 +50,18 @@ export enum ItemQuality {
 }
 
 export class ItemType {
-  public static types: Map<string, ItemType> = new Map<string, ItemType>();
-
+  private static _types: Map<string, ItemType> = new Map<string, ItemType>();
   public static addType(type: string): ItemType {
     let itemType = new ItemType();
     itemType._type = type;
     itemType._name = toTitleCase(type.replace('_', ' '));
-    this.types.set(type, itemType);
+    this._types.set(type, itemType);
     return itemType;
   }
+	public static getType(type: string): ItemType {
+		if (!this._types.has(type)) throw `ItemType '${type}' is not defined.`;
+		return this._types.get(type);
+	}
 
   private _type: string;
   private _name: string;
@@ -181,3 +184,6 @@ export enum ItemRarity {
   UNCOMMON,
   COMMON
 }
+
+ItemType.addType('tile')
+  .setName('Tile'); // TODO Add proper tile item, if necessary, might just make all tiles drop items

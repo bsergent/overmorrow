@@ -10,15 +10,18 @@ import UIWorld from 'overmorrow/ui/UIWorld';
 import World from 'overmorrow/classes/World';
 import WorldTiled from 'overmorrow/classes/WorldTiled';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
-import UIImage from './overmorrow/ui/UIImage';
-import Rectangle from './overmorrow/primitives/Rectangle';
-import AnimationSheet from './overmorrow/classes/AnimationSheet';
-import EntityItem from './overmorrow/classes/EntityItem';
-import Item, { ItemType, ItemRarity } from './overmorrow/classes/Item';
-import EntityLiving from './overmorrow/classes/EntityLiving';
-import Vector from './overmorrow/primitives/Vector';
-import EntitySlime from './overmorrow/classes/EntitySlime';
-import { ActionUseItem, ActionMove } from './overmorrow/classes/Action';
+import UIImage from 'overmorrow/ui/UIImage';
+import Rectangle from 'overmorrow/primitives/Rectangle';
+import AnimationSheet from 'overmorrow/classes/AnimationSheet';
+import EntityItem from 'overmorrow/classes/EntityItem';
+import Item, { ItemType, ItemRarity } from 'overmorrow/classes/Item';
+import EntityLiving from 'overmorrow/classes/EntityLiving';
+import Vector from 'overmorrow/primitives/Vector';
+import EntitySlime from 'overmorrow/classes/EntitySlime';
+import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
+import WorldSandbox from 'overmorrow/classes/WorldSandbox';
+import { TileType } from 'overmorrow/classes/Tile';
+import WorldDungeon from './WorldDungeon';
 
 class Demo {
   public static main(): void {
@@ -58,18 +61,18 @@ class Demo {
     testAnimation.setAnimationSheet(testAniSheet);
     panel.addComponent(testAnimation, 0);
 
-    let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
-    testButton.setAction(() => {
-      console.log('Clicked test button');
-      testButton.setText(Math.random().toString(16).substr(2, 5));
-    });
-    panel.addComponent(testButton, 0);
-    let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
-    closeButton.setAction(() => {
-      renderer.removeComponent(panel);
-    });
-    panel.addComponent(closeButton, 0);
-    renderer.addComponent(panel, 2);
+    // let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
+    // testButton.setAction(() => {
+    //   console.log('Clicked test button');
+    //   testButton.setText(Math.random().toString(16).substr(2, 5));
+    // });
+    // panel.addComponent(testButton, 0);
+    // let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
+    // closeButton.setAction(() => {
+    //   renderer.removeComponent(panel);
+    // });
+    // panel.addComponent(closeButton, 0);
+    // renderer.addComponent(panel, 2);
 
     // Compile item types
     ItemType.addType('sword_obsidian')
@@ -108,11 +111,26 @@ class Demo {
       .setPower(10)
       .setWeight(8);
 
+    TileType.addType('dirt')
+      .setImage('assets/f1_terrain.png')
+      .addSpriteCoords(new Rectangle(0, 16, 16, 16))
+      .setSolid(false);
+    TileType.addType('wall')
+      .setImage('assets/f1_terrain.png')
+      .addSpriteCoords(new Rectangle(64, 0, 16, 16));
+    TileType.addType('wall_moss')
+      .setImage('assets/f1_terrain.png')
+      .addSpriteCoords(new Rectangle(16, 0, 16, 16));
+    TileType.addType('door')
+      .setImage('assets/f1_terrain.png')
+      .addSpriteCoords(new Rectangle(48, 0, 16, 16))
+      .setSolid(false);
+
     // Build world
     let world = new WorldTiled('assets/dungeonEntrance.json');
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
-    let player = new EntityPlayer(12, 19, 'Wake');
+    let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
     player.itemPrimary = new Item('sword_obsidian');
     world.addEntity(player);
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
@@ -137,14 +155,14 @@ class Demo {
     world.addEntity(gwindor);
     let slime = new EntitySlime(19, 11);
     world.addEntity(slime);
-    let uiworld = new UIWorld(0, 0, renderer.getWidth(), renderer.getHeight(), renderer);
+    let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
 
-    let healthBarBorder = new UIImage(0, renderer.getHeight() - 32, 212, 32, 'assets/health_bd.png');
-    let healthBarBackground = new UIImage(6, renderer.getHeight() - 26, 200, 20, 'assets/health_bg.png');
-    let healthBarForeground = new UIImage(6, renderer.getHeight() - 26, 200, 20, 'assets/health_fg.png');
-    let healthBarText = new UILabel(106, renderer.getHeight() - 24, '100/100');
+    let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
+    let healthBarBackground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_bg.png');
+    let healthBarForeground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_fg.png');
+    let healthBarText = new UILabel(106, renderer.height - 24, '100/100');
     healthBarText.setAlignment('center');
     healthBarText.setSize(20);
     healthBarText.setColor(Color.WHITE);
@@ -153,9 +171,9 @@ class Demo {
     renderer.addComponent(healthBarForeground, 1);
     renderer.addComponent(healthBarText, 1);
 
-    let staminaBarBackground = new UIImage(6, renderer.getHeight() - 52, 200, 20, 'assets/health_bg.png');
-    let staminaBarForeground = new UIImage(6, renderer.getHeight() - 52, 200, 20, 'assets/health_fg.png');
-    let staminaBarText = new UILabel(106, renderer.getHeight() - 50, '100/100');
+    let staminaBarBackground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_bg.png');
+    let staminaBarForeground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_fg.png');
+    let staminaBarText = new UILabel(106, renderer.height - 50, '100/100');
     staminaBarText.setAlignment('center');
     staminaBarText.setSize(20);
     staminaBarText.setColor(Color.WHITE);
@@ -250,7 +268,8 @@ class Demo {
           player = newPlayer;
         }, 2500);
       }
-      playerPosLabel.setText(player.x1.toFixed(2) + ',' + player.y1.toFixed(2));
+      world.discover(player.x1, player.y1, 3);
+      playerPosLabel.setText(`${world.name}:${player.x1.toFixed(2)},${player.y1.toFixed(2)}`);
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
