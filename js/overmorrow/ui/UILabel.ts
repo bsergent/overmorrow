@@ -1,5 +1,4 @@
 import Renderer from 'overmorrow/Renderer';
-import InputEvent from 'overmorrow/Controller';
 import Color from 'overmorrow/primitives/Color';
 import UIComponent from 'overmorrow/ui/UIComponent';
 

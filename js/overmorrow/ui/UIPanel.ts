@@ -4,6 +4,8 @@ import Color from 'overmorrow/primitives/Color';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import UIComponent from 'overmorrow/ui/UIComponent';
 
+// TODO Add static method to set default skin
+
 interface UISkin {
   img: HTMLImageElement,
   url: string,
@@ -14,16 +16,22 @@ interface UISkin {
 }
 
 export default class UIPanel extends UIComponent {
-    private _title: string;
-    private _padding: number = 0;
+    private _title: string = '';
+    protected _padding: number = 0;
     private _skin: UISkin;
     private _components: UIComponent[][] = [];
     private _currentSkinChange: number = 0;
     private _draggable: boolean = true;
+
+    public get title(): string {
+      return this._title;
+    }
+
     constructor(x: number, y: number, width: number, height: number) {
       super(x, y, width, height);
       this.setSkin('assets/borderPatch.png', 1, Color.BLUE);
     }
+
     public setTitle(title: string): UIPanel {
       this._title = title;
       return this;
@@ -64,6 +72,8 @@ export default class UIPanel extends UIComponent {
     public draw(ui: Renderer): void {
       // Draw background
       this.drawBackground(ui);
+      if (this._title !== '')
+        ui.drawText(this.clone().offset(this._padding, this._padding), this._title, 'Times New Roman', 16, Color.WHITE, 'left');
   
       // Draw components
       ui.translateContext(this.x1 + this._padding, this.y1 + this._padding);

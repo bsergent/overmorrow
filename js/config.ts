@@ -12,7 +12,7 @@ if (UNITTEST) {
   function  ( UnitTesting ) {
   });
 } else {
-  requirejs(['demo/DemoDungeon'],
+  requirejs(['demo/DemoOverworld'],
   function  ( Demo ) {
   });
 }

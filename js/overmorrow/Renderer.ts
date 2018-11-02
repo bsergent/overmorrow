@@ -63,6 +63,14 @@ export default class Renderer {
     for (let componentArray of this._components) {
       if (componentArray === undefined)
         continue;
+      // Move currently selected component to forefront of layer
+      for (let c = 0; c < componentArray.length; c++) {
+        let comp = componentArray[c];
+        if (comp.selected && c !== componentArray.length - 1) {
+          componentArray.splice(c, 1);
+          componentArray.push(comp);
+        }
+      }
       for (let comp of componentArray)
         comp.draw(this);
     }
@@ -87,6 +95,7 @@ export default class Renderer {
     for (let componentArray of this._components) {
       if (componentArray === undefined)
         continue;
+      // TODO Buttons not receiving event when panel was just moved, something to do with array ordering?
       for (let comp of componentArray)
         comp.selected = comp === component;
     }

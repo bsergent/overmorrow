@@ -30,14 +30,14 @@ class Demo {
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
-    tpsLabel.setAlignment('right').setColor(Color.white);
+    tpsLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(tpsLabel, 10);
     let drawLabel = new UILabel(renderer.width - 2, 20, '1');
-    drawLabel.setAlignment('right').setColor(Color.white);
+    drawLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(drawLabel, 10);
     
     let playerPosLabel = new UILabel(0, 0, 'Unknown:0,0');
-    playerPosLabel.setAlignment('left').setColor(Color.white);
+    playerPosLabel.setAlignment('left').setColor(Color.WHITE);
     renderer.addComponent(playerPosLabel, 10);
 
     TileType.addType('dirt')

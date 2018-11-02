@@ -22,6 +22,8 @@ import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import { TileType } from 'overmorrow/classes/Tile';
 import WorldDungeon from './WorldDungeon';
+import UIInventory from '../overmorrow/ui/UIInventory';
+import Inventory from '../overmorrow/classes/Inventory';
 
 class Demo {
   public static main(): void {
@@ -29,10 +31,10 @@ class Demo {
     var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
 
     // Set up UI
-    let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
+    let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
     tpsLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(tpsLabel, 10);
-    let drawLabel = new UILabel(renderer.getWidth() - 2, 20, '1');
+    let drawLabel = new UILabel(renderer.width - 2, 20, '1');
     drawLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(drawLabel, 10);
     
@@ -43,10 +45,6 @@ class Demo {
 
     let panel = new UIPanel(10, 10, 250, 250);
     panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
-
-    let testLabel = new UILabel(0, 0, 'Title');
-    testLabel.setSize(24).setColor(Color.WHITE);
-    panel.addComponent(testLabel, 0);
 
     let testImage = new UIImage(0, 42, 32, 32, 'assets/collision.png');
     panel.addComponent(testImage, 0);
@@ -61,18 +59,18 @@ class Demo {
     testAnimation.setAnimationSheet(testAniSheet);
     panel.addComponent(testAnimation, 0);
 
-    // let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
-    // testButton.setAction(() => {
-    //   console.log('Clicked test button');
-    //   testButton.setText(Math.random().toString(16).substr(2, 5));
-    // });
-    // panel.addComponent(testButton, 0);
-    // let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
-    // closeButton.setAction(() => {
-    //   renderer.removeComponent(panel);
-    // });
-    // panel.addComponent(closeButton, 0);
-    // renderer.addComponent(panel, 2);
+    let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
+    testButton.setAction(() => {
+      console.log('Clicked test button');
+      testButton.setText(Math.random().toString(16).substr(2, 5));
+    });
+    panel.addComponent(testButton, 0);
+    let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
+    closeButton.setAction(() => {
+      renderer.removeComponent(panel);
+    });
+    panel.addComponent(closeButton, 0);
+    renderer.addComponent(panel, 2);
 
     // Compile item types
     ItemType.addType('sword_obsidian')
@@ -132,6 +130,9 @@ class Demo {
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
     player.itemPrimary = new Item('sword_obsidian');
+    player.giveItem(new Item('sword_obsidian'));
+    player.giveItem(new Item('book_of_wynn'));
+    player.giveItem(new Item('torch'));
     world.addEntity(player);
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
     darkblade.setEyeColor(Color.BROWN);
@@ -180,6 +181,10 @@ class Demo {
     renderer.addComponent(staminaBarBackground, 1);
     renderer.addComponent(staminaBarForeground, 1);
     renderer.addComponent(staminaBarText, 1);
+
+    let inv = new UIInventory(0, 0, 24, 5, 4, player.inventory);
+    inv.setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
+    renderer.addComponent(inv, 2);
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)

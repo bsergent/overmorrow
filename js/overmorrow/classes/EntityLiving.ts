@@ -21,7 +21,7 @@ export default abstract class EntityLiving extends Entity {
   protected _inventory: Inventory = null;
   protected _speedSprint: number;
   protected _direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
-  public    itemPrimary: Item = null;
+  public    itemPrimary: Item = null; // TODO This should be an index into their inventory instead of an item
   public    itemSecondary: Item = null;
 
   public get health(): number {
@@ -51,6 +51,9 @@ export default abstract class EntityLiving extends Entity {
   }
   public get action(): Action {
     return this._action;
+  }
+  public get inventory(): Inventory {
+    return this._inventory;
   }
   public get direction(): Direction {
     return this._direction;

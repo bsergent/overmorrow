@@ -1,16 +1,17 @@
 import Item, { ItemType } from "./Item";
 
 export default class Inventory {
-  private _contents: Item[] = [];
+  protected _contents: Item[] = [];
 
   public name: string;
   public get size(): number {
     return this._contents.length;
   }
 
-  constructor(size: number) {
+  constructor(size: number, name: string = 'Inventory') {
     for (let s = 0; s < size; s++)
       this._contents.push(null);
+    this.name = name;
   }
 
   public addItem(item: Item): Item {
@@ -35,6 +36,10 @@ export default class Inventory {
 
   public getItems(): Item[] {
     return this._contents.filter(item => item !== null);
+  }
+
+  public getAllItems(): Item[] {
+    return this._contents;
   }
 
   public getItemsByType(type: string): Item[] {

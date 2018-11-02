@@ -75,6 +75,8 @@ export class ItemType {
   private _power: number = 0;
   private _range: number = 1;
   private _action: Function = null;
+  private _invWidth: number = 1;
+  private _invHeight: number = 1;
 
   public get type(): string {
     return this._type;
@@ -111,6 +113,12 @@ export class ItemType {
   }
   public get action(): Function {
     return this._action === null ? function (item: Item, world: World, user: EntityLiving) {} : this._action;
+  }
+  public get invWidth(): number {
+    return this._invWidth;
+  }
+  public get invHeight(): number {
+    return this._invHeight;
   }
 
   public setName(name: string): ItemType {
@@ -174,6 +182,11 @@ export class ItemType {
   }
   public setAction(action: Function): ItemType {
     this._action = action;
+    return this;
+  }
+  public setInventoryDimensions(width: number, height: number): ItemType {
+    this._invWidth = width;
+    this._invHeight = height;
     return this;
   }
 }

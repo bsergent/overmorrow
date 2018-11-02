@@ -6,6 +6,7 @@ export class Controller {
   private mousePosX: number = 0;
   private mousePosY: number = 0;
   private pressedKeys: Keys[] = [];
+  // TODO Allow movement while dragging panels
 
   constructor(canvas: JQuery) {
     this.$canvas = canvas;
