@@ -9,7 +9,10 @@ import UILabel from 'overmorrow/ui/UILabel';
 import UIPanel from 'overmorrow/ui/UIPanel';
 import { Filter } from './primitives/Filter';
 import Line from './primitives/Line';
+import Vector from './primitives/Vector';
 declare var DEBUG;
+
+// TODO Allow setting of default font
 
 export default class Renderer {
   private _canvasActive: JQuery;
@@ -218,6 +221,12 @@ export default class Renderer {
     this._context.font = size + 'px ' + font;
     this._context.fillText(text, rect.x1, rect.y1);
     this._context.closePath();
+  }
+
+  public measureText(text: string, font: string, size: number): Vector {
+    this._context.font = size + 'px ' + font;
+    // Note that this assumes 'M' is a perfect square. Still better than just using the font size though.
+    return new Vector(this._context.measureText(text).width, this._context.measureText('M').width);
   }
 
   public drawBuffer(): void {

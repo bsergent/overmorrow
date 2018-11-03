@@ -43,8 +43,9 @@ class Demo {
     renderer.addComponent(playerPosLabel, 10);
 
 
+    UIPanel.setDefaultSkin('assets/borderPatch.png', 2, 10, new Color(87, 73, 57, 1), new Color(195, 170, 141));
     let panel = new UIPanel(10, 10, 250, 250);
-    panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
+    panel.setTitle('Test');
 
     let testImage = new UIImage(0, 42, 32, 32, 'assets/collision.png');
     panel.addComponent(testImage, 0);
@@ -87,8 +88,8 @@ class Demo {
       .setShield(true)
       .setPower(1);
     ItemType.addType('torch')
-      .setImage('assets/item_book_of_wynn.png')
-      .setMaxQuantity(99);
+      .setImage('assets/item_torch.png')
+      .setMaxQuantity(1000);
     ItemType.addType('lantern');
     ItemType.addType('bread')
       .setMaxQuantity(99);
@@ -133,6 +134,7 @@ class Demo {
     player.giveItem(new Item('sword_obsidian'));
     player.giveItem(new Item('book_of_wynn'));
     player.giveItem(new Item('torch'));
+    player.giveItem(new Item('torch', 14));
     world.addEntity(player);
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
     darkblade.setEyeColor(Color.BROWN);
@@ -183,8 +185,10 @@ class Demo {
     renderer.addComponent(staminaBarText, 1);
 
     let inv = new UIInventory(0, 0, 24, 5, 4, player.inventory);
-    inv.setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
     renderer.addComponent(inv, 2);
+    setInterval(() => {
+      player.inventory.addItem(new Item('torch'));
+    }, 100);
     
     // Bind controls
     controller.addListener(EventTypes.KEYDOWN)
