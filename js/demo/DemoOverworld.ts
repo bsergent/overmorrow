@@ -17,7 +17,7 @@ import EntityItem from 'overmorrow/classes/EntityItem';
 import Item, { ItemType, ItemRarity } from 'overmorrow/classes/Item';
 import EntityLiving from 'overmorrow/classes/EntityLiving';
 import Vector from 'overmorrow/primitives/Vector';
-import EntitySlime from 'overmorrow/classes/EntitySlime';
+import EntitySlime from './EntitySlime';
 import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import { TileType } from 'overmorrow/classes/Tile';
@@ -157,6 +157,7 @@ class Demo {
     gwindor.direction = Direction.NORTHEAST;
     world.addEntity(gwindor);
     let slime = new EntitySlime(19, 11);
+    slime.name = 'Vegeta';
     world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
@@ -255,6 +256,7 @@ class Demo {
       .setAction(event => {
         if (world.isTileOccupied(19, 11)) return;
         let slime = new EntitySlime(19, 11);
+        slime.name = 'Vegeta Imposter';
         world.addEntity(slime);
       });
 
