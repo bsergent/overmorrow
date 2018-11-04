@@ -14,7 +14,7 @@ import UIImage from 'overmorrow/ui/UIImage';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import EntityItem from 'overmorrow/classes/EntityItem';
-import Item, { ItemType, ItemRarity } from 'overmorrow/classes/Item';
+import Item, { ItemType, ItemRarity, ItemQuality } from 'overmorrow/classes/Item';
 import EntityLiving from 'overmorrow/classes/EntityLiving';
 import Vector from 'overmorrow/primitives/Vector';
 import EntitySlime from './EntitySlime';
@@ -78,6 +78,7 @@ class Demo {
     ItemType.addType('sword_obsidian')
       .setName('Obsidian Sword')
       .setImage('assets/item_sword_obsidian.png')
+      .setDescription('Sharp, shimmering sword\nShouldn\'t this be brittle?')
       .setRarity(ItemRarity.UNCOMMON)
       .setWeapon(true)
       .setPower(10)
@@ -85,11 +86,13 @@ class Demo {
     ItemType.addType('book_of_wynn')
       .setName('Book of Wynn')
       .setImage('assets/item_book_of_wynn.png')
+      .setDescription('Book filled with strange runes')
       .setRarity(ItemRarity.MYTHIC)
       .setShield(true)
       .setPower(1);
     ItemType.addType('torch')
       .setImage('assets/item_torch.png')
+      .setDescription('Convenient light source\nEmbrace the light and fear the dark.')
       .setMaxQuantity(1000);
     ItemType.addType('lantern');
     ItemType.addType('bread')
@@ -131,8 +134,10 @@ class Demo {
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
-    player.itemPrimary = new Item('sword_obsidian');
-    player.giveItem(new Item('sword_obsidian'));
+    let sword = new Item('sword_obsidian');
+    sword.quality = ItemQuality.EXCELLENT;
+    player.giveItem(sword);
+    player.itemPrimary = sword;
     player.giveItem(new Item('book_of_wynn'));
     player.giveItem(new Item('torch'));
     player.giveItem(new Item('torch', 14));

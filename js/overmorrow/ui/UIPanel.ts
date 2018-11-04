@@ -117,7 +117,7 @@ export default class UIPanel extends UIComponent {
 		// Draw background
 		this.drawBackground(ui);
 		if (this._title !== '')
-			ui.drawText(this.clone().offset(this.padding, this.padding), this._title, 'Times New Roman', 16, Color.WHITE, 'left');
+			ui.drawText(this.clone().offset(this.padding, this.padding), this._title, 'Times New Roman', 16, this._skin !== undefined ? this.skin.colorFG : Color.WHITE, 'left');
 
 		// Draw components
 		ui.translateContext(this.x1 + this.padding, this.y1 + this.padding);

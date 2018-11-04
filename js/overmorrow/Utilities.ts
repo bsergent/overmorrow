@@ -376,7 +376,8 @@ export class SeededRandom {
 }
 
 export function toTitleCase(str: string): string {
-    return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+  if (str === undefined) return 'Undefined';
+  return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
 // So there's not such thing as output parameters in JavaScript/TypeScript

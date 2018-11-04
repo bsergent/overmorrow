@@ -1,11 +1,12 @@
 import Inventory from "../classes/Inventory";
 import Renderer from "../Renderer";
-import { InputEvent, EventTypes, Controller } from "../Controller";
-import Item from "../classes/Item";
+import { InputEvent, EventTypes, Controller, Keys } from "../Controller";
+import Item, { ItemQuality, ItemRarity } from "../classes/Item";
 import UIPanel, { UISkin } from "./UIPanel";
 import Rectangle from "../primitives/Rectangle";
 import Color from "../primitives/Color";
 import Vector from "../primitives/Vector";
+import { toTitleCase } from "../Utilities";
 declare var DEBUG;
 
 // TODO Make this abstract after testing
@@ -19,7 +20,7 @@ export default abstract class UIInventory extends UIPanel {
 	protected _cellSize: number;
 	protected _cellColor: Color = Color.BLACK.clone().setAlpha(0.2);
 	protected _cellColorHover: Color = Color.BLACK.clone().setAlpha(0.3);
-	protected _cellTextBGColor: Color = new Color(0, 0, 0, 0.5);
+	protected _cellTextBGColor: Color = new Color(0, 0, 0, 0.7);
 	protected _cellTextSize: number = 10;
 	protected _autoResize: boolean = true;
 	protected _cellHovered: number = -1;
@@ -117,6 +118,30 @@ export default abstract class UIInventory extends UIPanel {
 			rect.y1 = cur.y - this._cellSize / 2;
 			ui.drawImage(rect, UIInventory._selectedItem.image);
 		}
+
+		// Draw hovered item label
+		if (this._inventory.getItemAt(this._cellHovered) !== null) {
+			let cur = Controller.getCursor();
+			let item = this._inventory.getItemAt(this._cellHovered);
+			let text = item.name;
+			if (Controller.isKeyDown(Keys.KEY_SHIFT)) {
+				text += `\nQuality: ${toTitleCase(ItemQuality[item.quality])}`;
+				text += `\nRarity: ${toTitleCase(ItemRarity[item.type.rarity])}`;
+				if (item.description !== '') text += `\n${item.description}`;
+			}
+			let textSize = ui.measureText(text, 'Times New Roman', 16, 2);
+			let padding = 3;
+			rect.x1 = cur.x - padding;
+			rect.y1 = cur.y - textSize.y - 2*padding - 2;
+			rect.width = textSize.x + 2*padding;
+			rect.height = textSize.y + 2*padding;
+			ui.drawRect(rect, this._cellTextBGColor);
+			ui.drawRectWire(rect, this.skin.colorFG);
+			rect.x1 += padding;
+			rect.y1 += padding;
+			ui.drawText(rect, text, 'Times New Roman', 16, Color.WHITE, 'left', 2);
+			// TODO Draw this above all other UIInventory on same layer, not sure how to go about that yet though
+		}
 	}
 
 	protected getCellAtCursor(x: number, y: number): number {
@@ -147,15 +172,15 @@ export default abstract class UIInventory extends UIPanel {
 					if (dest === null) {
 						this._inventory.putItemAt(src, this._cellHovered);
 						UIInventory._selectedItemSource._inventory.removeItemAt(UIInventory._selectedItemSource._cellSelected);
-						console.log('Moved');
+						if (DEBUG) console.log('Moved');
 					} else {
 						if (dest.canStack(src)) {
 							src.quantity = dest.stack(src);
-							console.log('Stacked');
+							if (DEBUG) console.log('Stacked');
 						} else {
 							this._inventory.putItemAt(src, this._cellHovered);
 							UIInventory._selectedItemSource._inventory.putItemAt(dest, UIInventory._selectedItemSource._cellSelected);
-							console.log('Swapped');
+							if (DEBUG) console.log('Swapped');
 						}
 					}
 					UIInventory._selectedItemSource._cellSelected = -1;
@@ -170,7 +195,6 @@ export default abstract class UIInventory extends UIPanel {
 					UIInventory._selectedItem = this._inventory.getItemAt(this._cellSelected);
 					UIInventory._selectedItemSource = this;
 					ui.selectComponent(this);
-					console.log(`Selected Item[${UIInventory._selectedItem.name}] from Inv[${this.title}]`);
 					return true;
 				}
 		}

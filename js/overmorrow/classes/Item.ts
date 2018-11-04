@@ -3,7 +3,7 @@ import EntityLiving from "./EntityLiving";
 import { toTitleCase, directionToVector, degreesToDirection } from "../Utilities";
 
 export default class Item {
-  public quality: ItemQuality;
+  public quality: ItemQuality = ItemQuality.AVERAGE;
   public name: string;
   public description: string;
   public power: number;
@@ -90,9 +90,9 @@ export class ItemType {
   private _type: string;
   private _name: string;
   private _image: string;
-  private _description: string;
+  private _description: string = '';
   private _maxQuantity: number = 1;
-  private _rarity: ItemRarity;
+  private _rarity: ItemRarity = ItemRarity.COMMON;
   private _weight: number = 0;
   private _canAttack: boolean = false;
   private _canBlock: boolean = false;

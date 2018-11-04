@@ -210,21 +210,38 @@ export default class Renderer {
     if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);
   }
 
-  public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
+  public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right', linePadding: number = 0): void {
     if (DEBUG) this.drawRect(new Rectangle(rect.x1, rect.y1, 5, 5), new Color(0, 0, 255, 0.5));
+    let lines = text.split('\n');
     this._context.beginPath();
     this._context.fillStyle = color.rgba;
     this._context.textAlign = alignment;
     this._context.textBaseline = 'hanging';
     this._context.font = size + 'px ' + font;
-    this._context.fillText(text, rect.x1, rect.y1);
+    if (lines.length > 1) {
+      let rectInt = rect.clone();
+      for (let line of lines) {
+        this._context.fillText(line, rectInt.x1, rectInt.y1);
+        rectInt.y1 += this._context.measureText('M').width + linePadding;
+      }
+    } else {
+      this._context.fillText(text, rect.x1, rect.y1);
+    }
     this._context.closePath();
   }
 
-  public measureText(text: string, font: string, size: number): Vector {
+  public measureText(text: string, font: string, size: number, linePadding: number = 0): Vector {
     this._context.font = size + 'px ' + font;
+    let dims = new Vector(0, 0);
+    let lines = text.split('\n');
     // Note that this assumes 'M' is a perfect square. Still better than just using the font size though.
-    return new Vector(this._context.measureText(text).width, this._context.measureText('M').width);
+    let lineHeight = this._context.measureText('M').width;
+    for (let l of lines) {
+      dims.x = Math.max(dims.x, this._context.measureText(l).width);
+      dims.y += lineHeight + linePadding;
+    }
+    dims.y -= linePadding;
+    return dims;
   }
 
   public drawBuffer(): void {
