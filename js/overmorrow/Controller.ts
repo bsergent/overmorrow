@@ -1,17 +1,23 @@
 import $ = require('jquery');
+import Vector from './primitives/Vector';
 export class Controller {
-  private inputQueue: InputEvent[] = [];
-  private $canvas: JQuery;
-  private listeners: Listener[] = [];
-  private mousePosX: number = 0;
-  private mousePosY: number = 0;
-  private pressedKeys: Keys[] = [];
+  private static inputQueue: InputEvent[] = [];
+  private static $canvas: JQuery;
+  private static listeners: Listener[] = [];
+  private static mousePosX: number = 0;
+  private static mousePosY: number = 0;
+  private static pressedKeys: Keys[] = [];
   // TODO Allow movement while dragging panels
 
-  constructor(canvas: JQuery) {
+  public static init(canvas: JQuery) {
+    if (this.$canvas !== undefined) return;
     this.$canvas = canvas;
     canvas.click(event => {
-      this.queueInput(new InputEvent(event));
+      let mouseEvent = new InputEvent(event);
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
+      this.queueInput(mouseEvent);
+      return false;
     });
     canvas.mousedown(event => {
       let mouseEvent = new InputEvent(event);
@@ -70,14 +76,14 @@ export class Controller {
       mouseEvent.dy = (event.originalEvent as any).wheelDeltaY;
       event.preventDefault();
       this.queueInput(mouseEvent);
-    })
+    });
   }
 
-  public queueInput(event: InputEvent): void {
+  public static queueInput(event: InputEvent): void {
     this.inputQueue.push(event);
   }
 
-  public processInput(): void {
+  public static processInput(): void {
     for (let e of this.inputQueue) {
       for (let l of this.listeners) {
         if (l.type === EventTypes.ALL || (l.type === e.type && (l.keys === undefined || l.keys.indexOf(e.key) !== -1))) {
@@ -98,14 +104,18 @@ export class Controller {
     }
   }
 
-  public addListener(type: EventTypes): Listener {
+  public static addListener(type: EventTypes): Listener {
     let l = new Listener(type);
     this.listeners.push(l);
     return l;
   }
 
-  public isKeyDown(key: Keys): boolean {
+  public static isKeyDown(key: Keys): boolean {
     return this.pressedKeys.indexOf(key) !== -1;
+  }
+
+  public static getCursor(): Vector {
+    return new Vector(this.mousePosX - this.$canvas[0].getBoundingClientRect().left, this.mousePosY - this.$canvas[0].getBoundingClientRect().top);
   }
 }
 

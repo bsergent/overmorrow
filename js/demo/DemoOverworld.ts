@@ -24,11 +24,12 @@ import { TileType } from 'overmorrow/classes/Tile';
 import WorldDungeon from './WorldDungeon';
 import UIInventory from '../overmorrow/ui/UIInventory';
 import Inventory from '../overmorrow/classes/Inventory';
+import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
 
 class Demo {
   public static main(): void {
-    var controller = new Controller($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
+    Controller.init($('#game'));
+    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
@@ -71,7 +72,7 @@ class Demo {
       renderer.removeComponent(panel);
     });
     panel.addComponent(closeButton, 0);
-    renderer.addComponent(panel, 2);
+    //renderer.addComponent(panel, 2);
 
     // Compile item types
     ItemType.addType('sword_obsidian')
@@ -158,7 +159,7 @@ class Demo {
     world.addEntity(gwindor);
     let slime = new EntitySlime(19, 11);
     slime.name = 'Vegeta';
-    world.addEntity(slime);
+    //world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
@@ -185,73 +186,77 @@ class Demo {
     renderer.addComponent(staminaBarForeground, 1);
     renderer.addComponent(staminaBarText, 1);
 
-    let inv = new UIInventory(0, 0, 24, 5, 4, player.inventory);
+    let inv = new UIInventoryGrid(0, 64, 24, 5, 4, player.inventory).setTitle('Backpack');
     renderer.addComponent(inv, 2);
+    let inv2 = new UIInventoryGrid(256, 64, 24, 3, 3, new Inventory(9)).setTitle('Chest');
+    renderer.addComponent(inv2, 2);
+    let inv3 = new UIInventoryGrid(256, 256 + 64, 24, 2, 2, new Inventory(4)).setTitle('Barrel');
+    renderer.addComponent(inv3, 2);
     setInterval(() => {
       player.inventory.addItem(new Item('torch'));
     }, 100);
     
     // Bind controls
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_ENTER])
       .setAction(event => {
         DEBUG = !DEBUG;
         console.log('DEBUG=' + DEBUG);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_EQUALS])
       .setAction(event => {
         uiworld.tileScale += 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_MINUS])
       .setAction(event => {
         uiworld.tileScale -= 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
+        player.setAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
+        player.setAction(new ActionMove(0, Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(-(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
+        player.setAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
+        player.setAction(new ActionMove(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
       });
-    controller.addListener(EventTypes.MOUSEMOVE)
+    Controller.addListener(EventTypes.MOUSEMOVE)
       .setAction((event: InputEvent) => {
         let px = (player.x1 + 0.5) * uiworld.tileScale - uiworld.viewport.x1;
         let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
         player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
       });
     // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
-    controller.addListener(EventTypes.MOUSEDOWN)
+    Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
         player.setAction(new ActionUseItem(player.itemPrimary, 1));
       });
-    controller.addListener(EventTypes.MOUSEDOWN)
+    Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_RIGHT])
       .setAction(event => {
         player.setAction(new ActionUseItem(player.itemPrimary, 2));
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_M])
       .setAction(event => {
         if (world.isTileOccupied(19, 11)) return;
@@ -267,7 +272,7 @@ class Demo {
     var $tps = $('#tps');
     function update() {
       timekeep.startUpdate();
-      controller.processInput();
+      Controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta()));
       if (player.health <= 0) {
         setTimeout(function() {

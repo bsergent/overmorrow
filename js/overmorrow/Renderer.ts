@@ -28,7 +28,7 @@ export default class Renderer {
   private _height: number;
   private _filters: Filter[] = []; // Applied to the temp canvas
 
-  constructor(canvasActive: JQuery, canvasBuffer: JQuery, canvasTemp: JQuery, controller: Controller) {
+  constructor(canvasActive: JQuery, canvasBuffer: JQuery, canvasTemp: JQuery) {
     this._canvasActive = canvasActive;
     this._canvasBuffer = canvasBuffer;
     this._canvasTemp = canvasTemp;
@@ -47,8 +47,7 @@ export default class Renderer {
       this._contextTemp.imageSmoothingEnabled = false;
     }
     this._context = this._contextBuffer;
-    if (controller !== null)
-      controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
+    Controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
   }
 
   public preloadImages(urls: string[]) {
@@ -84,13 +83,12 @@ export default class Renderer {
   private processInput(e: InputEvent): void {
     // Check higher indices first
     outer:
-    for (let c = this._components.length - 1; c >= 0; c--) {
-      if (this._components[c] === undefined)
+    for (let layer = this._components.length - 1; layer >= 0; layer--) {
+      if (this._components[layer] === undefined)
         continue;
-      for (let comp of this._components[c]) {
-        if (comp.input(this, e))
+      for (let c = this._components[layer].length - 1; c >= 0; c--)
+        if (this._components[layer][c].input(this, e))
           break outer;
-      }
     }
   }
 

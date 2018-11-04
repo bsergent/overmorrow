@@ -44,7 +44,7 @@
 	<body>
 		<img src="assets/logo.png" width="128" style="margin:0xp;"/>
 		<h1>Overmorrow Demo</h1>
-		<p>v0.0.4</p>
+		<p>v0.1.0</p>
 		<div id="game-container">
 			<canvas id="game" width="800" height="600" tabfocus="1" style=""></canvas>
 			<canvas id="buffer" width="800" height="600" tabfocus="1" style="visibility:hidden; display:none;"></canvas>

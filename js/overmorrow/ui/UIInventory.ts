@@ -1,29 +1,31 @@
 import Inventory from "../classes/Inventory";
 import Renderer from "../Renderer";
-import { InputEvent } from "../Controller";
+import { InputEvent, EventTypes, Controller } from "../Controller";
 import Item from "../classes/Item";
 import UIPanel, { UISkin } from "./UIPanel";
 import Rectangle from "../primitives/Rectangle";
 import Color from "../primitives/Color";
+import Vector from "../primitives/Vector";
+declare var DEBUG;
 
 // TODO Make this abstract after testing
 // TODO Implement static stuff to handle dragging items between inventories
-export default class UIInventory extends UIPanel {
-	protected _inventory: Inventory;
-	private _selectedItem: Item;
-	private _gridWidth: number;
-	private _gridHeight: number;
-	private _cellWidth: number;
-	private _cellColor: Color = new Color(0, 0, 0, 0.2);
-	private _cellTextBGColor: Color = new Color(0, 0, 0, 0.5);
-	private _cellTextSize: number = 10;
+export default abstract class UIInventory extends UIPanel {
+	protected static _selectedItem: Item = null;
+	protected static _selectedItemSource: UIInventory = null;
 
-	public get gridWidth(): number {
-		return this._gridWidth;
-	}
-	public get gridHeight(): number {
-		return this._gridHeight;
-	}
+	protected _inventory: Inventory;
+	protected _cellPositions: Vector[] = []; // Positions relative to padding
+	protected _cellSize: number;
+	protected _cellColor: Color = Color.BLACK.clone().setAlpha(0.2);
+	protected _cellColorHover: Color = Color.BLACK.clone().setAlpha(0.3);
+	protected _cellTextBGColor: Color = new Color(0, 0, 0, 0.5);
+	protected _cellTextSize: number = 10;
+	protected _autoResize: boolean = true;
+	protected _cellHovered: number = -1;
+	protected _cellSelected: number = -1;
+	// Ex: (12, 3) will be 12 pixels right of the left padding and 3 pixels below the upper padding and title
+
 	public get skin(): UISkin {
 		return super.skin;
 	}
@@ -32,24 +34,41 @@ export default class UIInventory extends UIPanel {
 		this.updateDimensions();
 	}
 
-	// TODO Support InventoryPositional more later
-	constructor(x: number, y: number, cellWidth: number, gridWidth: number, gridHeight: number, inv: Inventory) {
-		super(x, y, gridWidth * cellWidth, gridHeight * cellWidth + 18);
-		this._gridWidth = gridWidth;
-		this._gridHeight = gridHeight;
-		this._cellWidth = cellWidth;
+	constructor(x: number, y: number, cellSize: number, inv: Inventory, cellPositions: Vector[]) {
+		super(x, y, 0, 0);
+		this._cellSize = cellSize;
 		this._inventory = inv;
+		this._cellPositions = cellPositions;
 		this.setTitle(inv.name);
-	}
-
-	private updateDimensions(): void {
-		this.width = this._gridWidth * this._cellWidth + 2 * this.padding;
-		this.height = this._gridHeight * this._cellWidth + 2 * this.padding + 18;
-	}
-
-	public setPadding(padding: number): UIPanel {
-		this._padding = padding;
 		this.updateDimensions();
+		// TODO Figure out how inventory positional is going to work with an array of cell positions (adjacency list)
+	}
+
+	// TODO Support custom dimensions
+	protected updateDimensions(): void {
+		if (!this._autoResize) return;
+		let width = 0;
+		let height = 0;
+		for (let pos of this._cellPositions) {
+			width = Math.max(width, pos.x + this._cellSize);
+			height = Math.max(height, pos.y + this._cellSize);
+		}
+		this.width = width + 2 * this.padding;
+		this.height = height + 2 * this.padding + (this.title !== '' ? 18 : 0);
+		//console.log(`Inv[${this.title}] dimensions set to ${this.width}x,${this.height}y`);
+	}
+
+	protected setCellPositions(positions: Vector[]): UIInventory {
+		if (positions.length !== this._inventory.size) throw `Length of positions vector for Inv[${this.title}] (${positions.length}) must equal the inventory size (${this._inventory.size}).`;
+		this._cellPositions = positions;
+		this.updateDimensions();
+		return this;
+	}
+
+	public setPadding(padding: number): UIInventory {
+		// if (padding !== this._padding)
+		// 	this.width = this.width - 2*this._padding + 2*padding;
+		this._padding = padding;
 		return this;
 	}
 
@@ -57,46 +76,107 @@ export default class UIInventory extends UIPanel {
 		super.draw(ui);
 		
 		// Draw item grid
-		let rect: Rectangle = new Rectangle(0, 0, this._cellWidth, this._cellWidth);
-		for (let y = 0; y < this._gridHeight; y++) {
-			for (let x = 0; x < this._gridWidth; x++) {
-				rect.x1 = x * rect.width + this.padding + this.x1;
-				rect.y1 = y * rect.width + this.padding + this.y1 + 18;
-				ui.drawRectWire(rect, this._cellColor);
-			}
+		let rect: Rectangle = new Rectangle(0, 0, this._cellSize - 2, this._cellSize - 2);
+		for (let c = 0; c < this._cellPositions.length; c++) {
+			let cell = this._cellPositions[c];
+			rect.x1 = this.x1 + this.padding + cell.x + 1;
+			rect.y1 = this.y1 + this.padding + cell.y + (this.title !== '' ? 18 : 0) + 1;
+			ui.drawRect(rect, c === this._cellHovered ? this._cellColorHover : this._cellColor);
 		}
 
 		// Draw items in grid
 		let item: Item;
-		for (let y = 0; y < this._gridHeight; y++) {
-			for (let x = 0; x < this._gridWidth; x++) {
-				rect.x1 = x * rect.width + this.padding + this.x1;
-				rect.y1 = y * rect.width + this.padding + this.y1 + 18;
-				item = this._inventory.getAllItems()[y*this._gridWidth+x];
-				if (item !== null) {
-					ui.drawImage(rect, item.image);
-					if (item.quantity > 1 && this.skin !== undefined) {
-						let textDims = ui.measureText('' + item.quantity, 'Times New Roman', this._cellTextSize);
-						ui.drawRect(new Rectangle(
-								rect.x1 + this._cellWidth - textDims.x - 2,
-								rect.y1 + this._cellWidth - textDims.y,
-								textDims.x + 2,
-								textDims.y),
-							this._cellTextBGColor);
-						ui.drawText(rect.offset(this._cellWidth - 1, this._cellWidth - this._cellTextSize + 2),
-							'' + item.quantity, 'Times New Roman',
-							this._cellTextSize, this.skin.colorFG, 'right');
-					}
+		rect.width = this._cellSize;
+		rect.height = this._cellSize;
+		for (let c = 0; c < this._cellPositions.length; c++) {
+			let pos = this._cellPositions[c];
+			rect.x1 = this.x1 + this.padding + pos.x;
+			rect.y1 = this.y1 + this.padding + pos.y + (this.title !== '' ? 18 : 0);
+			item = this._inventory.getItemAt(c);
+			if (item !== null) {
+				ui.drawImage(rect, item.image, c === this._cellSelected ? 0.2 : 1.0);
+				if (item.quantity > 1 && this.skin !== undefined) {
+					let textDims = ui.measureText('' + item.quantity, 'Times New Roman', this._cellTextSize);
+					ui.drawRect(new Rectangle(
+							rect.x1 + this._cellSize - textDims.x - 2,
+							rect.y1 + this._cellSize - textDims.y,
+							textDims.x + 2,
+							textDims.y),
+						this._cellTextBGColor);
+					ui.drawText(rect.offset(this._cellSize - 1, this._cellSize - this._cellTextSize + 2),
+						'' + item.quantity, 'Times New Roman',
+						this._cellTextSize, this.skin.colorFG, 'right');
 				}
 			}
 		}
 		
 		// Draw selected item at cursor
+		if (UIInventory._selectedItem !== null && this._cellSelected !== -1) {
+			let cur = Controller.getCursor();
+			rect.x1 = cur.x - this._cellSize / 2;
+			rect.y1 = cur.y - this._cellSize / 2;
+			ui.drawImage(rect, UIInventory._selectedItem.image);
+		}
+	}
+
+	protected getCellAtCursor(x: number, y: number): number {
+		let cell: Rectangle = new Rectangle(0, 0, this._cellSize, this._cellSize);
+		for (let c = 0; c < this._cellPositions.length; c++) {
+			let pos = this._cellPositions[c];
+			cell.x1 = this.x1 + this.padding + pos.x;
+			cell.y1 = this.y1 + this.padding + pos.y + (this.title !== '' ? 18 : 0);
+			if (cell.contains(x, y)) return c;
+		}
+		return -1;
 	}
 
   public input(ui: Renderer, e: InputEvent): boolean {
-		if (super.input(ui, e)) return true;
-		// TODO Handle drag and drop
-    return false; // Return true if event is consumed
+		switch (e.type) {
+			case EventTypes.MOUSEMOVE:
+				// Hovered cells
+				this._cellHovered = this.getCellAtCursor(e.x, e.y);
+				break;
+			case EventTypes.MOUSEUP:	
+				if (UIInventory._selectedItem !== null && this._cellHovered !== -1) {
+					// Dropping/swapping/stacking items
+					// TODO Implement picking up half of a stack
+					// TODO Implement putting down one item of a stack
+					if (DEBUG) console.log(`Moving Item[${UIInventory._selectedItem.name}] from Inv[${UIInventory._selectedItemSource.title}][${UIInventory._selectedItemSource._cellSelected}] to Inv[${this.title}][${this._cellHovered}]`);
+					let src = UIInventory._selectedItem;
+					let dest = this._inventory.getItemAt(this._cellHovered);
+					if (dest === null) {
+						this._inventory.putItemAt(src, this._cellHovered);
+						UIInventory._selectedItemSource._inventory.removeItemAt(UIInventory._selectedItemSource._cellSelected);
+						console.log('Moved');
+					} else {
+						if (dest.canStack(src)) {
+							src.quantity = dest.stack(src);
+							console.log('Stacked');
+						} else {
+							this._inventory.putItemAt(src, this._cellHovered);
+							UIInventory._selectedItemSource._inventory.putItemAt(dest, UIInventory._selectedItemSource._cellSelected);
+							console.log('Swapped');
+						}
+					}
+					UIInventory._selectedItemSource._cellSelected = -1;
+					UIInventory._selectedItem = null;
+					ui.selectComponent(null);
+					return true;
+				}
+			case EventTypes.MOUSEDOWN:
+				// Picking up items
+				if (UIInventory._selectedItem === null && this._cellHovered !== -1 && this._inventory.getItemAt(this._cellHovered) !== null) {
+					this._cellSelected = this._cellHovered;
+					UIInventory._selectedItem = this._inventory.getItemAt(this._cellSelected);
+					UIInventory._selectedItemSource = this;
+					ui.selectComponent(this);
+					console.log(`Selected Item[${UIInventory._selectedItem.name}] from Inv[${this.title}]`);
+					return true;
+				}
+		}
+		if (this._cellHovered === -1 && UIInventory._selectedItem === null)
+			if (super.input(ui, e))
+				return true;
+		return false; // Return true if event is consumed
   }
 }
