@@ -65,7 +65,7 @@ export default class Tile implements Tickable {
 
 	public draw(ui: WorldRenderer, x: number, y: number): void {
 		if (this._light <= 0 || this._fog === DiscoveryLevel.UNKNOWN) {
-			ui.drawRect(new Rectangle(x, y, 1, 1), Color.black);
+			ui.drawRect(new Rectangle(x, y, 1, 1), Color.BLACK);
 			return;
 		}
 		this._type.draw(ui, x, y, this);
@@ -103,7 +103,7 @@ export class TileType {
 	private _description: string = '';
 	private _solid: boolean = true; // This is just for basic collision, might need to add directional collision later
 	private _hardness: number = -1; // -1 for unbreakable
-	private _mapColor: Color = Color.black; // Color on map shards and minimaps
+	private _mapColor: Color = Color.BLACK; // Color on map shards and minimaps
 	private _transparent: boolean = false;
 	private _defaultMeta: Map<string, any>;
 	private _draw: Function = null; // Allow for override of regular draw function that uses the _image property

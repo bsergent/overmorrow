@@ -23,8 +23,8 @@ import { ActionUseItem } from './overmorrow/classes/Action';
 
 class UnitTesting {
   public static main(): void {
-    var controller = new Controller($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
+    Controller.init($('#game'));
+    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
 
     // Compile item types
     ItemType.addType('sword_obsidian')

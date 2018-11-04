@@ -21,8 +21,9 @@ export default abstract class EntityLiving extends Entity {
   protected _inventory: Inventory = null;
   protected _speedSprint: number;
   protected _direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
-  public    itemPrimary: Item = null;
-  public    itemSecondary: Item = null;
+  public itemPrimary: Item = null; // TODO This should be an index into their inventory instead of an item
+  public itemSecondary: Item = null;
+  public name: string = '';
 
   public get health(): number {
     return this._health;
@@ -51,6 +52,9 @@ export default abstract class EntityLiving extends Entity {
   }
   public get action(): Action {
     return this._action;
+  }
+  public get inventory(): Inventory {
+    return this._inventory;
   }
   public get direction(): Direction {
     return this._direction;
@@ -157,11 +161,15 @@ export default abstract class EntityLiving extends Entity {
       ui.drawRectWire(this, this.isFatigued() ? Color.WHITE : Color.GREEN);
       ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.RED);
       ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.GREEN);
-      if (this.type !== 'player') ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this.type} [${this.id}]`: this.type, 'Courier', 12, Color.WHITE, 'center');
       let vec = directionToVector(this.direction);
       vec.magnitude = 1;
       ui.drawLine(new Rectangle(this.x1 + 0.5, this.y1 + 0.5, vec.x, vec.y), Color.RED, 3);
+      ui.drawText(this.clone().offset(this.width / 2, 1.2),
+        this._action === null ? 'Rest' : `${this._action.constructor.name} - ${ActionState[this._action.state]}`,
+        'Courier', 10, Color.WHITE, 'center');
     }
+    if (this.name !== '')
+      ui.drawText(this.clone().offset(this.width / 2, 1.1), DEBUG ? `${this.name} [${this.id}]`: this.name, 'Courier', 12, Color.WHITE, 'center');
   }
 
   public tick(delta: number, world: World): void {

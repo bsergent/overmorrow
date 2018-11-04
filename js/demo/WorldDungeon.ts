@@ -61,7 +61,7 @@ export default class Dungeon extends WorldSandbox {
     if (DEBUG) {
       for (let r = 0; r < this._rooms.length; r++) {
         let room = this._rooms[r];
-        ui.drawRectWire(room, Color.red);
+        ui.drawRectWire(room, Color.RED);
       }
       for (let r = 0; r < this._rooms.length-1; r++) {
         let r1: Rectangle = this._rooms[r];

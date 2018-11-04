@@ -17,7 +17,6 @@ import EntityItem from 'overmorrow/classes/EntityItem';
 import Item, { ItemType, ItemRarity } from 'overmorrow/classes/Item';
 import EntityLiving from 'overmorrow/classes/EntityLiving';
 import Vector from 'overmorrow/primitives/Vector';
-import EntitySlime from 'overmorrow/classes/EntitySlime';
 import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import Tile, { TileType } from 'overmorrow/classes/Tile';
@@ -25,19 +24,19 @@ import WorldDungeon from './WorldDungeon';
 
 class Demo {
   public static main(): void {
-    var controller = new Controller($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
+    Controller.init($('#game'));
+    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
-    tpsLabel.setAlignment('right').setColor(Color.white);
+    tpsLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(tpsLabel, 10);
     let drawLabel = new UILabel(renderer.width - 2, 20, '1');
-    drawLabel.setAlignment('right').setColor(Color.white);
+    drawLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(drawLabel, 10);
     
     let playerPosLabel = new UILabel(0, 0, 'Unknown:0,0');
-    playerPosLabel.setAlignment('left').setColor(Color.white);
+    playerPosLabel.setAlignment('left').setColor(Color.WHITE);
     renderer.addComponent(playerPosLabel, 10);
 
     TileType.addType('dirt')
@@ -86,70 +85,70 @@ class Demo {
     DEBUG = true;
     
     // Bind controls
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_ENTER])
       .setAction((event: InputEvent) => {
         DEBUG = !DEBUG;
         console.log('DEBUG=' + DEBUG);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_EQUALS])
       .setAction((event: InputEvent) => {
         uiworld.tileScale += 4;
         if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_MINUS])
       .setAction((event: InputEvent) => {
         uiworld.tileScale -= 4;
         if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
         uiworld.viewport.y1 -= 4;
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
         uiworld.viewport.y1 += 4;
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
         uiworld.viewport.x1 -= 4;
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
         uiworld.viewport.x1 += 4;
       });
-    controller.addListener(EventTypes.KEYUP)
+    Controller.addListener(EventTypes.KEYUP)
     .setKeys([Keys.KEY_1])
     .setAction((event: InputEvent) => {
       worldGenType = 'SpreadMinTree';
       world = new WorldDungeon(worldGenType, 'dirt', 'stone');
       uiworld.setWorld(world);
     });
-    controller.addListener(EventTypes.KEYUP)
+    Controller.addListener(EventTypes.KEYUP)
     .setKeys([Keys.KEY_2])
     .setAction((event: InputEvent) => {
       worldGenType = 'PerfectSparsen';
       world = new WorldDungeon(worldGenType, 'dirt', 'stone');
       uiworld.setWorld(world);
     });
-    controller.addListener(EventTypes.MOUSEMOVE)
+    Controller.addListener(EventTypes.MOUSEMOVE)
     .setAction((event: InputEvent) => {
-      if (controller.isKeyDown(Keys.MOUSE_LEFT)) {
+      if (Controller.isKeyDown(Keys.MOUSE_LEFT)) {
         uiworld.viewport.x1 += event.dx;
         uiworld.viewport.y1 += event.dy;
       }
     });
-    controller.addListener(EventTypes.SCROLL)
+    Controller.addListener(EventTypes.SCROLL)
     .setAction((event: InputEvent) => {
       uiworld.tileScale += Math.sign(event.d);
       if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
@@ -163,7 +162,7 @@ class Demo {
     var $tps = $('#tps');
     function update() {
       timekeep.startUpdate();
-      controller.processInput();
+      Controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta()));
       playerPosLabel.setText(world.name);
       timekeep.addDraw(renderer.draw());

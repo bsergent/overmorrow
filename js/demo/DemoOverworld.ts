@@ -14,25 +14,28 @@ import UIImage from 'overmorrow/ui/UIImage';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import EntityItem from 'overmorrow/classes/EntityItem';
-import Item, { ItemType, ItemRarity } from 'overmorrow/classes/Item';
+import Item, { ItemType, ItemRarity, ItemQuality } from 'overmorrow/classes/Item';
 import EntityLiving from 'overmorrow/classes/EntityLiving';
 import Vector from 'overmorrow/primitives/Vector';
-import EntitySlime from 'overmorrow/classes/EntitySlime';
+import EntitySlime from './EntitySlime';
 import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import { TileType } from 'overmorrow/classes/Tile';
 import WorldDungeon from './WorldDungeon';
+import UIInventory from '../overmorrow/ui/UIInventory';
+import Inventory from '../overmorrow/classes/Inventory';
+import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
 
 class Demo {
   public static main(): void {
-    var controller = new Controller($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'), controller);
+    Controller.init($('#game'));
+    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
 
     // Set up UI
-    let tpsLabel = new UILabel(renderer.getWidth() - 2, 2, '1');
+    let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
     tpsLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(tpsLabel, 10);
-    let drawLabel = new UILabel(renderer.getWidth() - 2, 20, '1');
+    let drawLabel = new UILabel(renderer.width - 2, 20, '1');
     drawLabel.setAlignment('right').setColor(Color.WHITE);
     renderer.addComponent(drawLabel, 10);
     
@@ -41,12 +44,9 @@ class Demo {
     renderer.addComponent(playerPosLabel, 10);
 
 
+    UIPanel.setDefaultSkin('assets/borderPatch.png', 2, 10, new Color(87, 73, 57, 1), new Color(195, 170, 141));
     let panel = new UIPanel(10, 10, 250, 250);
-    panel.setTitle('Test').setPadding(10).setSkin('assets/borderPatch.png', 2, new Color(87, 73, 57, 1));
-
-    let testLabel = new UILabel(0, 0, 'Title');
-    testLabel.setSize(24).setColor(Color.WHITE);
-    panel.addComponent(testLabel, 0);
+    panel.setTitle('Test');
 
     let testImage = new UIImage(0, 42, 32, 32, 'assets/collision.png');
     panel.addComponent(testImage, 0);
@@ -61,23 +61,24 @@ class Demo {
     testAnimation.setAnimationSheet(testAniSheet);
     panel.addComponent(testAnimation, 0);
 
-    // let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
-    // testButton.setAction(() => {
-    //   console.log('Clicked test button');
-    //   testButton.setText(Math.random().toString(16).substr(2, 5));
-    // });
-    // panel.addComponent(testButton, 0);
-    // let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
-    // closeButton.setAction(() => {
-    //   renderer.removeComponent(panel);
-    // });
-    // panel.addComponent(closeButton, 0);
-    // renderer.addComponent(panel, 2);
+    let testButton = new UIButton(panel.width / 2 - 32, panel.height - 32, 64, 16, 'Test');
+    testButton.setAction(() => {
+      console.log('Clicked test button');
+      testButton.setText(Math.random().toString(16).substr(2, 5));
+    });
+    panel.addComponent(testButton, 0);
+    let closeButton = new UIButton(panel.width - 84, 0, 64, 16, 'Close');
+    closeButton.setAction(() => {
+      renderer.removeComponent(panel);
+    });
+    panel.addComponent(closeButton, 0);
+    //renderer.addComponent(panel, 2);
 
     // Compile item types
     ItemType.addType('sword_obsidian')
       .setName('Obsidian Sword')
       .setImage('assets/item_sword_obsidian.png')
+      .setDescription('Sharp, shimmering sword\nShouldn\'t this be brittle?')
       .setRarity(ItemRarity.UNCOMMON)
       .setWeapon(true)
       .setPower(10)
@@ -85,12 +86,14 @@ class Demo {
     ItemType.addType('book_of_wynn')
       .setName('Book of Wynn')
       .setImage('assets/item_book_of_wynn.png')
+      .setDescription('Book filled with strange runes')
       .setRarity(ItemRarity.MYTHIC)
       .setShield(true)
       .setPower(1);
     ItemType.addType('torch')
-      .setImage('assets/item_book_of_wynn.png')
-      .setMaxQuantity(99);
+      .setImage('assets/item_torch.png')
+      .setDescription('Convenient light source\nEmbrace the light and fear the dark.')
+      .setMaxQuantity(1000);
     ItemType.addType('lantern');
     ItemType.addType('bread')
       .setMaxQuantity(99);
@@ -131,7 +134,13 @@ class Demo {
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
-    player.itemPrimary = new Item('sword_obsidian');
+    let sword = new Item('sword_obsidian');
+    sword.quality = ItemQuality.EXCELLENT;
+    player.giveItem(sword);
+    player.itemPrimary = sword;
+    player.giveItem(new Item('book_of_wynn'));
+    player.giveItem(new Item('torch'));
+    player.giveItem(new Item('torch', 14));
     world.addEntity(player);
     let darkblade = new EntityPlayer(11, 16, 'Raesan');
     darkblade.setEyeColor(Color.BROWN);
@@ -154,7 +163,8 @@ class Demo {
     gwindor.direction = Direction.NORTHEAST;
     world.addEntity(gwindor);
     let slime = new EntitySlime(19, 11);
-    world.addEntity(slime);
+    slime.name = 'Vegeta';
+    //world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);
@@ -180,72 +190,83 @@ class Demo {
     renderer.addComponent(staminaBarBackground, 1);
     renderer.addComponent(staminaBarForeground, 1);
     renderer.addComponent(staminaBarText, 1);
+
+    let inv = new UIInventoryGrid(0, 64, 24, 5, 4, player.inventory).setTitle('Backpack');
+    renderer.addComponent(inv, 2);
+    let inv2 = new UIInventoryGrid(256, 64, 24, 3, 3, new Inventory(9)).setTitle('Chest');
+    renderer.addComponent(inv2, 2);
+    let inv3 = new UIInventoryGrid(256, 256 + 64, 24, 2, 2, new Inventory(4)).setTitle('Barrel');
+    renderer.addComponent(inv3, 2);
+    setInterval(() => {
+      player.inventory.addItem(new Item('torch'));
+    }, 100);
     
     // Bind controls
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_ENTER])
       .setAction(event => {
         DEBUG = !DEBUG;
         console.log('DEBUG=' + DEBUG);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_EQUALS])
       .setAction(event => {
         uiworld.tileScale += 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_MINUS])
       .setAction(event => {
         uiworld.tileScale -= 16;
         console.log('tileScale=' + uiworld.tileScale);
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, -(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
+        player.setAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
+        player.setAction(new ActionMove(0, Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(-(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
+        player.setAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
       });
-    controller.addListener(EventTypes.KEYHELD)
+    Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
+        player.setAction(new ActionMove(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
       });
-    controller.addListener(EventTypes.MOUSEMOVE)
+    Controller.addListener(EventTypes.MOUSEMOVE)
       .setAction((event: InputEvent) => {
         let px = (player.x1 + 0.5) * uiworld.tileScale - uiworld.viewport.x1;
         let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
         player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
       });
     // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
-    controller.addListener(EventTypes.MOUSEDOWN)
+    Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
         player.setAction(new ActionUseItem(player.itemPrimary, 1));
       });
-    controller.addListener(EventTypes.MOUSEDOWN)
+    Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_RIGHT])
       .setAction(event => {
         player.setAction(new ActionUseItem(player.itemPrimary, 2));
       });
-    controller.addListener(EventTypes.KEYDOWN)
+    Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_M])
       .setAction(event => {
         if (world.isTileOccupied(19, 11)) return;
         let slime = new EntitySlime(19, 11);
+        slime.name = 'Vegeta Imposter';
         world.addEntity(slime);
       });
 
@@ -256,7 +277,7 @@ class Demo {
     var $tps = $('#tps');
     function update() {
       timekeep.startUpdate();
-      controller.processInput();
+      Controller.processInput();
       timekeep.addTick(world.tick(timekeep.getDelta()));
       if (player.health <= 0) {
         setTimeout(function() {

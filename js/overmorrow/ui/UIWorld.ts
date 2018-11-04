@@ -86,7 +86,7 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   private _renderer: Renderer;
 
   constructor(renderer: Renderer, viewport: Rectangle, tileScale: number = 16) {
-    super(null, null, null, null); // Ignore own render functions and just call them on the given Renderer with needed transformations
+    super(null, null, null); // Ignore own render functions and just call them on the given Renderer with needed transformations
     this._renderer = renderer;
     this.viewport = viewport;
     this.tileScale = tileScale;

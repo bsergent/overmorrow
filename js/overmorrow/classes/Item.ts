@@ -3,14 +3,20 @@ import EntityLiving from "./EntityLiving";
 import { toTitleCase, directionToVector, degreesToDirection } from "../Utilities";
 
 export default class Item {
-  public quantity: number;
-  public quality: ItemQuality;
+  public quality: ItemQuality = ItemQuality.AVERAGE;
   public name: string;
   public description: string;
   public power: number;
-
+  private _quantity: number;
   private _type: ItemType;
 
+  public get quantity(): number {
+    return this._quantity;
+  }
+  public set quantity(amt: number) {
+    if (amt < 0) amt = 0;
+    this._quantity = amt;
+  }
   public get type(): ItemType {
     return this._type;
   }
@@ -25,7 +31,7 @@ export default class Item {
     this._type = type;
   }
   public get image(): string {
-    return this.type.image; // TODO Probably give the option to use an animation sheet later
+    return this.type.image; // TODO Add option to use an animation/sprite sheet
   }
 
   constructor(type: string, quantity: number = 1) {
@@ -33,11 +39,29 @@ export default class Item {
     this.quantity = quantity;
   }
 
+  /**
+   * Check if items meet the criteria to stack together
+   * @param item Item to be stacked
+   */
   public canStack(item: Item): boolean {
     return this.type === item.type
       && this.name === item.name
       && this.description === item.description
       && this.quality === item.quality;
+  }
+
+  /**
+   * Stack item parameter on this item
+   * @param src Source item to stack on this target item (src.quantity may decrease)
+   * @returns Number of item(s) that could not be stacked
+   */
+  public stack(src: Item): number {
+    if (this.canStack(src)) {
+      let amt = Math.min(src.quantity, this.type.maxQuantity - this._quantity);
+      src.quantity -= amt;
+      this.quantity += amt;
+    }
+    return src.quantity;
   }
 }
 
@@ -66,15 +90,17 @@ export class ItemType {
   private _type: string;
   private _name: string;
   private _image: string;
-  private _description: string;
+  private _description: string = '';
   private _maxQuantity: number = 1;
-  private _rarity: ItemRarity;
+  private _rarity: ItemRarity = ItemRarity.COMMON;
   private _weight: number = 0;
   private _canAttack: boolean = false;
   private _canBlock: boolean = false;
   private _power: number = 0;
   private _range: number = 1;
   private _action: Function = null;
+  private _invWidth: number = 1;
+  private _invHeight: number = 1;
 
   public get type(): string {
     return this._type;
@@ -111,6 +137,12 @@ export class ItemType {
   }
   public get action(): Function {
     return this._action === null ? function (item: Item, world: World, user: EntityLiving) {} : this._action;
+  }
+  public get invWidth(): number {
+    return this._invWidth;
+  }
+  public get invHeight(): number {
+    return this._invHeight;
   }
 
   public setName(name: string): ItemType {
@@ -174,6 +206,11 @@ export class ItemType {
   }
   public setAction(action: Function): ItemType {
     this._action = action;
+    return this;
+  }
+  public setInventoryDimensions(width: number, height: number): ItemType {
+    this._invWidth = width;
+    this._invHeight = height;
     return this;
   }
 }
