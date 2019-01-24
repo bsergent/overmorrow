@@ -169,7 +169,7 @@ class Demo {
     slime.name = 'Vegeta';
     world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
-    uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
+    uiworld.setWorld(world).setPlayer(player).setTileScale(48);
     renderer.addComponent(uiworld, 0);
 
     let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');

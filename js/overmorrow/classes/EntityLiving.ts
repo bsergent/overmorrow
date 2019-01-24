@@ -99,7 +99,7 @@ export default abstract class EntityLiving extends Entity {
   // }
 
   public queueAction(action: Action): void {
-		//if (this.type === 'slime') console.log(`Slime queuing ${action.type} action`);
+    //if (this.type === 'slime') console.log(`Slime queuing ${action.type} action`);
     this._actionQueued = action;
   }
 

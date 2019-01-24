@@ -81,6 +81,7 @@ export default class Dungeon extends WorldSandbox {
   }
 
   public tick(delta: number): number {
+    super.tick(delta);
     let startTime = moment();
     if (this.name === 'SpreadMinTree')
       this._tick1(delta);
