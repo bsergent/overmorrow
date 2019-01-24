@@ -112,9 +112,11 @@ export default class WorldTiled extends World {
         for (let x = area.x1; x < area.x2; x++) {
           fogAtTile = this._fog[y][x];
           if (fogAtTile === DiscoveryLevel.UNKNOWN)
-            ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 1.0));
+            //ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 1.0));
+            ui.drawImage(new Rectangle(x, y, 1, 1), 'assets/black.png');
           else if (fogAtTile === DiscoveryLevel.DISCOVERED)
-          ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
+            //ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
+            ui.drawImage(new Rectangle(x, y, 1, 1), 'assets/black.png', 0.7);
         }
       }
     }
