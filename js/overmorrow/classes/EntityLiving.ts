@@ -186,8 +186,10 @@ export default abstract class EntityLiving extends Entity {
   }
 
   public tick(delta: number, world: World): void {
-    // Action
-    if (this.stamina <= 0)
+		// Action
+		// Allow only walking action while fatigued
+		if (this.isFatigued() && this._actionQueued !== null && (this._actionQueued.type !== 'move'
+				|| (this._actionQueued.type === 'move' && (this._actionQueued as ActionMove).velocity.magnitude > this.speed)))
       this._actionQueued = null;
     if (this._action === null || this._action.state == ActionState.COMPLETE && this.isAligned(world))
       this.popAction();
