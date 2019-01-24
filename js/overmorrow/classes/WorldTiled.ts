@@ -92,11 +92,6 @@ export default class WorldTiled extends World {
         };
       }
     }
-
-    // Initialize entity collision map
-    this._entityCollision = new Array(this._height);
-    for (let r = 0; r < this._height; r++)
-      this._entityCollision[r] = new Array(this._width);
   }
 
   public draw(ui: WorldRenderer): void {
@@ -198,10 +193,21 @@ export default class WorldTiled extends World {
 			|| y < 0
 			|| x > this._width
 			|| y > this._height
-			|| this._collision[fY][fX]
-      || (entityToIgnore !== undefined
-          && this._entityCollision[fY][fX].length > 1
-          && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+			|| this._collision[fY][fX];
+      // || (entityToIgnore !== undefined
+      //     && this._entityCollision[fY][fX].length > 1
+      //     && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+  }
+
+  public collides(e: Entity): boolean {
+    return e.x1 < 0
+			|| e.y1 < 0
+			|| e.x2 > this._width
+			|| e.y2 > this._height
+      || this._collision[Math.floor(e.y1)][Math.floor(e.x1)]
+      || this._collision[Math.floor(e.y1)][Math.floor(e.x1 + e.width - World.SIGMA)]
+      || this._collision[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1)]
+      || this._collision[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1 + e.width - World.SIGMA)];
   }
   
   public discover(x: number, y: number, radius: number): void {

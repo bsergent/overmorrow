@@ -24,7 +24,9 @@ import { ActionUseItem } from './overmorrow/classes/Action';
 class UnitTesting {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
+    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>,
+      $('#temp') as JQuery<HTMLCanvasElement>);
 
     // Compile item types
     ItemType.addType('sword_obsidian')

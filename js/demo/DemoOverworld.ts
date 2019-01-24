@@ -29,7 +29,9 @@ import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
 class Demo {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
+    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>,
+      $('#temp') as JQuery<HTMLCanvasElement>);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
@@ -155,7 +157,7 @@ class Demo {
         x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
       else
         y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
-      darkblade.setAction(new ActionMove(x, y));
+      darkblade.queueAction(new ActionMove(x, y));
       darkblade.direction = facingToDirection(darkblade.facing);
     }, 3000);
     let gwindor = new EntityPlayer(14, 15, 'Gwindor');
@@ -165,7 +167,7 @@ class Demo {
     world.addEntity(gwindor);
     let slime = new EntitySlime(19, 11);
     slime.name = 'Vegeta';
-    //world.addEntity(slime);
+    world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
     renderer.addComponent(uiworld, 0);

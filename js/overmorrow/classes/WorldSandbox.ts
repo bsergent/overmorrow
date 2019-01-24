@@ -115,10 +115,19 @@ export default class WorldSandbox extends World {
 			|| y < 0
 			|| x > this._width
 			|| y > this._height
-			|| this._tilesFG[fY][fX].type.solid
-      || (entityToIgnore !== undefined
-          && this._entityCollision[fY][fX].length > 1
-          && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+      || this._tilesFG[fY][fX].type.solid;
+    // TODO Reimplement checks for entities
+  }
+
+  public collides(e: Entity): boolean {
+    return e.x1 < 0
+			|| e.y1 < 0
+			|| e.x2 >= this._width
+			|| e.y2 >= this._height
+      || this._tilesFG[Math.floor(e.y1)][Math.floor(e.x1)].type.solid
+      || this._tilesFG[Math.floor(e.y1)][Math.floor(e.x1 + e.width - World.SIGMA)].type.solid
+      || this._tilesFG[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1)].type.solid
+      || this._tilesFG[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1 + e.width - World.SIGMA)].type.solid;
   }
 
   protected countTileTypesInArea(area: Rectangle): Map<TileType, number> {

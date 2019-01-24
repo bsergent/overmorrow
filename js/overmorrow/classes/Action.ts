@@ -129,15 +129,15 @@ export class ActionUseItem extends Action {
   public actTicks: number;
 
   constructor(item: Item, forceMultiplier: number = 1) {
-    super(item.type.weight * forceMultiplier, item.type.weight / 2, 'useritem');
+    super(item.type.weight * forceMultiplier, item.type.weight / 2, 'useitem');
     this.item = item;
     this.force = forceMultiplier;
     this.actTicks = this.item.type.weight;
   }
 
   public act(world: World, entity: EntityLiving): void {
-    this.actTicks--;
-    entity.useItem(world, this.item);
+    if (this.actTicks-- === this.item.type.weight)
+      entity.useItem(world, this.item);
   }
 
   public isActionComplete(world: World, entity: EntityLiving): boolean {

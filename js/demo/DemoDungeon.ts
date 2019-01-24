@@ -25,7 +25,9 @@ import WorldDungeon from './WorldDungeon';
 class Demo {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
+    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>,
+      $('#temp') as JQuery<HTMLCanvasElement>);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');

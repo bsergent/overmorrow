@@ -86,19 +86,20 @@ export default abstract class EntityLiving extends Entity {
     world.removeEntity(this);
   }
 
-  public setAction(action: Action): void {
-    if (this._action !== null) {
-      if (typeof(this._action) !== typeof(action)) return;
-      if (this._action.state !== ActionState.COMPLETE
-        && !(this._action instanceof ActionMove/* && (this._action as ActionMove).age > 3*/)) return;
-      if (this._action instanceof ActionUseItem
-          && this.isFatigued())
-        return;
-    }
-    this._action = action;
-  }
+  // public setAction(action: Action): void {
+  //   if (this._action !== null) {
+  //     if (typeof(this._action) !== typeof(action)) return;
+  //     if (this._action.state !== ActionState.COMPLETE
+  //       && !(this._action instanceof ActionMove/* && (this._action as ActionMove).age > 3*/)) return;
+  //     if (this._action instanceof ActionUseItem
+  //         && this.isFatigued())
+  //       return;
+  //   }
+  //   this._action = action;
+  // }
 
   public queueAction(action: Action): void {
+		//if (this.type === 'slime') console.log(`Slime queuing ${action.type} action`);
     this._actionQueued = action;
   }
 
