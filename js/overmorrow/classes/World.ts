@@ -18,6 +18,7 @@ export default abstract class World implements Tickable {
 	protected _width: number;
 	protected _height: number;
 	protected _passages: Passage[];
+	public subGridDivisions: number = 1;
 
 	constructor(name: string, width: number, height: number) {
 		this._name = name;
@@ -101,7 +102,7 @@ export default abstract class World implements Tickable {
         this._entityCollision[y][x] = [];
 		for (let e of this._entities) {
 			if (e.y1 < 0 || e.y2 > this._height || e.x1 < 0 || e.x2 > this._width)
-				e.revertMovement();
+				e.revertMovement(this);
 			if (!e.collidable)
 				continue;
 				// Track new location to collision map
@@ -114,7 +115,7 @@ export default abstract class World implements Tickable {
 			// Only revert movement if moving into an occupied tile
 			if ((this.isTileOccupied(e.x1, e.y1, e) && (e.vel.x < 0 || e.vel.y < 0)) // Top-left side is occupied and entering
 					|| (this.isTileOccupied(Math.ceil(e.x1), Math.ceil(e.y1), e) && (e.vel.x > 0 || e.vel.y > 0))) // Bottom-right side is occupied and entering
-				e.revertMovement();
+				e.revertMovement(this);
 		}
 		return moment().diff(startTime);
 	}

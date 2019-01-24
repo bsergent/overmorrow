@@ -103,10 +103,6 @@ export default class WorldTiled extends World {
     this.drawBG(ui);
 
     let area = ui.getVisibleTileArea();
-    if (DEBUG)
-      for (let y = area.y1; y < area.y2; y++)
-        for (let x = area.x1; x < area.x2; x++)
-          ui.drawRectWire(new Rectangle(x, y, 1, 1), new Color(255, 255, 255, 0.1));
 
     for (let e of this._entities)
       if (this._fog[Math.floor(e.y1)][Math.floor(e.x1)] === DiscoveryLevel.VISIBLE  || DEBUG)
@@ -126,6 +122,15 @@ export default class WorldTiled extends World {
           ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
         }
       }
+    }
+
+    if (DEBUG) {
+      for (let y = area.y1; y < area.y2; y++)
+        for (let x = area.x1; x < area.x2; x++)
+          ui.drawRectWire(new Rectangle(x, y, 1, 1), new Color(255, 255, 255, 0.1));
+      for (let y = area.y1; y < area.y2; y += 1/this.subGridDivisions)
+        for (let x = area.x1; x < area.x2; x += 1/this.subGridDivisions)
+          ui.drawRectWire(new Rectangle(x, y, 1/this.subGridDivisions, 1/this.subGridDivisions), new Color(255, 255, 255, 0.05));
     }
 	}
 

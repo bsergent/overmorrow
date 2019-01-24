@@ -18,6 +18,7 @@ export default abstract class EntityLiving extends Entity {
   protected _maxHealth: number;
   protected _maxStamina: number;
   protected _action: Action = null;
+  protected _actionQueued: Action = null;
   protected _inventory: Inventory = null;
   protected _speedSprint: number;
   protected _direction: Direction = Direction.SOUTH; // Direction attacking/blocking, not visual
@@ -97,6 +98,17 @@ export default abstract class EntityLiving extends Entity {
     this._action = action;
   }
 
+  public queueAction(action: Action): void {
+    this._actionQueued = action;
+  }
+
+  private popAction(): void {
+    if (this._actionQueued !== null)
+      this._action = this._actionQueued;
+    if (this._action !== null && !this._action.equals(this._actionQueued))
+      this._actionQueued = null;
+  }
+
   public useItem(world: World, item: Item): void {
     if (item != null) item.type.action(item, world, this);
   }
@@ -173,18 +185,83 @@ export default abstract class EntityLiving extends Entity {
   }
 
   public tick(delta: number, world: World): void {
+    // Action
     if (this.stamina <= 0)
-      this.velIntended.magnitude = Math.min(this.velIntended.magnitude, this._speed);
-    if (this._action !== null) this._action.tick(delta, world, this);
-    super.tick(delta, world);
+      this._actionQueued = null;
+    if (this._action === null || this._action.state == ActionState.COMPLETE && this.isAligned(world))
+      this.popAction();
+    if (this._action !== null)
+      this._action.tick(delta, world, this);
 
+    super.tick(delta, world);
+    // if (this.type === 'player' && (this as EntityPlayer).username === 'Wake'
+    //     && this._action !== null && this._action.type === 'move')
+    //   console.log('Action:', (this._action as ActionMove).velocity);
+
+    // Align to grid and stop
+    if (this._action !== null && this._action.isActionComplete(world, this) && !this._action.equals(this._actionQueued)) {
+      // Alignment
+      this.forceAlign(world);
+
+      // Stop movement
+      this._action = null;
+      this.vel.magnitude = 0;
+    }
+
+    // Stamina and Fatigue
     if (this.vel.magnitude === this._speedSprint)
       this.stamina -= 0.05 * delta;
     else if (this._fatigueTicks <= 0)
       this.stamina += 0.03 * delta;
-
     this._fatigueTicks -= delta;
+
+    // Health
     if (this._health <= 0)
       this.die(world);
+
+    this._actionQueued = null;
   }
+
+  public isAligned(world: World): boolean {
+    return this.x1 * world.subGridDivisions % 1 === 0
+      && this.y1 * world.subGridDivisions % 1 === 0;
+  }
+
+  public isMajorAligned(): boolean {
+    return this.x1 % 1 === 0 && this.y1 % 1 === 0;
+  }
+
+  private floorSubDiv(val: number, world: World): number {
+    return Math.floor(val * world.subGridDivisions) / world.subGridDivisions;
+  }
+
+  private ceilSubDiv(val: number, world: World): number {
+    return Math.ceil(val * world.subGridDivisions) / world.subGridDivisions;
+  }
+
+  private roundSubDiv(val: number, world: World): number {
+    return Math.round(val * world.subGridDivisions) / world.subGridDivisions;
+  }
+  
+  public forceAlign(world: World, round: boolean = false) {
+    if (round) {
+      this.x1 = this.roundSubDiv(this._prevPos.x, world);
+      this.y1 = this.roundSubDiv(this._prevPos.y, world);
+    } else {
+      if (this.floorSubDiv(this.x1, world) - this.floorSubDiv(this._prevPos.x, world) > 0)
+        this.x1 = this.floorSubDiv(this.x1, world);
+      if (this.ceilSubDiv(this.x1, world) - this.ceilSubDiv(this._prevPos.x, world) < 0)
+        this.x1 = this.ceilSubDiv(this.x1, world);
+      if (this.floorSubDiv(this.y1, world) - this.floorSubDiv(this._prevPos.y, world) > 0)
+        this.y1 = this.floorSubDiv(this.y1, world);
+      if (this.ceilSubDiv(this.y1, world) - this.ceilSubDiv(this._prevPos.y, world) < 0)
+        this.y1 = this.ceilSubDiv(this.y1, world);
+    }
+  }
+
+	public revertMovement(world: World): void {
+		this.forceAlign(world, true);
+		this.vel.magnitude = 0;
+		this._action = null;
+	}
 }

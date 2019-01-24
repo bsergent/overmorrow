@@ -131,6 +131,7 @@ class Demo {
 
     // Build world
     let world = new WorldTiled('assets/dungeonEntrance.json');
+    world.subGridDivisions = 4;
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
@@ -224,25 +225,25 @@ class Demo {
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
+        player.queueAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
+        player.queueAction(new ActionMove(0, Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
+        player.queueAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
+        player.queueAction(new ActionMove(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
       });
     Controller.addListener(EventTypes.MOUSEMOVE)
       .setAction((event: InputEvent) => {
@@ -254,12 +255,12 @@ class Demo {
     Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, 1));
+        player.queueAction(new ActionUseItem(player.itemPrimary, 1));
       });
     Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_RIGHT])
       .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, 2));
+        player.queueAction(new ActionUseItem(player.itemPrimary, 2));
       });
     Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_M])
