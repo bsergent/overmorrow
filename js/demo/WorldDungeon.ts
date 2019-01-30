@@ -26,10 +26,6 @@ export default class Dungeon extends WorldSandbox {
     this._height = height;
     this._bounds.width = width;
     this._bounds.height = height;
-    
-		this._entityCollision = new Array(height);
-    for (let r = 0; r < height; r++)
-      this._entityCollision[r] = new Array(width);
 
 		this._tilesFG = new Array(height);
     for (let r = 0; r < height; r++) {
@@ -85,6 +81,7 @@ export default class Dungeon extends WorldSandbox {
   }
 
   public tick(delta: number): number {
+    super.tick(delta);
     let startTime = moment();
     if (this.name === 'SpreadMinTree')
       this._tick1(delta);

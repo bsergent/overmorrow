@@ -9,24 +9,22 @@ import Vector from '../primitives/Vector';
 import Passage from './Passage';
 
 export default abstract class World implements Tickable {
+  protected static SIGMA: number = 0.0001; // Collision precision
+
 	private _name;
   protected _backgroundColor: Color;
 	protected _entities: Entity[] = []; // TODO Add draw order to entities
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
-	protected _entityCollision: number[][][];
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
 	protected _width: number;
 	protected _height: number;
 	protected _passages: Passage[];
+	public subGridDivisions: number = 1;
 
 	constructor(name: string, width: number, height: number) {
 		this._name = name;
 		this._width = width;
     this._height = height;
-
-		this._entityCollision = new Array(height);
-    for (let r = 0; r < height; r++)
-      this._entityCollision[r] = new Array(width);
 	}
 
 	public setName(name: string): World {
@@ -87,7 +85,9 @@ export default abstract class World implements Tickable {
 		return false;
 	}
 
+	// TODO Replace isTileOccupied w/ wouldCollide or something and then provide and entity and offset, useful for AI
 	public abstract isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean;
+	public abstract collides(e: Entity): boolean;
 	public abstract discover(x: number, y: number, radius: number): void;
 
 	public tick(delta: number): number {
@@ -95,26 +95,27 @@ export default abstract class World implements Tickable {
 		// Update tiles and entities
 		for (let e of this._entities)
 			e.tick(delta, this);
-		// Reset entity collision map
-		for (let y = 0; y < this._height; y++)
-			for (let x = 0; x < this._width; x++)
-        this._entityCollision[y][x] = [];
-		for (let e of this._entities) {
-			if (e.y1 < 0 || e.y2 > this._height || e.x1 < 0 || e.x2 > this._width)
-				e.revertMovement();
-			if (!e.collidable)
+
+		// Entity collision detection
+		entity1:
+		for (let e1 of this._entities) {
+			// World border
+			if (e1.y1 < 0 || e1.y2 > this._height || e1.x1 < 0 || e1.x2 > this._width) {
+				e1.revertMovement(this);
 				continue;
-				// Track new location to collision map
-			this._entityCollision[Math.floor(e.y1)][Math.floor(e.x1)].push(e.id);
-			if (Math.floor(e.y1) !== Math.ceil(e.y1) || Math.floor(e.x1) !== Math.ceil(e.x1))
-				this._entityCollision[Math.ceil(e.y1)][Math.ceil(e.x1)].push(e.id);
-    }
-		for (let e of this._entities) {
-			// Check if colliding with something from collision maps
-			// Only revert movement if moving into an occupied tile
-			if ((this.isTileOccupied(e.x1, e.y1, e) && (e.vel.x < 0 || e.vel.y < 0)) // Top-left side is occupied and entering
-					|| (this.isTileOccupied(Math.ceil(e.x1), Math.ceil(e.y1), e) && (e.vel.x > 0 || e.vel.y > 0))) // Bottom-right side is occupied and entering
-				e.revertMovement();
+			}
+			if (!e1.collidable) continue;
+			// Other entities
+			for (let e2 of this._entities) {
+				if (e1 !== e2 && e2.collidable && e1.intersects(e2)) {
+					e1.revertMovement(this);
+					e2.revertMovement(this);
+					continue entity1;
+				}
+			}
+			// Tile collision
+			if (this.collides(e1))
+				e1.revertMovement(this);
 		}
 		return moment().diff(startTime);
 	}

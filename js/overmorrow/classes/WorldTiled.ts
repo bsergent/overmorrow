@@ -92,21 +92,12 @@ export default class WorldTiled extends World {
         };
       }
     }
-
-    // Initialize entity collision map
-    this._entityCollision = new Array(this._height);
-    for (let r = 0; r < this._height; r++)
-      this._entityCollision[r] = new Array(this._width);
   }
 
   public draw(ui: WorldRenderer): void {
     this.drawBG(ui);
 
     let area = ui.getVisibleTileArea();
-    if (DEBUG)
-      for (let y = area.y1; y < area.y2; y++)
-        for (let x = area.x1; x < area.x2; x++)
-          ui.drawRectWire(new Rectangle(x, y, 1, 1), new Color(255, 255, 255, 0.1));
 
     for (let e of this._entities)
       if (this._fog[Math.floor(e.y1)][Math.floor(e.x1)] === DiscoveryLevel.VISIBLE  || DEBUG)
@@ -121,11 +112,22 @@ export default class WorldTiled extends World {
         for (let x = area.x1; x < area.x2; x++) {
           fogAtTile = this._fog[y][x];
           if (fogAtTile === DiscoveryLevel.UNKNOWN)
-            ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 1.0));
+            //ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 1.0));
+            ui.drawImage(new Rectangle(x, y, 1, 1), 'assets/black.png');
           else if (fogAtTile === DiscoveryLevel.DISCOVERED)
-          ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
+            //ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
+            ui.drawImage(new Rectangle(x, y, 1, 1), 'assets/black.png', 0.5);
         }
       }
+    }
+
+    if (DEBUG) {
+      for (let y = area.y1; y < area.y2; y++)
+        for (let x = area.x1; x < area.x2; x++)
+          ui.drawRectWire(new Rectangle(x, y, 1, 1), new Color(255, 255, 255, 0.1));
+      for (let y = area.y1; y < area.y2; y += 1/this.subGridDivisions)
+        for (let x = area.x1; x < area.x2; x += 1/this.subGridDivisions)
+          ui.drawRectWire(new Rectangle(x, y, 1/this.subGridDivisions, 1/this.subGridDivisions), new Color(255, 255, 255, 0.05));
     }
 	}
 
@@ -193,10 +195,21 @@ export default class WorldTiled extends World {
 			|| y < 0
 			|| x > this._width
 			|| y > this._height
-			|| this._collision[fY][fX]
-      || (entityToIgnore !== undefined
-          && this._entityCollision[fY][fX].length > 1
-          && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+			|| this._collision[fY][fX];
+      // || (entityToIgnore !== undefined
+      //     && this._entityCollision[fY][fX].length > 1
+      //     && this._entityCollision[fY][fX].indexOf(entityToIgnore.id) !== -1);
+  }
+
+  public collides(e: Entity): boolean {
+    return e.x1 < 0
+			|| e.y1 < 0
+			|| e.x2 > this._width
+			|| e.y2 > this._height
+      || this._collision[Math.floor(e.y1)][Math.floor(e.x1)]
+      || this._collision[Math.floor(e.y1)][Math.floor(e.x1 + e.width - World.SIGMA)]
+      || this._collision[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1)]
+      || this._collision[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1 + e.width - World.SIGMA)];
   }
   
   public discover(x: number, y: number, radius: number): void {

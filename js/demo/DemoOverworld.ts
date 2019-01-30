@@ -29,7 +29,9 @@ import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
 class Demo {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
+    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>,
+      $('#temp') as JQuery<HTMLCanvasElement>);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
@@ -131,6 +133,7 @@ class Demo {
 
     // Build world
     let world = new WorldTiled('assets/dungeonEntrance.json');
+    world.subGridDivisions = 4;
     world.addEntity(new EntityItem(15, 29, new Item('sword_obsidian')));
     world.addEntity(new EntityItem(14, 26, new Item('book_of_wynn'), 10));
     let player = new EntityPlayer(Math.floor(world.width/2), Math.floor(world.height/2), 'Wake');
@@ -154,7 +157,7 @@ class Demo {
         x = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
       else
         y = (Math.floor(Math.random() * 3) - 1) * darkblade.speed;
-      darkblade.setAction(new ActionMove(x, y));
+      darkblade.queueAction(new ActionMove(x, y));
       darkblade.direction = facingToDirection(darkblade.facing);
     }, 3000);
     let gwindor = new EntityPlayer(14, 15, 'Gwindor');
@@ -164,9 +167,9 @@ class Demo {
     world.addEntity(gwindor);
     let slime = new EntitySlime(19, 11);
     slime.name = 'Vegeta';
-    //world.addEntity(slime);
+    world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
-    uiworld.setWorld(world).setPlayer(player).setTileScale(128 - 32);
+    uiworld.setWorld(world).setPlayer(player).setTileScale(48);
     renderer.addComponent(uiworld, 0);
 
     let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
@@ -224,25 +227,25 @@ class Demo {
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
+        player.queueAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(0, Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
+        player.queueAction(new ActionMove(0, Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed));
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
+        player.queueAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
       .setAction(event => {
-        player.setAction(new ActionMove(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
+        player.queueAction(new ActionMove(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed, 0));
       });
     Controller.addListener(EventTypes.MOUSEMOVE)
       .setAction((event: InputEvent) => {
@@ -254,12 +257,12 @@ class Demo {
     Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, 1));
+        player.queueAction(new ActionUseItem(player.itemPrimary, 1));
       });
     Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_RIGHT])
       .setAction(event => {
-        player.setAction(new ActionUseItem(player.itemPrimary, 2));
+        player.queueAction(new ActionUseItem(player.itemPrimary, 2));
       });
     Controller.addListener(EventTypes.KEYDOWN)
       .setKeys([Keys.KEY_M])

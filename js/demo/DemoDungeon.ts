@@ -25,7 +25,9 @@ import WorldDungeon from './WorldDungeon';
 class Demo {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
+    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>,
+      $('#temp') as JQuery<HTMLCanvasElement>);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
@@ -79,10 +81,12 @@ class Demo {
     // Build world
     let worldGenType: string = 'SpreadMinTree';
     let world = new WorldDungeon(worldGenType, 'dirt', 'stone', 1025); //1529552122944
+    world.subGridDivisions = 4;
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
     uiworld.setWorld(world).setViewport(new Rectangle(0, 0, 800, 600)).setTileScale(8);
     renderer.addComponent(uiworld, 0);
     DEBUG = true;
+    let player: EntityPlayer = null;
     
     // Bind controls
     Controller.addListener(EventTypes.KEYDOWN)
@@ -107,24 +111,32 @@ class Demo {
       .setKeys([Keys.KEY_W])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
+        if (player !== null)
+          player.queueAction(new ActionMove(0, -(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
         uiworld.viewport.y1 -= 4;
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_S])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
+        if (player !== null)
+          player.queueAction(new ActionMove(0, (Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed)));
         uiworld.viewport.y1 += 4;
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_A])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
+        if (player !== null)
+          player.queueAction(new ActionMove(-(Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
         uiworld.viewport.x1 -= 4;
       });
     Controller.addListener(EventTypes.KEYHELD)
       .setKeys([Keys.KEY_D])
       .setDuration(0.1)
       .setAction((event: InputEvent) => {
+        if (player !== null)
+          player.queueAction(new ActionMove((Controller.isKeyDown(Keys.KEY_SHIFT) ? player.speedSprint : player.speed), 0));
         uiworld.viewport.x1 += 4;
       });
     Controller.addListener(EventTypes.KEYUP)
@@ -132,6 +144,7 @@ class Demo {
     .setAction((event: InputEvent) => {
       worldGenType = 'SpreadMinTree';
       world = new WorldDungeon(worldGenType, 'dirt', 'stone');
+      world.subGridDivisions = 4;
       uiworld.setWorld(world);
     });
     Controller.addListener(EventTypes.KEYUP)
@@ -139,6 +152,7 @@ class Demo {
     .setAction((event: InputEvent) => {
       worldGenType = 'PerfectSparsen';
       world = new WorldDungeon(worldGenType, 'dirt', 'stone');
+      world.subGridDivisions = 4;
       uiworld.setWorld(world);
     });
     Controller.addListener(EventTypes.MOUSEMOVE)
@@ -152,6 +166,14 @@ class Demo {
     .setAction((event: InputEvent) => {
       uiworld.tileScale += Math.sign(event.d);
       if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
+    });
+    Controller.addListener(EventTypes.KEYUP)
+    .setKeys([Keys.KEY_SPACE])
+    .setAction((event: InputEvent) => {
+      player = new EntityPlayer(15, 15, 'Wake');
+      world.addEntity(player);
+      uiworld.setPlayer(player);
+      timekeep.setMinFrameTime();
     });
 
     console.log('Initialized');

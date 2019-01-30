@@ -11,13 +11,12 @@ export default abstract class Entity extends Rectangle {
 	private _type: string;
 	private _id: number;
 	private _image: AnimationSheet;
-	private _prevPos: Vector; // Position at beginning of previous tick
+	protected _prevPos: Vector; // Position at beginning of previous tick
 	protected _speed: number;
 	protected _collidable: boolean = true;
 
 	public facing: Facing = Facing.DOWN; // Current facing of sprite
 	public vel: Vector = new Vector(0, 0); // Current velocity
-	public velIntended: Vector = new Vector(0, 0); // Velocity that should be used when aligned and not colliding
 
 	constructor(x: number, y: number, width: number, height: number, type: string, speed: number) {
 		super(x, y, width, height);
@@ -32,48 +31,25 @@ export default abstract class Entity extends Rectangle {
 		this._prevPos.x = this.x1;
 		this._prevPos.y = this.y1;
 
-    if (this.isAligned()) {
-			this.vel.x = this.velIntended.x; // TODO Should this be handled by actions?
-			this.vel.y = this.velIntended.y;
-		}
     this.x1 += this.vel.x * delta;
 		this.y1 += this.vel.y * delta;
 		
 		// Handle facing
-		if (this.velIntended.y > 0) {
+		if (this.vel.y > 0) {
 			this.facing = Facing.DOWN;
-		} else if (this.velIntended.x < 0) {
+		} else if (this.vel.x < 0) {
 			this.facing = Facing.LEFT;
-		} else if (this.velIntended.y < 0) {
+		} else if (this.vel.y < 0) {
 			this.facing = Facing.UP;
-		} else if (this.velIntended.x > 0) {
+		} else if (this.vel.x > 0) {
 			this.facing = Facing.RIGHT;
 		}
-
-		// Attempt to align to grid and stop
-    if (!this.isAligned() && this.velIntended !== this.vel) {
-      // If changed grid boundary in last tick, align to grid
-      if (Math.floor(this.x1) - Math.floor(this._prevPos.x) > 0)
-        this.x1 = Math.floor(this.x1);
-      if (Math.ceil(this.x1) - Math.ceil(this._prevPos.x) < 0)
-        this.x1 = Math.ceil(this.x1);
-      if (Math.floor(this.y1) - Math.floor(this._prevPos.y) > 0)
-        this.y1 = Math.floor(this.y1);
-      if (Math.ceil(this.y1) - Math.ceil(this._prevPos.y) < 0)
-				this.y1 = Math.ceil(this.y1);
-    }
-		this.velIntended.magnitude = 0;
 	};
 
-	public isAligned(): boolean {
-		return this.x1 % 1 === 0 && this.y1 % 1 === 0;
-	}
-
-	public revertMovement(): void {
-		this.x1 = Math.round(this._prevPos.x);
-		this.y1 = Math.round(this._prevPos.y);
+	public revertMovement(world: World): void {
+		this.x1 = this._prevPos.x;
+		this.y1 = this._prevPos.y;
 		this.vel.magnitude = 0;
-		// TODO Make sure entity is realigned to grid
 	}
 
 	get speed(): number {

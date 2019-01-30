@@ -38,7 +38,7 @@ export default class EntityPlayer extends EntityLiving {
   }
 	public tick(delta: number, world: World): void {
     super.tick(delta, world);
-    this._aniSheet.setDurationMultipler(this.velIntended.magnitude === this.speed ? 1 : this.speedSprint / this.speed);
+    this._aniSheet.setDurationMultipler(this.vel.magnitude === this.speed ? 1 : this.speedSprint / this.speed);
     if (this.vel.magnitude === 0)
       this._aniSheet.setFrameTag('idle_' + this.facing);
     else

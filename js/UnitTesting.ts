@@ -24,7 +24,9 @@ import { ActionUseItem } from './overmorrow/classes/Action';
 class UnitTesting {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game'), $('#buffer'), $('#temp'));
+    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>,
+      $('#temp') as JQuery<HTMLCanvasElement>);
 
     // Compile item types
     ItemType.addType('sword_obsidian')
@@ -89,7 +91,7 @@ class UnitTesting {
     console.log('Starting unit tests.');
 
     /* Combat Tests */
-    p1.setAction(new ActionUseItem(p1.itemPrimary));
+    p1.queueAction(new ActionUseItem(p1.itemPrimary));
     world.tick(1);
     // Horizontal
     p1.direction = Direction.EAST;

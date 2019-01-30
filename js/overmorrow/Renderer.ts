@@ -15,20 +15,20 @@ declare var DEBUG;
 // TODO Allow setting of default font
 
 export default class Renderer {
-  private _canvasActive: JQuery;
-  private _canvasBuffer: JQuery;
-  private _canvasTemp: JQuery;
-  private _contextActive: any;
-  private _contextBuffer: any;
-  private _contextTemp: any;
-  private _context: any;
+  private _canvasActive: JQuery<HTMLCanvasElement>;
+  private _canvasBuffer: JQuery<HTMLCanvasElement>;
+  private _canvasTemp: JQuery<HTMLCanvasElement>;
+  private _contextActive: CanvasRenderingContext2D;
+  private _contextBuffer: CanvasRenderingContext2D;
+  private _contextTemp: CanvasRenderingContext2D;
+  private _context: CanvasRenderingContext2D;
   private _imageCache: Map<string, HTMLImageElement> = new Map();
   private _components: UIComponent[][] = [];
   private _width: number;
   private _height: number;
   private _filters: Filter[] = []; // Applied to the temp canvas
 
-  constructor(canvasActive: JQuery, canvasBuffer: JQuery, canvasTemp: JQuery) {
+  constructor(canvasActive: JQuery<HTMLCanvasElement>, canvasBuffer: JQuery<HTMLCanvasElement>, canvasTemp: JQuery<HTMLCanvasElement>) {
     this._canvasActive = canvasActive;
     this._canvasBuffer = canvasBuffer;
     this._canvasTemp = canvasTemp;

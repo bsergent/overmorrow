@@ -10,18 +10,23 @@ import EntityPlayer from "./EntityPlayer";
 export default abstract class Action {
   private ticksWarmup = 0; // Decrement with time
   private ticksRecovery = 0;
+  private _type: string = '';
   public state: ActionState = ActionState.WARMUP;
 
-  constructor(warmup: number, recovery: number) {
+  constructor(warmup: number, recovery: number, typeID: string) {
     this.ticksWarmup = warmup;
     this.ticksRecovery = recovery;
+    this._type = typeID;
+  }
+
+  public get type(): string {
+    return this._type;
   }
 
   public tick(delta: number, world: World, entity: EntityLiving): void {
     switch (this.state) {
       case ActionState.WARMUP:
-        this.ticksWarmup--;
-        if (this.ticksWarmup < 0)
+        if (--this.ticksWarmup < 0)
           this.state = ActionState.ACT;
         else break;
       case ActionState.ACT:
@@ -30,8 +35,7 @@ export default abstract class Action {
           this.state = ActionState.RECOVERY;
         else break;
       case ActionState.RECOVERY:
-        this.ticksRecovery--;
-        if (this.ticksRecovery < 0)
+        if (--this.ticksRecovery < 0)
           this.state = ActionState.COMPLETE;
         else break;
       default:
@@ -41,6 +45,10 @@ export default abstract class Action {
 
   public isActionComplete(world: World, entity: EntityLiving): boolean {
     return true;
+  }
+
+  public equals(action: Action): boolean {
+    return action !== null && this._type === action._type;
   }
 
   public abstract act(world: World, entity: EntityLiving): void;
@@ -62,27 +70,30 @@ export class ActionMove extends Action {
   }
 
   constructor(x: number, y: number) {
-    super(0, 0);
+    super(0, 0, 'move');
     this.velocity = new Vector(x, y);
   }
 
   public act(world: World, entity: EntityLiving): void {
     this._age++;
-    if (entity.isAligned())
-      entity.velIntended = this.velocity;
-    //if (entity instanceof EntityPlayer && (entity as EntityPlayer).username === 'Wake')
-    //  console.log('Acting:', this);
+    entity.vel = this.velocity;
   }
 
+  // private static LASTSTATE: boolean = true;
   public isActionComplete(world: World, entity: EntityLiving): boolean {
-    // End action if crossed grid boundary
-    //if (this._age <= 0) return false;
-    //if (entity instanceof EntityPlayer && (entity as EntityPlayer).username === 'Wake')
-    //  console.log('Checking move complete:', this);
-    return Math.floor(entity.x1) - Math.floor(entity.prevPos.x) > 0
-      || Math.ceil(entity.x1) - Math.ceil(entity.prevPos.x) < 0
-      || Math.floor(entity.y1) - Math.floor(entity.prevPos.y) > 0
-      || Math.ceil(entity.y1) - Math.ceil(entity.prevPos.y) < 0;
+    // End action if crossed subgrid boundary
+    let completed = Math.floor(entity.x1 * world.subGridDivisions) - Math.floor(entity.prevPos.x * world.subGridDivisions) > 0
+    || Math.ceil(entity.x1 * world.subGridDivisions) - Math.ceil(entity.prevPos.x * world.subGridDivisions) < 0
+    || Math.floor(entity.y1 * world.subGridDivisions) - Math.floor(entity.prevPos.y * world.subGridDivisions) > 0
+    || Math.ceil(entity.y1 * world.subGridDivisions) - Math.ceil(entity.prevPos.y * world.subGridDivisions) < 0;
+    // if (entity.type === 'player' && (entity as EntityPlayer).username === 'Wake' && ActionMove.LASTSTATE !== completed)
+    //   console.log('Move completed: ' + completed);
+    // ActionMove.LASTSTATE = completed;
+    return completed;
+  }
+
+  public equals(action: Action): boolean {
+    return super.equals(action) && this.velocity.equals((action as ActionMove).velocity);
   }
 }
 
@@ -90,7 +101,7 @@ export class ActionPath extends Action {
   public path: Path;
 
   constructor(path: Path) {
-    super(0, 0);
+    super(0, 0, 'path');
     this.path = path;
   }
 
@@ -103,7 +114,7 @@ export class ActionFollow extends Action {
   public target: EntityLiving;
 
   constructor(target: EntityLiving) {
-    super(0, 0);
+    super(0, 0, 'follow');
     this.target = target;
   }
 
@@ -118,15 +129,14 @@ export class ActionUseItem extends Action {
   public actTicks: number;
 
   constructor(item: Item, forceMultiplier: number = 1) {
-    super(item.type.weight * forceMultiplier, item.type.weight / 2);
+    super(item.type.weight * forceMultiplier, item.type.weight / 2, 'useitem');
     this.item = item;
     this.force = forceMultiplier;
     this.actTicks = this.item.type.weight;
   }
 
   public act(world: World, entity: EntityLiving): void {
-    this.actTicks--;
-    if (entity.isAligned() && this.actTicks <= 0)
+    if (this.actTicks-- === this.item.type.weight)
       entity.useItem(world, this.item);
   }
 
