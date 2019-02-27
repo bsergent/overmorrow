@@ -11,6 +11,7 @@ import { Filter } from './primitives/Filter';
 import Line from './primitives/Line';
 import Vector from './primitives/Vector';
 declare var DEBUG;
+let gl: WebGLRenderingContext;
 
 // TODO Allow setting of default font
 
@@ -18,10 +19,10 @@ export default class Renderer {
   private _canvasActive: JQuery<HTMLCanvasElement>;
   private _canvasBuffer: JQuery<HTMLCanvasElement>;
   private _canvasTemp: JQuery<HTMLCanvasElement>;
-  private _contextActive: CanvasRenderingContext2D;
-  private _contextBuffer: CanvasRenderingContext2D;
-  private _contextTemp: CanvasRenderingContext2D;
-  private _context: CanvasRenderingContext2D;
+  private _contextActive: WebGLRenderingContext;
+  private _contextBuffer: WebGLRenderingContext;
+  private _contextTemp: WebGLRenderingContext;
+  private _context: WebGLRenderingContext;
   private _imageCache: Map<string, HTMLImageElement> = new Map();
   private _components: UIComponent[][] = [];
   private _width: number;
@@ -29,24 +30,58 @@ export default class Renderer {
   private _filters: Filter[] = []; // Applied to the temp canvas
 
   constructor(canvasActive: JQuery<HTMLCanvasElement>, canvasBuffer: JQuery<HTMLCanvasElement>, canvasTemp: JQuery<HTMLCanvasElement>) {
+    // Set up Canvases
     this._canvasActive = canvasActive;
     this._canvasBuffer = canvasBuffer;
     this._canvasTemp = canvasTemp;
     if (this._canvasActive !== null && this._canvasActive.length > 0) {
-      this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('2d');
+      this._contextActive = (this._canvasActive[0] as HTMLCanvasElement).getContext('webgl');
       this._width = this._canvasActive.width();
       this._height = this._canvasActive.height();
       this._canvasActive.on('contextmenu', function(event) { return false; });
     }
     if (this._canvasBuffer !== null && this._canvasBuffer.length > 0) {
-      this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('2d');
-      this._contextBuffer.imageSmoothingEnabled = false;
+      this._contextBuffer = (this._canvasBuffer[0] as HTMLCanvasElement).getContext('webgl');
     }
     if (this._canvasTemp !== null && this._canvasTemp.length > 0) {
-      this._contextTemp = (this._canvasTemp[0] as HTMLCanvasElement).getContext('2d');
-      this._contextTemp.imageSmoothingEnabled = false;
+      this._contextTemp = (this._canvasTemp[0] as HTMLCanvasElement).getContext('webgl');
     }
     this._context = this._contextBuffer;
+
+    // #region WebGL
+    gl = this._context; // TODO Will later updating this._context update gl?
+    if (this._context === null) {
+      alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+      return;
+    }
+    // Set clear color to black, fully opaque
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    // Clear the color buffer with specified clear color
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // Create default shader program (just renders normally)
+    let v_shader = this.loadShader('./shaders/default.vert');
+    let f_shader = this.loadShader('./shaders/default.frag');
+    let prog = this.createProgram(v_shader, f_shader);
+
+    // Location lookups and binding
+    // Always do attr and uniform loc lookups during initialization, not rendering
+    let loc_a_location = gl.getAttribLocation(prog, 'a_position');
+    let positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    // Buffer three 2d points
+    let positions = [
+      0, 0,
+      0, 0.5,
+      0.7, 0,
+    ];
+    // gl.ARRAY_BUFFER is bound to the positionBuffer located on the GPU
+    // gl.STATIC_DRAW is a hint to WebGL that the data won't change much
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    // #endregion
+
+    // Control listening
     Controller.addListener(EventTypes.ALL).setAction((e) => this.processInput(e));
   }
 
@@ -61,7 +96,13 @@ export default class Renderer {
 
   public draw(): number {
     let startTime = moment();
-    this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.BLACK);
+    gl.viewport(0, 0, this._width, this._height);
+
+    // Clear the canvas
+    //this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.BLACK); // Replaced w/ clear
+    gl.clearColor(0, 0, 0, 255);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
     for (let componentArray of this._components) {
       if (componentArray === undefined)
         continue;
@@ -76,10 +117,12 @@ export default class Renderer {
       for (let comp of componentArray)
         comp.draw(this);
     }
+    
     this.drawBuffer();
     return moment().diff(startTime);
   }
 
+  // #region UI
   private processInput(e: InputEvent): void {
     // Check higher indices first
     outer:
@@ -117,6 +160,7 @@ export default class Renderer {
         }
     return false;
   }
+  // #endregion
 
   public get width(): number {
     return this._width;
@@ -126,15 +170,64 @@ export default class Renderer {
     return this._height;
   }
 
+  // #region Shaders
+  /**
+   * Load source from the given url and create a shader. 
+   * @param url Address of the shader source to load
+   * @returns Compiled shader
+   * @notes The file extension of the url determines the type of shader. Use *.vert for
+   * vertex shaders and *.frag for fragment shaders. Function blocks while shader loads. 
+   */
+  public loadShader(url: string): WebGLShader {
+    // Determine type
+    let type = gl.VERTEX_SHADER;
+    if (url.endsWith('.frag')) type = gl.FRAGMENT_SHADER;
+    let shader = gl.createShader(type);
+
+    // Load source
+    let xhttp = new XMLHttpRequest();
+    xhttp.open('GET', url, false);
+    xhttp.send();
+    gl.shaderSource(shader, xhttp.responseText);
+
+    // Compile
+    gl.compileShader(shader);
+    if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) // Returns true if successful
+      return shader;
+    
+    // Error handling
+    console.error(gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
+
+  public createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram {
+    // Program creation
+    let program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    if (gl.getProgramParameter(program, gl.LINK_STATUS)) // Returns true if successful
+      return program;
+
+    // Error handling
+    console.error(gl.getProgramInfoLog(program));
+    gl.deleteProgram(program);
+    return null;
+  }
+  // #endregion
+
+  // #region Render
   public setAA(enable: boolean): void {
-    this._context.imageSmoothingEnabled = enable;
+    //this._context.imageSmoothingEnabled = enable;
   }
 
   public translateContext(x: number, y: number): void {
-    this._context.translate(x ,y);
+    //this._context.translate(x ,y);
   }
 
   public drawRect(rect: Rectangle, color: Color): void {
+    
     this._context.beginPath();
     this._context.fillStyle = color.rgba;
     // Start with x,y on original canvas
@@ -297,5 +390,6 @@ export default class Renderer {
   public clearFilters(): void {
     this._filters = [];
   }
+  // #endregion
 }
 
