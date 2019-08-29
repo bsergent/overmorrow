@@ -45,13 +45,22 @@ export default abstract class Entity extends Rectangle {
 			this.facing = Facing.RIGHT;
 		}
 	}
+
 	/**
-	 * Collide against another entity
+	 * Run into another entity
 	 * @param collider Entity being collided w/, the collidee
 	 */
-	public collide(world: World, collider: Entity): void {
-		if (collider._collidable)
+	public collideWith(world: World, collidee: Entity): void {
+		if (collidee._collidable)
 			this.revertMovement(world);
+	}
+
+	/**
+	 * Ran into by another entity
+	 * @param collider Entity colliding, the collider
+	 */
+	public collidedBy(world: World, collider: Entity): void {
+		// Nothing, meant to be overwritten by children
 	}
 
 	public revertMovement(world: World): void {

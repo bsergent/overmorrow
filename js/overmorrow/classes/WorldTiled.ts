@@ -4,6 +4,7 @@ import Color from "overmorrow/primitives/Color";
 import Rectangle from "overmorrow/primitives/Rectangle";
 import { WorldRenderer } from "../ui/UIWorld";
 import Entity from 'overmorrow/classes/Entity';
+import Circle from "../primitives/Circle";
 
 export default class WorldTiled extends World {
   private _tileKey: Map<number, TileKey> = new Map<number, TileKey>();
@@ -49,11 +50,11 @@ export default class WorldTiled extends World {
       for (let x = 0; x < this._width; x++)
         this._collision[y][x] = false;
 
-    this._fog = new Array(this._height);
-    for (let r = 0; r < this._height; r++)
-      this._fog[r] = new Array(this._width);
-    for (let y = 0; y < this._height; y++)
-      for (let x = 0; x < this._width; x++)
+    this._fog = new Array(this._height * this.subGridDivisions);
+    for (let r = 0; r < this._height * this.subGridDivisions; r++)
+      this._fog[r] = new Array(this._width * this.subGridDivisions);
+    for (let y = 0; y < this._height * this.subGridDivisions; y++)
+      for (let x = 0; x < this._width * this.subGridDivisions; x++)
         this._fog[y][x] = DiscoveryLevel.UNKNOWN;
 
     // Parse layers
@@ -94,6 +95,19 @@ export default class WorldTiled extends World {
         };
       }
     }
+  }
+
+	public get subGridDivisions(): number {
+		return super.subGridDivisions;
+	}
+  public set subGridDivisions(value: number) {
+    super.subGridDivisions = value;
+    this._fog = new Array(this._height * this.subGridDivisions);
+    for (let r = 0; r < this._height * this.subGridDivisions; r++)
+      this._fog[r] = new Array(this._width * this.subGridDivisions);
+    for (let y = 0; y < this._height * this.subGridDivisions; y++)
+      for (let x = 0; x < this._width * this.subGridDivisions; x++)
+        this._fog[y][x] = DiscoveryLevel.UNKNOWN;
   }
 
   public draw(ui: WorldRenderer): void {
@@ -210,13 +224,13 @@ export default class WorldTiled extends World {
   }
   
   public discover(x: number, y: number, radius: number): void {
-    for (let r = 0; r < this._width; r++)
-      for (let c = 0; c < this._width; c++)
-        if (this._fog[r][c] === DiscoveryLevel.VISIBLE)
+    let fov = new Circle(x * this.subGridDivisions, y * this.subGridDivisions, radius * this.subGridDivisions);
+    for (let r = 0; r < this._width * this.subGridDivisions; r++)
+      for (let c = 0; c < this._width * this.subGridDivisions; c++)
+        if (fov.contains(c, r))
+          this._fog[r][c] = DiscoveryLevel.VISIBLE;
+        else if (this._fog[r][c] === DiscoveryLevel.VISIBLE)
           this._fog[r][c] = DiscoveryLevel.DISCOVERED;
-    for (let r = Math.floor(Math.max(y + 0.5 - radius, 0)); r < Math.ceil(Math.min(y + 0.5 + radius, this._height)); r++)
-      for (let c = Math.floor(Math.max(x + 0.5 - radius, 0)); c < Math.ceil(Math.min(x + 0.5 + radius, this._width)); c++)
-        this._fog[r][c] = DiscoveryLevel.VISIBLE;
   }
 }
 

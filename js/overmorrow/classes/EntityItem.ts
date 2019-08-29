@@ -50,8 +50,8 @@ export default class EntityItem extends Entity {
     // Probably spawn some "pickup" particles
   }
 
-  public collide(world: World, collider: Entity): void {
-    super.collide(world, collider);
+  public collidedBy(world: World, collider: Entity): void {
+    super.collidedBy(world, collider);
     if (collider instanceof EntityLiving) {
       this.item = collider.inventory.addItem(this.item);
       if (this.item === null || this.item.quantity <= 0)

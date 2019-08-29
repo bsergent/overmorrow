@@ -25,7 +25,9 @@ export default class Circle {
         <= (this.r + cir.r) * (this.r + cir.r);
   }
 
-  public contains(v: Vector): boolean {
-    return (v.x - this.x) * (v.x - this.x) + (v.y - this.y) * (v.y - this.y) < this.r * this.r;
-  } 
+  public contains(vecOrX: Vector|number, y?: number): boolean {
+    if (vecOrX instanceof Vector)
+      return (vecOrX.x - this.x) * (vecOrX.x - this.x) + (vecOrX.y - this.y) * (vecOrX.y - this.y) < this.r * this.r;
+    return (vecOrX - this.x) * (vecOrX - this.x) + (y - this.y) * (y - this.y) < this.r * this.r;
+  }
 }

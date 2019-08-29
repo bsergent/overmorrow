@@ -49,9 +49,9 @@ export default class EntityProjectile extends Entity {
       this.die(world);
   }
 
-  public collide(world: World, collider: Entity): void {
+  public collideWith(world: World, collider: Entity): void {
     if (collider === this.origin) return;
-    super.collide(world, collider);
+    super.collideWith(world, collider);
     if (collider instanceof EntityLiving) {
       collider.health -= this.item.power;
       this.item = null;

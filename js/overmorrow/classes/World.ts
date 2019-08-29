@@ -21,7 +21,7 @@ export default abstract class World implements Tickable {
 	protected _height: number;
   protected _boundary: Rectangle;
 	protected _passages: Passage[];
-	public subGridDivisions: number = 1;
+	protected _subGridDivisions: number = 1;
 
 	constructor(name: string, width: number, height: number) {
 		this._name = name;
@@ -35,14 +35,20 @@ export default abstract class World implements Tickable {
 		return this;
 	}
 
-	get width(): number {
+	public get width(): number {
 		return this._width;
 	}
-	get height(): number {
+	public get height(): number {
 		return this._height;
 	}
-	get name(): string {
+	public get name(): string {
 		return this._name;
+	}
+	public get subGridDivisions(): number {
+		return this._subGridDivisions;
+	}
+	public set subGridDivisions(value: number) {
+		this._subGridDivisions = value;
 	}
 
 	public addEntity(entity: Entity) {
@@ -110,11 +116,15 @@ export default abstract class World implements Tickable {
 			// Other entities
 			for (let e2 of this._entities) {
 				if (e1 === e2) continue;
-				if (e1.intersects(e2)) { // Collision (moving collides w/ non-moving, non-moving gets triggered)
-					if (e1.vel.magnitude > 0) // TODO Need pair collide and collided functions? (either items can't trigger or arrows can't trigger)
-						e1.collide(this, e2);
-					if (e2.vel.magnitude > 0)
-						e2.collide(this, e1);
+				if (e1.intersects(e2)) { // Collision
+					if (e1.vel.magnitude > 0) {
+						e1.collideWith(this, e2);
+						e2.collidedBy(this, e1);
+					}
+					if (e2.vel.magnitude > 0) {
+						e2.collideWith(this, e1);
+						e1.collidedBy(this, e2);
+					}
 					//continue entity1;
 				}
 			}
