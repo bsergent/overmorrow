@@ -34,6 +34,8 @@ export default class WorldTiled extends World {
     });
     this._width = json.width;
     this._height = json.height;
+    this._boundary.width = this._width;
+    this._boundary.height = this._height;
     this._tileWidth = json.tilewidth;
     this._tileHeight = json.tileheight;
     let color = new Color();
@@ -100,7 +102,8 @@ export default class WorldTiled extends World {
     let area = ui.getVisibleTileArea();
 
     for (let e of this._entities)
-      if (this._fog[Math.floor(e.y1)][Math.floor(e.x1)] === DiscoveryLevel.VISIBLE  || DEBUG)
+      if ((this._boundary.contains(Math.floor(e.y1), Math.floor(e.x1)) 
+          && this._fog[Math.floor(e.y1)][Math.floor(e.x1)] === DiscoveryLevel.VISIBLE) || DEBUG)
         e.draw(ui);
 
     this.drawFG(ui);
@@ -191,10 +194,7 @@ export default class WorldTiled extends World {
   public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
 		let fX = Math.floor(x);
 		let fY = Math.floor(y);
-		return x < 0
-			|| y < 0
-			|| x > this._width
-			|| y > this._height
+		return !this._boundary.contains(x, y)
 			|| this._collision[fY][fX];
       // || (entityToIgnore !== undefined
       //     && this._entityCollision[fY][fX].length > 1
@@ -202,10 +202,7 @@ export default class WorldTiled extends World {
   }
 
   public collides(e: Entity): boolean {
-    return e.x1 < 0
-			|| e.y1 < 0
-			|| e.x2 > this._width
-			|| e.y2 > this._height
+    return !(this._boundary.contains(e.x1, e.y1) && this._boundary.contains(e.x2, e.y2))
       || this._collision[Math.floor(e.y1)][Math.floor(e.x1)]
       || this._collision[Math.floor(e.y1)][Math.floor(e.x1 + e.width - World.SIGMA)]
       || this._collision[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1)]

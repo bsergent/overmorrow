@@ -8,6 +8,8 @@ import Tile from 'overmorrow/classes/Tile';
 import Vector from '../primitives/Vector';
 import Passage from './Passage';
 
+// TODO Add snapToGrid() move entities onto the grid
+
 export default abstract class World implements Tickable {
   protected static SIGMA: number = 0.0001; // Collision precision
 
@@ -18,13 +20,15 @@ export default abstract class World implements Tickable {
 	private _dirty: boolean = true; // True if tiles have changed and buffer needs to be redrawn
 	protected _width: number;
 	protected _height: number;
+  protected _boundary: Rectangle;
 	protected _passages: Passage[];
 	public subGridDivisions: number = 1;
 
 	constructor(name: string, width: number, height: number) {
 		this._name = name;
 		this._width = width;
-    this._height = height;
+		this._height = height;
+		this._boundary = new Rectangle(0, 0, width, height); //  TODO Should the width and height be +1?
 	}
 
 	public setName(name: string): World {
@@ -104,12 +108,15 @@ export default abstract class World implements Tickable {
 				e1.revertMovement(this);
 				continue;
 			}
-			if (!e1.collidable) continue;
 			// Other entities
 			for (let e2 of this._entities) {
-				if (e1 !== e2 && e2.collidable && e1.intersects(e2)) {
-					e1.revertMovement(this);
-					e2.revertMovement(this);
+				if (e1 !== e2 && e1.intersects(e2)) {
+					e1.collide(this, e2);
+					e2.collide(this, e1);
+					if (e2.collidable)
+						e1.revertMovement(this);
+					if (e1.collidable)
+						e2.revertMovement(this);
 					continue entity1;
 				}
 			}

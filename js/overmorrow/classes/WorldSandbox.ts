@@ -14,13 +14,11 @@ export default class WorldSandbox extends World {
   protected _tilesBG: Tile[][];
   protected _defaultTileTypeFG: string;
   protected _defaultTileTypeBG: string;
-  protected _bounds: Rectangle;
   protected _rand: SeededRandom;
   private _seed: number;
   
   constructor(name: string, width: number, height: number, backgroundTileType: string, foregroundTileType: string, seed: number = -1) {
     super(name, width, height);
-    this._bounds = new Rectangle(0, 0, width, height);
     this._seed = seed === -1 ? Date.now() : seed;
     console.log(`Seed: ${this._seed}`);
     this._rand = new SeededRandom(this.seed.toString());
@@ -89,13 +87,13 @@ export default class WorldSandbox extends World {
   }
 
 	public getTile(x: number, y: number): Tile {
-    if (!this._bounds.contains(x, y))
+    if (!this._boundary.contains(x, y))
       return null;
 		return this._tilesFG[Math.floor(y)][Math.floor(x)];
   }
 
   public setTile(x: number, y: number, type: string, foreground: boolean = true): void {
-    if (!this._bounds.contains(x, y)) return;
+    if (!this._boundary.contains(x, y)) return;
     if (foreground)
       this._tilesFG[Math.floor(y)][Math.floor(x)].type = TileType.getType(type);
     else
@@ -111,19 +109,13 @@ export default class WorldSandbox extends World {
   public isTileOccupied(x: number, y: number, entityToIgnore?: Entity): boolean {
 		let fX = Math.floor(x);
 		let fY = Math.floor(y);
-		return x < 0
-			|| y < 0
-			|| x > this._width
-			|| y > this._height
+		return !this._boundary.contains(x, y)
       || this._tilesFG[fY][fX].type.solid;
     // TODO Reimplement checks for entities
   }
 
   public collides(e: Entity): boolean {
-    return e.x1 < 0
-			|| e.y1 < 0
-			|| e.x2 >= this._width
-			|| e.y2 >= this._height
+    return !(this._boundary.contains(e.x1, e.y1) && this._boundary.contains(e.x2, e.y2))
       || this._tilesFG[Math.floor(e.y1)][Math.floor(e.x1)].type.solid
       || this._tilesFG[Math.floor(e.y1)][Math.floor(e.x1 + e.width - World.SIGMA)].type.solid
       || this._tilesFG[Math.floor(e.y1 + e.height - World.SIGMA)][Math.floor(e.x1)].type.solid

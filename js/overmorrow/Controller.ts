@@ -152,15 +152,22 @@ export class Listener {
   }
 }
 
-export class InputEvent {
-  key: Keys;
+export abstract class Event {
   type: EventTypes;
+  constructor(type: EventTypes) {
+    this.type = type;
+  }
+}
+
+export class InputEvent extends Event {
+  key: Keys;
   x: number;
   y: number;
   dx: number;
   dy: number;
   get d(): number { return this.dx + this.dy; }
   constructor(event: JQuery.Event, type: EventTypes = null) {
+    super(type);
     if (event === null) return;
     this.key = event.which;
     this.type = type === null ? EventTypes[event.type.toUpperCase()] : type;
@@ -242,5 +249,6 @@ export enum EventTypes {
   KEYDOWN,
   KEYUP,
   KEYHELD,
+  INVMOVE,
   ALL
 }

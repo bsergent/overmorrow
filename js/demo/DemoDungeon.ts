@@ -21,6 +21,7 @@ import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import Tile, { TileType } from 'overmorrow/classes/Tile';
 import WorldDungeon from './WorldDungeon';
+import { Viewport } from '../overmorrow/primitives/Viewport';
 
 class Demo {
   public static main(): void {
@@ -83,7 +84,7 @@ class Demo {
     let world = new WorldDungeon(worldGenType, 'dirt', 'stone', 1025); //1529552122944
     world.subGridDivisions = 4;
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
-    uiworld.setWorld(world).setViewport(new Rectangle(0, 0, 800, 600)).setTileScale(8);
+    uiworld.setWorld(world).setViewport(new Viewport(0, 0, 800, 600, 8));
     renderer.addComponent(uiworld, 0);
     DEBUG = true;
     let player: EntityPlayer = null;

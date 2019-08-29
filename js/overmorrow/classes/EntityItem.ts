@@ -4,6 +4,7 @@ import Item, { ItemType } from './Item';
 import * as moment from '../../../node_modules/moment/moment';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';
+import EntityLiving from './EntityLiving';
 
 export default class EntityItem extends Entity {
   private _despawnTime: moment.Moment = null;
@@ -47,5 +48,13 @@ export default class EntityItem extends Entity {
     // Try to pick up if they have inventory space
     // Remove current EntityItem if picked up
     // Probably spawn some "pickup" particles
+  }
+
+  public collide(world: World, collider: Entity): void {
+    if (collider instanceof EntityLiving) {
+      this.item = collider.inventory.addItem(this.item);
+      if (this.item === null || this.item.quantity <= 0)
+        world.removeEntity(this);
+    }
   }
 }

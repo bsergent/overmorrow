@@ -5,6 +5,7 @@ import UIComponent from 'overmorrow/ui/UIComponent';
 import World from 'overmorrow/classes/World';
 import EntityPlayer from 'overmorrow/classes/EntityPlayer';
 import Vector from '../primitives/Vector';
+import { Viewport } from '../primitives/Viewport';
 
 export default class UIWorld extends UIComponent {
   private _worldRenderer: WorldRenderer = null;
@@ -13,17 +14,17 @@ export default class UIWorld extends UIComponent {
 
   constructor(x: number, y: number, width: number, height: number, renderer: Renderer) {
     super(x, y, width, height);
-    this._worldRenderer = new WorldRenderer(renderer, new Rectangle(0, 0, width, height));
+    this._worldRenderer = new WorldRenderer(renderer, new Viewport(0, 0, width, height, 16));
   }
 
-  public setViewport(viewport: Rectangle): UIWorld {
+  public setViewport(viewport: Viewport): UIWorld {
     this._worldRenderer.viewport = viewport;
     return this;
   }
-  get viewport(): Rectangle {
+  get viewport(): Viewport {
     return this._worldRenderer.viewport;
   }
-  set viewport(value: Rectangle) {
+  set viewport(value: Viewport) {
     this._worldRenderer.viewport = value;
   }
   public setTileScale(pixels: number): UIWorld {
@@ -80,16 +81,21 @@ export default class UIWorld extends UIComponent {
 }
 
 export class WorldRenderer extends Renderer { // Wrapper for Renderer class that handles the viewport
-  public viewport: Rectangle;
-  public tileScale: number; // Number of pixels a single tile occupies
+  public viewport: Viewport;
   public world: World;
   private _renderer: Renderer;
 
-  constructor(renderer: Renderer, viewport: Rectangle, tileScale: number = 16) {
+  public get tileScale(): number { // Number of pixels a single tile occupies
+    return this.viewport.scale;
+  }
+  public set tileScale(scale: number) {
+    this.viewport.scale = scale;
+  }
+
+  constructor(renderer: Renderer, viewport: Viewport) {
     super(null, null, null); // Ignore own render functions and just call them on the given Renderer with needed transformations
     this._renderer = renderer;
     this.viewport = viewport;
-    this.tileScale = tileScale;
   }
 
   private isOnScreen(rect: Rectangle): boolean {
@@ -98,17 +104,6 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
         && rect.y1 * this.tileScale < this.viewport.y2)
       || (rect.x2 * this.tileScale > this.viewport.x1
         && rect.y2 * this.tileScale > this.viewport.y1);
-  }
-
-  private rectToViewPort(rect: Rectangle): Rectangle {
-    let rect2 = rect.clone();
-    rect2.x1 *= this.tileScale;
-    rect2.y1 *= this.tileScale;
-    rect2.width *= this.tileScale;
-    rect2.height *= this.tileScale;
-    rect2.x1 -= this.viewport.x1;
-    rect2.y1 -= this.viewport.y1;
-    return rect2;
   }
   
   public getVisibleTileArea(): Rectangle {
@@ -126,32 +121,32 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   public drawRect(rect: Rectangle, color: Color): void {
     // TODO Instead of offsetting all the rectangles, could the canvas context be translated and scaled as done with UIPanel?
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawRect(this.rectToViewPort(rect), color);
+    this._renderer.drawRect(this.viewport.toAbsolute(rect) as Rectangle, color);
   }
 
   public drawRectWire(rect: Rectangle, color: Color): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawRectWire(this.rectToViewPort(rect), color);
+    this._renderer.drawRectWire(this.viewport.toAbsolute(rect) as Rectangle, color);
   }
 
   public drawLine(rect: Rectangle, color: Color, lineWidth: number = 1): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawLine(this.rectToViewPort(rect), color, lineWidth);
+    this._renderer.drawLine(this.viewport.toAbsolute(rect) as Rectangle, color, lineWidth);
   }
 
   public drawImage(rect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawImage(this.rectToViewPort(rect), url, opacity, rotation);
+    this._renderer.drawImage(this.viewport.toAbsolute(rect) as Rectangle, url, opacity, rotation);
   }
 
   public drawSprite(rect: Rectangle, drect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawSprite(this.rectToViewPort(rect), drect, url, opacity, rotation);
+    this._renderer.drawSprite(this.viewport.toAbsolute(rect) as Rectangle, drect, url, opacity, rotation);
   }
 
   public drawText(rect: Rectangle, text: string, font: string, size: number, color: Color, alignment: 'left'|'center'|'right'): void {
     if (!this.isOnScreen(rect)) return;
-    this._renderer.drawText(this.rectToViewPort(rect), text, font, size, color, alignment);
+    this._renderer.drawText(this.viewport.toAbsolute(rect) as Rectangle, text, font, size, color, alignment);
   }
 
   public get rendererAbsolute(): Renderer {

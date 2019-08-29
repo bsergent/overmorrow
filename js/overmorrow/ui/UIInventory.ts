@@ -1,6 +1,6 @@
 import Inventory from "../classes/Inventory";
 import Renderer from "../Renderer";
-import { InputEvent, EventTypes, Controller, Keys } from "../Controller";
+import { InputEvent, Event, EventTypes, Controller, Keys, Listener } from "../Controller";
 import Item, { ItemQuality, ItemRarity } from "../classes/Item";
 import UIPanel, { UISkin } from "./UIPanel";
 import Rectangle from "../primitives/Rectangle";
@@ -9,13 +9,12 @@ import Vector from "../primitives/Vector";
 import { toTitleCase } from "../Utilities";
 declare var DEBUG;
 
-// TODO Make this abstract after testing
-// TODO Implement static stuff to handle dragging items between inventories
 export default abstract class UIInventory extends UIPanel {
 	protected static _selectedItem: Item = null;
 	protected static _selectedItemSource: UIInventory = null;
 
 	protected _inventory: Inventory;
+  protected _listeners: Listener[] = [];
 	protected _cellPositions: Vector[] = []; // Positions relative to padding
 	protected _cellSize: number;
 	protected _cellColor: Color = Color.BLACK.clone().setAlpha(0.2);
@@ -183,6 +182,14 @@ export default abstract class UIInventory extends UIPanel {
 							if (DEBUG) console.log('Swapped');
 						}
 					}
+					let e: InventoryEvent = new InventoryEvent(
+						UIInventory._selectedItemSource._inventory, 
+						UIInventory._selectedItemSource._cellSelected,
+						this._inventory, 
+						this._cellHovered,
+						UIInventory._selectedItem);
+					for (let l of this._listeners)
+						l.action(e);
 					UIInventory._selectedItemSource._cellSelected = -1;
 					UIInventory._selectedItem = null;
 					ui.selectComponent(null);
@@ -202,5 +209,27 @@ export default abstract class UIInventory extends UIPanel {
 			if (super.input(ui, e))
 				return true;
 		return false; // Return true if event is consumed
+	}
+
+  public addListener(type: EventTypes): Listener {
+    let l = new Listener(type);
+    this._listeners.push(l);
+    return l;
   }
+}
+
+export class InventoryEvent extends Event {
+	fromInv: Inventory;
+	fromIndex: number;
+	toInv: Inventory;
+	toIndex: number;
+	item: Item;
+	constructor(fromInv: Inventory, fromIndex: number, toInv: Inventory, toIndex: number, item: Item) {
+		super(EventTypes.INVMOVE);
+		this.fromInv = fromInv;
+		this.fromIndex = fromIndex;
+		this.toInv = toInv;
+		this.toIndex = toIndex;
+		this.item = item;
+	}
 }

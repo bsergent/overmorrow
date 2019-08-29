@@ -1,5 +1,6 @@
 import * as moment from '../../node_modules/moment/moment';
 import Vector from './primitives/Vector';
+import Rectangle from './primitives/Rectangle';
 
 export class TimeKeep {
   public lastTwentyTickTimes: number[] = [];
@@ -77,7 +78,10 @@ export enum Direction {
   NORTHEAST = 315
 }
 
-export function degreesToDirection(degrees: number): Direction { // Assuming 0deg = East, 90deg = South, etc.
+/**
+ * Assumes 0deg=East, 90deg=South, etc.
+ */
+export function degreesToDirection(degrees: number): Direction {
   // Normalize degrees
   while (degrees < 0) degrees += 360;
   while (degrees >= 360) degrees -= 360;
@@ -380,7 +384,7 @@ export function toTitleCase(str: string): string {
   return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
-// So there's not such thing as output parameters in JavaScript/TypeScript
+// So there's no such thing as output parameters in JavaScript/TypeScript
 // export function swap(x: any, y: any): void {
 //   x = x ^ y;
 //   y = x ^ y;

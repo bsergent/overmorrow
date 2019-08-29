@@ -195,13 +195,13 @@ export default class Renderer {
       this._context.save();
 			this._context.translate(rect.x1 + (rect.width/2), rect.y1 + (rect.height/2));
       this._context.rotate(Math.PI/180*rotation.deg);
-      if (drect.width === 0 && drect.height === 0)
+      if (drect === null || (drect.width === 0 && drect.height === 0))
         this._context.drawImage(this._imageCache.get(url), -rect.width*rotation.x, -rect.height*rotation.y, rect.width, rect.height);
       else
         this._context.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, -rect.width*rotation.x, -rect.height*rotation.y, rect.width, rect.height);
       this._context.restore();
     } else {
-      if (drect.width === 0 && drect.height === 0)
+      if (drect === null || (drect.width === 0 && drect.height === 0))
         this._context.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
       else
         this._context.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);

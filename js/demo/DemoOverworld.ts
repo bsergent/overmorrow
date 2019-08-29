@@ -22,9 +22,10 @@ import { ActionUseItem, ActionMove } from 'overmorrow/classes/Action';
 import WorldSandbox from 'overmorrow/classes/WorldSandbox';
 import { TileType } from 'overmorrow/classes/Tile';
 import WorldDungeon from './WorldDungeon';
-import UIInventory from '../overmorrow/ui/UIInventory';
+import UIInventory, { InventoryEvent } from '../overmorrow/ui/UIInventory';
 import Inventory from '../overmorrow/classes/Inventory';
 import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
+import EntityProjectile from '../overmorrow/classes/EntityProjectile';
 
 class Demo {
   public static main(): void {
@@ -106,11 +107,26 @@ class Demo {
       .setWeapon(true)
       .setPower(5)
       .setRange(4)
+      .setImage('assets/item_arrow.png')
       .setAction(function (item: Item, world: World, user: EntityLiving) {
-        for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.direction, item.type.range, true))
-          if (e instanceof EntityLiving)
-            (e as EntityLiving).defendAgainst(user, item);
+        // TODO Look for arrows in inventory
+        let cursor = Controller.getCursor();
+        let cursorRel = uiworld.viewport.toRelative(cursor) as Vector;
+        let traj = cursorRel.add(player.center.invert());
+        traj.magnitude = 1;
+        let x = player.center.x + traj.x;
+        let y = player.center.y + traj.y;
+        world.addEntity(new EntityProjectile(x-0.3, y-0.3, 0.6, 0.6, 0.5, traj.direction, new Item('arrow_normal')));
+        // for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.direction, item.type.range, true))
+        //   if (e instanceof EntityLiving)
+        //     (e as EntityLiving).defendAgainst(user, item);
       });
+    ItemType.addType('arrow_normal')
+      .setWeapon(true)
+      .setPower(5)
+      .setRange(10)
+      .setMaxQuantity(50)
+      .setImage('assets/item_arrow.png');
     ItemType.addType('attack_slime')
       .setWeapon(true)
       .setPower(10)
@@ -141,6 +157,7 @@ class Demo {
     sword.quality = ItemQuality.EXCELLENT;
     player.giveItem(sword);
     player.itemPrimary = sword;
+    player.giveItem(new Item('bow'));
     player.giveItem(new Item('book_of_wynn'));
     player.giveItem(new Item('torch'));
     player.giveItem(new Item('torch', 14));
@@ -169,7 +186,7 @@ class Demo {
     slime.name = 'Vegeta';
     world.addEntity(slime);
     let uiworld = new UIWorld(0, 0, renderer.width, renderer.height, renderer);
-    uiworld.setWorld(world).setPlayer(player).setTileScale(48);
+    uiworld.setWorld(world).setPlayer(player).setTileScale(64);
     renderer.addComponent(uiworld, 0);
 
     let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
@@ -194,7 +211,13 @@ class Demo {
     renderer.addComponent(staminaBarForeground, 1);
     renderer.addComponent(staminaBarText, 1);
 
-    let inv = new UIInventoryGrid(0, 64, 24, 5, 4, player.inventory).setTitle('Backpack');
+    let inv = new UIInventoryGrid(0, 64, 24, 5, 4, player.inventory);
+    inv.setTitle('Backpack');
+    inv.addListener(EventTypes.INVMOVE)
+      .setAction((event: InventoryEvent) => {
+        if (event.toIndex === 0 || event.fromIndex)
+          player.itemPrimary = player.inventory.getItemAt(0);
+      });
     renderer.addComponent(inv, 2);
     let inv2 = new UIInventoryGrid(256, 64, 24, 3, 3, new Inventory(9)).setTitle('Chest');
     renderer.addComponent(inv2, 2);
@@ -253,7 +276,7 @@ class Demo {
         let py = (player.y1 + 0.5) * uiworld.tileScale - uiworld.viewport.y1;
         player.direction = degreesToDirection(Math.atan2(event.y - py, event.x - px) * 180 / Math.PI);
       });
-    // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, etc.
+    // TODO Change these from global listeners to only on the UIWorld element, otherwise typing in a text box will move the character, clicking an item will attack, etc.
     Controller.addListener(EventTypes.MOUSEDOWN)
       .setKeys([Keys.MOUSE_LEFT])
       .setAction(event => {
@@ -292,7 +315,7 @@ class Demo {
           player = newPlayer;
         }, 2500);
       }
-      world.discover(player.x1, player.y1, 3);
+      world.discover(player.x1, player.y1, 4);
       playerPosLabel.setText(`${world.name}:${player.x1.toFixed(2)},${player.y1.toFixed(2)}`);
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();

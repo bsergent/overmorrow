@@ -24,8 +24,8 @@ export default class Dungeon extends WorldSandbox {
   private setDimensions(width: number, height: number): void {
     this._width = width;
     this._height = height;
-    this._bounds.width = width;
-    this._bounds.height = height;
+    this._boundary.width = width;
+    this._boundary.height = height;
 
 		this._tilesFG = new Array(height);
     for (let r = 0; r < height; r++) {

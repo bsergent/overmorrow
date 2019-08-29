@@ -44,7 +44,8 @@ export default abstract class Entity extends Rectangle {
 		} else if (this.vel.x > 0) {
 			this.facing = Facing.RIGHT;
 		}
-	};
+	}
+	public collide(world: World, collider: Entity): void {}
 
 	public revertMovement(world: World): void {
 		this.x1 = this._prevPos.x;
