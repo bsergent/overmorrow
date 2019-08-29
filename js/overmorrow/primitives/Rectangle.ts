@@ -67,11 +67,13 @@ export default class Rectangle extends Line {
   /**
    * Checks if the x,y pair or Vector are within the rectangle
    */
-  public contains(xOrVec: number | Vector, y?: number): boolean {
-    if (xOrVec instanceof Vector)
-      return xOrVec.x >= this.x1 && xOrVec.x < this.x2 && xOrVec.y >= this.y1 && xOrVec.y < this.y2;
+  public contains(coords: number|Vector|Rectangle, y?: number): boolean {
+    if (coords instanceof Vector)
+      return coords.x >= this.x1 && coords.x < this.x2 && coords.y >= this.y1 && coords.y < this.y2;
+    else if (coords instanceof Rectangle)
+      return coords.x1 >= this.x1 && coords.x2 < this.x2 && coords.y1 >= this.y1 && coords.y2 < this.y2;
     else
-      return xOrVec >= this.x1 && xOrVec < this.x2 && y >= this.y1 && y < this.y2;
+      return coords >= this.x1 && coords < this.x2 && y >= this.y1 && y < this.y2;
   }
 
   public clone(): Rectangle {

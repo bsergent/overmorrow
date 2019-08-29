@@ -37,24 +37,36 @@ export default class Vector {
     return degrees;
   }
 
+  /**
+   * Immutable
+   */
   public transpose(): Vector {
     let ret = this.clone();
     ret.x = this.y;
     ret.y = this.x;
     return ret;
   }
+  /**
+   * Immutable
+   */
   public perpendicular(): Vector {
     let ret = this.clone();
     ret.x = this.y;
     ret.y = -this.x;
     return ret;
   }
+  /**
+   * Immutable
+   */
   public invert(): Vector {
     let ret = this.clone();
     ret.x = this.x * -1;
     ret.y = this.y * -1;
     return ret;
   }
+  /**
+   * Immutable
+   */
   public add(vec: Vector): Vector {
     if (vec === undefined) throw "Cannot add undefined to vector.";
     let result = this.clone();

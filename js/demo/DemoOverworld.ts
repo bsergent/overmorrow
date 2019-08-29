@@ -108,15 +108,16 @@ class Demo {
       .setPower(5)
       .setRange(4)
       .setImage('assets/item_arrow.png')
+      .setWeight(3)
       .setAction(function (item: Item, world: World, user: EntityLiving) {
         // TODO Look for arrows in inventory
         let cursor = Controller.getCursor();
         let cursorRel = uiworld.viewport.toRelative(cursor) as Vector;
         let traj = cursorRel.add(player.center.invert());
-        traj.magnitude = 1;
+        traj.magnitude = 0.5;
         let x = player.center.x + traj.x;
         let y = player.center.y + traj.y;
-        world.addEntity(new EntityProjectile(x-0.3, y-0.3, 0.6, 0.6, 0.5, traj.direction, new Item('arrow_normal')));
+        world.addEntity(new EntityProjectile(x-0.3, y-0.3, 0.6, 0.6, 0.5, traj.direction, new Item('arrow_normal'), player));
         // for (let e of world.getEntitiesByRaycast(user.x1, user.y1, user.direction, item.type.range, true))
         //   if (e instanceof EntityLiving)
         //     (e as EntityLiving).defendAgainst(user, item);
@@ -125,7 +126,7 @@ class Demo {
       .setWeapon(true)
       .setPower(5)
       .setRange(10)
-      .setMaxQuantity(50)
+      .setMaxQuantity(99)
       .setImage('assets/item_arrow.png');
     ItemType.addType('attack_slime')
       .setWeapon(true)

@@ -4,7 +4,6 @@ import { WorldRenderer } from 'overmorrow/ui/UIWorld';
 import Color from 'overmorrow/primitives/Color';
 import Rectangle from 'overmorrow/primitives/Rectangle';
 import Entity from 'overmorrow/classes/Entity';
-import Tile from 'overmorrow/classes/Tile';
 import Vector from '../primitives/Vector';
 import Passage from './Passage';
 
@@ -13,7 +12,7 @@ import Passage from './Passage';
 export default abstract class World implements Tickable {
   protected static SIGMA: number = 0.0001; // Collision precision
 
-	private _name;
+	private _name: string;
   protected _backgroundColor: Color;
 	protected _entities: Entity[] = []; // TODO Add draw order to entities
 	private _tileBuffer; // Where the tiles are first drawn to (only visible or all?), only updated if map changes
@@ -104,20 +103,19 @@ export default abstract class World implements Tickable {
 		entity1:
 		for (let e1 of this._entities) {
 			// World border
-			if (e1.y1 < 0 || e1.y2 > this._height || e1.x1 < 0 || e1.x2 > this._width) {
+			if (!this._boundary.contains(e1)) {
 				e1.revertMovement(this);
 				continue;
 			}
 			// Other entities
 			for (let e2 of this._entities) {
-				if (e1 !== e2 && e1.intersects(e2)) {
-					e1.collide(this, e2);
-					e2.collide(this, e1);
-					if (e2.collidable)
-						e1.revertMovement(this);
-					if (e1.collidable)
-						e2.revertMovement(this);
-					continue entity1;
+				if (e1 === e2) continue;
+				if (e1.intersects(e2)) { // Collision (moving collides w/ non-moving, non-moving gets triggered)
+					if (e1.vel.magnitude > 0) // TODO Need pair collide and collided functions? (either items can't trigger or arrows can't trigger)
+						e1.collide(this, e2);
+					if (e2.vel.magnitude > 0)
+						e2.collide(this, e1);
+					//continue entity1;
 				}
 			}
 			// Tile collision

@@ -51,6 +51,7 @@ export default class EntityItem extends Entity {
   }
 
   public collide(world: World, collider: Entity): void {
+    super.collide(world, collider);
     if (collider instanceof EntityLiving) {
       this.item = collider.inventory.addItem(this.item);
       if (this.item === null || this.item.quantity <= 0)

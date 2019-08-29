@@ -45,7 +45,14 @@ export default abstract class Entity extends Rectangle {
 			this.facing = Facing.RIGHT;
 		}
 	}
-	public collide(world: World, collider: Entity): void {}
+	/**
+	 * Collide against another entity
+	 * @param collider Entity being collided w/, the collidee
+	 */
+	public collide(world: World, collider: Entity): void {
+		if (collider._collidable)
+			this.revertMovement(world);
+	}
 
 	public revertMovement(world: World): void {
 		this.x1 = this._prevPos.x;
@@ -69,7 +76,10 @@ export default abstract class Entity extends Rectangle {
 		return this._collidable;
 	}
 
+	/**
+	 * Immutable
+	 */
 	get prevPos(): Vector {
-		return this._prevPos;
+		return this._prevPos.clone();
 	}
 }
