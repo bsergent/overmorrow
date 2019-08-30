@@ -316,7 +316,7 @@ class Demo {
           player = newPlayer;
         }, 2500);
       }
-      world.discover(player.x1, player.y1, 4);
+      world.discover(player.center.x, player.center.y, 4);
       playerPosLabel.setText(`${world.name}:${player.x1.toFixed(2)},${player.y1.toFixed(2)}`);
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();

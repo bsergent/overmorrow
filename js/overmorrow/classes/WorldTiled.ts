@@ -115,25 +115,39 @@ export default class WorldTiled extends World {
 
     let area = ui.getVisibleTileArea();
 
-    for (let e of this._entities)
-      if ((this._boundary.contains(Math.floor(e.y1), Math.floor(e.x1)) 
-          && this._fog[Math.floor(e.y1)][Math.floor(e.x1)] === DiscoveryLevel.VISIBLE) || DEBUG)
-        e.draw(ui);
+    let vis: boolean;
+    for (let e of this._entities) {
+      if ((!this._boundary.intersects(e)) && (!DEBUG)) continue;
+      vis = false;
+      for (let y = e.y1 * this.subGridDivisions; y < e.y2 * this.subGridDivisions; y++)
+        for (let x = e.x1 * this.subGridDivisions; x < e.x2 * this.subGridDivisions; x++)
+          if (this._fog[Math.floor(y)][Math.floor(x)] === DiscoveryLevel.VISIBLE || DEBUG)
+            vis = true;
+      if (vis) e.draw(ui);
+    }
 
     this.drawFG(ui);
 
     // Fog
     let fogAtTile: DiscoveryLevel;
     if (!DEBUG) {
-      for (let y = area.y1; y < area.y2; y++) {
-        for (let x = area.x1; x < area.x2; x++) {
+      for (let y = area.y1 * this.subGridDivisions; y < area.y2 * this.subGridDivisions; y++) {
+        for (let x = area.x1 * this.subGridDivisions; x < area.x2 * this.subGridDivisions; x++) {
           fogAtTile = this._fog[y][x];
           if (fogAtTile === DiscoveryLevel.UNKNOWN)
             //ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 1.0));
-            ui.drawImage(new Rectangle(x, y, 1, 1), 'assets/black.png');
+            ui.drawImage(new Rectangle(
+              x / this.subGridDivisions, 
+              y / this.subGridDivisions, 
+              1 / this.subGridDivisions, 
+              1 / this.subGridDivisions), 'assets/black.png');
           else if (fogAtTile === DiscoveryLevel.DISCOVERED)
             //ui.drawRect(new Rectangle(x, y, 1, 1), new Color(5, 5, 5, 0.7));
-            ui.drawImage(new Rectangle(x, y, 1, 1), 'assets/black.png', 0.5);
+            ui.drawImage(new Rectangle(
+              x / this.subGridDivisions, 
+              y / this.subGridDivisions, 
+              1 / this.subGridDivisions, 
+              1 / this.subGridDivisions), 'assets/black.png', 0.5);
         }
       }
     }
