@@ -5,8 +5,6 @@ import Rectangle from 'overmorrow/primitives/Rectangle';
 import UIComponent from 'overmorrow/ui/UIComponent';
 declare var DEBUG;
 
-// TODO Add static method to set default skin
-
 export interface UISkin {
   img: HTMLImageElement,
   url: string,

@@ -185,6 +185,7 @@ export default class Renderer {
     if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);
   }
 
+  // TODO Fix drect to not be pixel based, but range from 0 to 1 to allow any resolution of textures
   public drawSprite(rect: Rectangle, drect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
     if (!this._imageCache.has(url)) {
       this._imageCache.set(url, new Image());

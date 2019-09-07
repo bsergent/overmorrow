@@ -106,7 +106,6 @@ export default abstract class World implements Tickable {
 			e.tick(delta, this);
 
 		// Entity collision detection
-		entity1:
 		for (let e1 of this._entities) {
 			// World border
 			if (!this._boundary.contains(e1)) {

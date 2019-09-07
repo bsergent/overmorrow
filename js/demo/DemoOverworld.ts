@@ -26,6 +26,7 @@ import UIInventory, { InventoryEvent } from '../overmorrow/ui/UIInventory';
 import Inventory from '../overmorrow/classes/Inventory';
 import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
 import EntityProjectile from '../overmorrow/classes/EntityProjectile';
+import UIHealth from './UIHealth';
 
 class Demo {
   public static main(): void {
@@ -107,8 +108,16 @@ class Demo {
       .setWeapon(true)
       .setPower(5)
       .setRange(4)
-      .setImage('assets/item_arrow.png')
+      .setImage('assets/item_bow.png')
+      // TODO Set animation sheet for basic animations
+      // TODO Include held position and rotation for how the item should be held in the json, include at-rest
+      // TODO Rename AnimationSheet to a more general Sprite?
+      // TODO Modify Renderer.drawSprite() to actually take a sprite?
+      //      Probs unnecessary, but should rename method or make an override that calls after converting the AnimationSheet/Sprite
+      //.setAnimationSheet(new AnimationSheet('assets/item_bow.png'),
+      //  { WARMUP: 'draw', ACT: 'shoot', RECOVERY: 'normal', COMPLETE: 'normal'}) // Append _direction? if null, use the first tag
       .setWeight(3)
+      // TODO Set warmup, act, and recovery times directly
       .setAction(function (item: Item, world: World, user: EntityLiving) {
         // TODO Look for arrows in inventory
         let cursor = Controller.getCursor();
@@ -190,27 +199,13 @@ class Demo {
     uiworld.setWorld(world).setPlayer(player).setTileScale(64);
     renderer.addComponent(uiworld, 0);
 
-    let healthBarBorder = new UIImage(0, renderer.height - 32, 212, 32, 'assets/health_bd.png');
-    let healthBarBackground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_bg.png');
-    let healthBarForeground = new UIImage(6, renderer.height - 26, 200, 20, 'assets/health_fg.png');
+    let healthBar = new UIHealth(0, renderer.height - 306, 36, player, 'assets/gui_bars.png', 10);
+    renderer.addComponent(healthBar, 1);
     let healthBarText = new UILabel(106, renderer.height - 24, '100/100');
     healthBarText.setAlignment('center');
     healthBarText.setSize(20);
     healthBarText.setColor(Color.WHITE);
-    renderer.addComponent(healthBarBorder, 1);
-    renderer.addComponent(healthBarBackground, 1);
-    renderer.addComponent(healthBarForeground, 1);
     renderer.addComponent(healthBarText, 1);
-
-    let staminaBarBackground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_bg.png');
-    let staminaBarForeground = new UIImage(6, renderer.height - 52, 200, 20, 'assets/health_fg.png');
-    let staminaBarText = new UILabel(106, renderer.height - 50, '100/100');
-    staminaBarText.setAlignment('center');
-    staminaBarText.setSize(20);
-    staminaBarText.setColor(Color.WHITE);
-    renderer.addComponent(staminaBarBackground, 1);
-    renderer.addComponent(staminaBarForeground, 1);
-    renderer.addComponent(staminaBarText, 1);
 
     let inv = new UIInventoryGrid(0, 64, 24, 5, 4, player.inventory);
     inv.setTitle('Backpack');
@@ -314,19 +309,17 @@ class Demo {
           world.addEntity(newPlayer);
           uiworld.setPlayer(newPlayer);
           player = newPlayer;
+          healthBar.entity = newPlayer;
         }, 2500);
       }
       world.discover(player.center.x, player.center.y, 4);
       playerPosLabel.setText(`${world.name}:${player.x1.toFixed(2)},${player.y1.toFixed(2)}`);
+      healthBarText.setText(`${Math.round(player.health)} / ${player.maxHealth}`);
       timekeep.addDraw(renderer.draw());
       timekeep.completeUpdate();
       $tps.text(timekeep.getTPS().toFixed(0));
       tpsLabel.setText(timekeep.getTPS().toFixed(0));
       drawLabel.setText(timekeep.lastTwentyDrawTimes[0].toFixed(0) + 'ms');
-      healthBarForeground.width = player.health / player.maxHealth * 200;
-      healthBarText.setText(`${Math.round(player.health)} / ${player.maxHealth}`);
-      staminaBarForeground.width = player.stamina / player.maxStamina * 200;
-      staminaBarText.setText(`${Math.round(player.stamina)} / ${player.maxStamina}`);
       
       setTimeout(update, timekeep.getTimeToWait());
       // TODO Also handle multiplayer stuff in here somewhere, queuing to world
