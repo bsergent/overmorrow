@@ -81,7 +81,7 @@ export default abstract class EntityLiving extends Entity {
     // Drop items into world
     if (this._inventory !== null)
       for (let item of this._inventory.getItems())
-        world.addEntity(new EntityItem(this.x1, this.y1, item, 30));
+        world.addEntity(new EntityItem(this.x1, this.y1, item, 300));
     // TODO Leave behind some particle effects or something
     world.removeEntity(this);
   }

@@ -13,11 +13,12 @@ export interface UISkin {
 	scale: number,
 	paddingDefault: number,
   colorBG: Color,
-  colorFG: Color
+	colorFG: Color,
+	font: string
 }
 
 export default class UIPanel extends UIComponent {
-  public static setDefaultSkin(skin: string, scale: number, padding: number, colorBG: Color, colorFG: Color) {
+  public static setDefaultSkin(skin: string, scale: number, padding: number, colorBG: Color, colorFG: Color, font: string) {
 		let skinImage = new Image();
 		skinImage.src = skin;
 		skinImage.onload = () => {
@@ -30,7 +31,8 @@ export default class UIPanel extends UIComponent {
 				scale: scale,
 				paddingDefault: padding,
 				colorBG: colorBG,
-				colorFG: colorFG
+				colorFG: colorFG,
+				font: 'Times New Roman'
 			};
 			for (let p of UIPanel._waitingForSkin) {
 				if (p._currentSkinChange > 0) continue;
@@ -100,7 +102,8 @@ export default class UIPanel extends UIComponent {
 				scale: scale,
 				paddingDefault: padding,
 				colorBG: colorBG,
-				colorFG: colorFG
+				colorFG: colorFG,
+				font: 'Times New Roman'
 			};
 		};
 		return this;
@@ -114,8 +117,8 @@ export default class UIPanel extends UIComponent {
 	public draw(ui: Renderer): void {
 		// Draw background
 		this.drawBackground(ui);
-		if (this._title !== '')
-			ui.drawText(this.clone().offset(this.padding, this.padding), this._title, 'Times New Roman', 16, this._skin !== undefined ? this.skin.colorFG : Color.WHITE, 'left');
+		if (this._title !== '' && this._skin !== undefined)
+			ui.drawText(this.clone().offset(this.padding, this.padding), this._title, this._skin.font, 16, this._skin !== undefined ? this.skin.colorFG : Color.WHITE, 'left');
 
 		// Draw components
 		ui.translateContext(this.x1 + this.padding, this.y1 + this.padding);
