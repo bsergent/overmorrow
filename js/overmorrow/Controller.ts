@@ -72,8 +72,8 @@ export class Controller {
       let mouseEvent = new InputEvent(event, EventTypes.SCROLL);
       mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
       mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
-      mouseEvent.dx = (event.originalEvent as any).wheelDeltaX;
-      mouseEvent.dy = (event.originalEvent as any).wheelDeltaY;
+      mouseEvent.dx = (event.originalEvent as any).deltaX;
+      mouseEvent.dy = (event.originalEvent as any).deltaY;
       event.preventDefault();
       this.queueInput(mouseEvent);
     });

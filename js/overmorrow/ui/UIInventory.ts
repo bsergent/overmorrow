@@ -72,6 +72,12 @@ export default abstract class UIInventory extends UIPanel {
 		return this;
 	}
 
+	public setInventory(inventory: Inventory): UIInventory {
+		if (inventory === null) throw 'Cannot set UIInventory\'s inventory to null.';
+		this._inventory = inventory;
+		return this;
+	}
+
 	public draw(ui: Renderer): void {
 		super.draw(ui);
 		

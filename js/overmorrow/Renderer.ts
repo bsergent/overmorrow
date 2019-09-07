@@ -187,25 +187,38 @@ export default class Renderer {
 
   // TODO Fix drect to not be pixel based, but range from 0 to 1 to allow any resolution of textures
   public drawSprite(rect: Rectangle, drect: Rectangle, url: string, opacity: number = 1, rotation: { deg: number, x: number, y: number } = { deg: 0, x: 0, y: 0 }): void {
+    // Check for cache
     if (!this._imageCache.has(url)) {
       this._imageCache.set(url, new Image());
       this._imageCache.get(url).src = url;
     }
+
+    // Translate from 0 to 1 to 0 to width or height
+    let dr: Rectangle = null;
+    if (drect !== null) {
+      dr = drect.clone();
+      // dr.x1 /= this._imageCache.get(url).width;
+      // dr.y1 /= this._imageCache.get(url).height;
+      // dr.width /= this._imageCache.get(url).width;
+      // dr.height /= this._imageCache.get(url).height;
+    }
+
+    // Draw while handling opacity and rotation
     this._context.globalAlpha = opacity;
     if (rotation.deg !== 0) {
       this._context.save();
 			this._context.translate(rect.x1 + (rect.width/2), rect.y1 + (rect.height/2));
       this._context.rotate(Math.PI/180*rotation.deg);
-      if (drect === null || (drect.width === 0 && drect.height === 0))
+      if (dr === null || (dr.width === 0 && dr.height === 0))
         this._context.drawImage(this._imageCache.get(url), -rect.width*rotation.x, -rect.height*rotation.y, rect.width, rect.height);
       else
-        this._context.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, -rect.width*rotation.x, -rect.height*rotation.y, rect.width, rect.height);
+        this._context.drawImage(this._imageCache.get(url), dr.x1, dr.y1, dr.width, dr.height, -rect.width*rotation.x, -rect.height*rotation.y, rect.width, rect.height);
       this._context.restore();
     } else {
-      if (drect === null || (drect.width === 0 && drect.height === 0))
+      if (dr === null || (dr.width === 0 && dr.height === 0))
         this._context.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
       else
-        this._context.drawImage(this._imageCache.get(url), drect.x1, drect.y1, drect.width, drect.height, rect.x1, rect.y1, rect.width, rect.height);
+        this._context.drawImage(this._imageCache.get(url), dr.x1, dr.y1, dr.width, dr.height, rect.x1, rect.y1, rect.width, rect.height);
     }
     // TODO Implement colorization and color replacement
     if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);

@@ -199,7 +199,7 @@ class Demo {
     uiworld.setWorld(world).setPlayer(player).setTileScale(64);
     renderer.addComponent(uiworld, 0);
 
-    let healthBar = new UIHealth(0, renderer.height - 306, 36, player, 'assets/gui_bars.png', 10);
+    let healthBar = new UIHealth(0, renderer.height - 156, 36, player, 'assets/gui_bars.png', 10);
     renderer.addComponent(healthBar, 1);
     let healthBarText = new UILabel(106, renderer.height - 24, '100/100');
     healthBarText.setAlignment('center');
@@ -215,13 +215,13 @@ class Demo {
           player.itemPrimary = player.inventory.getItemAt(0);
       });
     renderer.addComponent(inv, 2);
-    let inv2 = new UIInventoryGrid(256, 64, 24, 3, 3, new Inventory(9)).setTitle('Chest');
-    renderer.addComponent(inv2, 2);
-    let inv3 = new UIInventoryGrid(256, 256 + 64, 24, 2, 2, new Inventory(4)).setTitle('Barrel');
-    renderer.addComponent(inv3, 2);
-    setInterval(() => {
-      player.inventory.addItem(new Item('torch'));
-    }, 100);
+    // let inv2 = new UIInventoryGrid(256, 64, 24, 3, 3, new Inventory(9)).setTitle('Chest');
+    // renderer.addComponent(inv2, 2);
+    // let inv3 = new UIInventoryGrid(256, 256 + 64, 24, 2, 2, new Inventory(4)).setTitle('Barrel');
+    // renderer.addComponent(inv3, 2);
+    // setInterval(() => {
+    //   player.inventory.addItem(new Item('torch'));
+    // }, 100);
     
     // Bind controls
     Controller.addListener(EventTypes.KEYDOWN)
@@ -291,6 +291,15 @@ class Demo {
         slime.name = 'Vegeta Imposter';
         world.addEntity(slime);
       });
+    Controller.addListener(EventTypes.SCROLL)
+      .setAction(event => {
+        if (event.dy < 0)
+          player.health++;
+        if (event.dy > 0)
+          player.health--;
+        if (player.health > player.maxHealth)
+          player.health = player.maxHealth;
+      })
 
     console.log('Initialized');
 
@@ -308,11 +317,12 @@ class Demo {
           newPlayer.itemPrimary = player.itemPrimary;
           world.addEntity(newPlayer);
           uiworld.setPlayer(newPlayer);
+          inv.setInventory(newPlayer.inventory);
           player = newPlayer;
           healthBar.entity = newPlayer;
         }, 2500);
       }
-      world.discover(player.center.x, player.center.y, 4);
+      world.discover(player.center.x, player.center.y, 4.5);
       playerPosLabel.setText(`${world.name}:${player.x1.toFixed(2)},${player.y1.toFixed(2)}`);
       healthBarText.setText(`${Math.round(player.health)} / ${player.maxHealth}`);
       timekeep.addDraw(renderer.draw());
