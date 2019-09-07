@@ -238,11 +238,11 @@ export default class WorldTiled extends World {
   }
   
   public discover(x: number, y: number, radius: number): void {
-    let fov = new Circle(x * this.subGridDivisions, y * this.subGridDivisions, radius * this.subGridDivisions);
-    for (let r = 0; r < this._width * this.subGridDivisions; r++)
+    let fov = new Circle(x * this.subGridDivisions, y * this.subGridDivisions, radius * this.subGridDivisions - 0.01);
+    for (let r = 0; r < this._height * this.subGridDivisions; r++)
       for (let c = 0; c < this._width * this.subGridDivisions; c++)
         if (fov.contains(c, r))
-          this._fog[r][c] = DiscoveryLevel.VISIBLE;
+          this._fog[Math.floor(r)][Math.floor(c)] = DiscoveryLevel.VISIBLE;
         else if (this._fog[r][c] === DiscoveryLevel.VISIBLE)
           this._fog[r][c] = DiscoveryLevel.DISCOVERED;
   }
