@@ -140,6 +140,10 @@ export default abstract class UIInventory extends UIPanel {
 			rect.y1 = cur.y - textSize.y - 2*padding - 2;
 			rect.width = textSize.x + 2*padding;
 			rect.height = textSize.y + 2*padding;
+			if (rect.x1 < 0) rect.x1 = 0;
+			if (rect.y1 < 0) rect.y1 = 0;
+			if (rect.x2 > ui.width) rect.x1 = ui.width - rect.width;
+			if (rect.y2 > ui.height) rect.y1 = ui.height - rect.height;
 			ui.drawRect(rect, this._cellTextBGColor);
 			ui.drawRectWire(rect, this.skin.colorFG);
 			rect.x1 += padding;

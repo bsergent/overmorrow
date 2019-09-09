@@ -111,7 +111,7 @@ export default abstract class EntityLiving extends Entity {
   }
 
   public useItem(world: World, item: Item): void {
-    if (item != null) item.type.action(item, world, this);
+    if (item !== null) item.type.action(item, world, this);
   }
 
   public canBlock(): boolean {
