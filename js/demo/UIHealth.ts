@@ -19,7 +19,6 @@ export default class UIHealth extends UIComponent {
   }
 
   // TODO Animate when a heart is lost
-  // TODO Just use a context switch insead of dealing w/ actual coordinates
   public draw(ui: Renderer): void {
     // Calculate number of sprites
     let emptyCount = Math.ceil(this.entity.maxHealth / this._healthPerSquare);

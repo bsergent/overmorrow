@@ -173,7 +173,7 @@ export default abstract class EntityLiving extends Entity {
     if (DEBUG) {
       ui.drawRectWire(this, this.isFatigued() ? Color.WHITE : Color.GREEN);
       ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width, 0.05), Color.RED);
-      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.GREEN);
+      ui.drawRect(new Rectangle(this.x1, this.y1 + 1.02, this.width * this.health / this.maxHealth , 0.05), Color.LIME);
       let vec = directionToVector(this.direction);
       vec.magnitude = 1;
       ui.drawLine(new Rectangle(this.x1 + 0.5, this.y1 + 0.5, vec.x, vec.y), Color.RED, 3);

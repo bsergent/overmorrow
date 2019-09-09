@@ -27,6 +27,7 @@ import Inventory from '../overmorrow/classes/Inventory';
 import UIInventoryGrid from '../overmorrow/ui/UIInventoryGrid';
 import EntityProjectile from '../overmorrow/classes/EntityProjectile';
 import UIHealth from './UIHealth';
+import UIStamina from './UIStamina';
 
 class Demo {
   public static main(): void {
@@ -201,6 +202,8 @@ class Demo {
 
     let healthBar = new UIHealth(0, renderer.height - 104, 24, player, 'assets/gui_bars.png', 10);
     renderer.addComponent(healthBar, 1);
+    let staminaBar = new UIStamina(24, renderer.height - 64, 24, 64, player, 'assets/gui_bars.png');
+    renderer.addComponent(staminaBar, 1);
 
     let inv = new UIInventoryGrid(0, 0, 32, 5, 4, player.inventory);
     inv.setTitle('Backpack');
@@ -291,11 +294,11 @@ class Demo {
     Controller.addListener(EventTypes.SCROLL)
       .setAction(event => {
         if (event.dy < 0)
-          player.health++;
+          player.stamina += 0.5;
         if (event.dy > 0)
-          player.health--;
-        if (player.health > player.maxHealth)
-          player.health = player.maxHealth;
+          player.stamina -= 0.5;
+        if (player.stamina > player.maxStamina)
+          player.stamina = player.maxStamina;
       })
 
     console.log('Initialized');
@@ -317,6 +320,7 @@ class Demo {
           inv.setInventory(newPlayer.inventory);
           player = newPlayer;
           healthBar.entity = newPlayer;
+          staminaBar.entity = newPlayer;
         }, 2500);
       }
       world.discover(player.center.x, player.center.y, 4.5);
