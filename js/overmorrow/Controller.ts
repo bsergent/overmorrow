@@ -37,6 +37,18 @@ export class Controller {
         this.pressedKeys.splice(i, 1);
       this.queueInput(mouseEvent);
     });
+    canvas.mouseenter(event => {
+      let mouseEvent = new InputEvent(event);
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
+      this.queueInput(mouseEvent);
+    });
+    canvas.mouseleave(event => {
+      let mouseEvent = new InputEvent(event);
+      mouseEvent.x = event.clientX - canvas[0].getBoundingClientRect().left;
+      mouseEvent.y = event.clientY - canvas[0].getBoundingClientRect().top;
+      this.queueInput(mouseEvent);
+    });
     $(document).keydown(event => {
       canvas.focus();
       if (this.pressedKeys.indexOf(event.which as Keys) === -1)
@@ -245,6 +257,8 @@ export enum EventTypes {
   MOUSEMOVE,
   MOUSEDOWN,
   MOUSEUP,
+  MOUSEENTER,
+  MOUSELEAVE,
   SCROLL,
   KEYDOWN,
   KEYUP,

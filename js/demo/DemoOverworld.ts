@@ -48,7 +48,7 @@ class Demo {
     renderer.addComponent(playerPosLabel, 10);
 
 
-    UIPanel.setDefaultSkin('assets/borderPatch.png', 6, 24, new Color(87, 73, 57, 1), new Color(195, 170, 141), 'Courier New');
+    UIPanel.setDefaultSkin('assets/borderPatch.png', 4, 24, new Color(87, 73, 57, 1), new Color(195, 170, 141), 'Courier New');
     let panel = new UIPanel(10, 10, 250, 250);
     panel.setTitle('Test');
 
@@ -199,7 +199,7 @@ class Demo {
     uiworld.setWorld(world).setPlayer(player).setTileScale(64);
     renderer.addComponent(uiworld, 0);
 
-    let healthBar = new UIHealth(0, renderer.height - 156, 36, player, 'assets/gui_bars.png', 10);
+    let healthBar = new UIHealth(0, renderer.height - 104, 24, player, 'assets/gui_bars.png', 10);
     renderer.addComponent(healthBar, 1);
 
     let inv = new UIInventoryGrid(0, 0, 32, 5, 4, player.inventory);

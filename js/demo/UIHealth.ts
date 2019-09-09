@@ -62,7 +62,7 @@ export default class UIHealth extends UIComponent {
     
     // Show exact numbers
     ui.drawText(new Rectangle(this.center.x, this.height - 8, 0, 0),
-      Math.ceil(this.entity.health)+'/'+this.entity.maxHealth, 'Courier', 10,
+      Math.ceil(this.entity.health)+'/'+this.entity.maxHealth, 'Courier', 8,
       new Color(209, 117, 115), 'center');
 
     // Reset context

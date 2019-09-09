@@ -276,12 +276,16 @@ export default class UIPanel extends UIComponent {
 		if (e.type === EventTypes.MOUSEDOWN && this.contains(e.x, e.y)) {
 			ui.selectComponent(this);
 			return true;
-		} else if (e.type === EventTypes.MOUSEUP) {
+		} else if (e.type === EventTypes.MOUSEUP || e.type === EventTypes.MOUSELEAVE) {
 			ui.selectComponent(null);
 			return true;
 		} else if (e.type === EventTypes.MOUSEMOVE && this.selected && this._draggable) {
 			this.x1 -= e.dx;
 			this.y1 -= e.dy;
+			if (this.x1 < 0) this.x1 = 0;
+			if (this.y1 < 0) this.y1 = 0;
+			if (this.x2 > ui.width) this.x1 = ui.width - this.width;
+			if (this.y2 > ui.height) this.y1 = ui.height - this.height;
 			return true;
 		}
 
