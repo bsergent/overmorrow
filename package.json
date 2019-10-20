@@ -1,6 +1,6 @@
 {
   "name": "overmorrow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typescript canvas game library",
   "main": "dist/overmorrow.js",
   "author": "Ben Sergent V / ha1fBit",
