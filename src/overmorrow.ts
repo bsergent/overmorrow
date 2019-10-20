@@ -11,5 +11,13 @@
 export let DEBUG = true;
 
 import Game from './Game';
+import Renderer from './Renderer';
+import * as Controller from './Controller';
+import * as Utilities from './Utilities';
 
-new Game();
+export default {
+  Game: Game,
+  Renderer: Renderer,
+  Controller: Controller,
+  Utilities: Utilities
+};

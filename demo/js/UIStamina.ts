@@ -1,8 +1,8 @@
-import UIComponent from "../../js/overmorrow/ui/UIComponent";
-import EntityLiving from "../../js/overmorrow/classes/EntityLiving";
-import Renderer from "../../js/overmorrow/Renderer";
-import Rectangle from "../../js/overmorrow/primitives/Rectangle";
-import Color from "../../js/overmorrow/primitives/Color";
+import UIComponent from "../../src/ui/UIComponent";
+import EntityLiving from "../../src/classes/EntityLiving";
+import Renderer from "../../src/Renderer";
+import Rectangle from "../../src/primitives/Rectangle";
+import Color from "../../src/primitives/Color";
 declare var DEBUG: boolean;
 
 export default class UIStamina extends UIComponent {

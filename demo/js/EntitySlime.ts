@@ -1,14 +1,12 @@
-import EntityLiving from 'overmorrow/classes/EntityLiving';
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Color from 'overmorrow/primitives/Color';
-import AnimationSheet from 'overmorrow/classes/AnimationSheet';
-import World from 'overmorrow/classes/World';
-import Item from '../../js/overmorrow/classes/Item';
-import Inventory from '../../js/overmorrow/classes/Inventory';
-import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../../js/overmorrow/Utilities';
-import EntityPlayer from '../../js/overmorrow/classes/EntityPlayer';
-import { ActionMove, ActionUseItem } from '../../js/overmorrow/classes/Action';
+import EntityLiving from '../../src/classes/EntityLiving';
+import { WorldRenderer } from '../../src/ui/UIWorld';
+import Rectangle from '../../src/primitives/Rectangle';
+import World from '../../src/classes/World';
+import Item from '../../src/classes/Item';
+import Inventory from '../../src/classes/Inventory';
+import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../../src/Utilities';
+import EntityPlayer from '../../src/classes/EntityPlayer';
+import { ActionMove, ActionUseItem } from '../../src/classes/Action';
 
 export default class EntitySlime extends EntityLiving {
 

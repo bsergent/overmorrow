@@ -1,16 +1,16 @@
 import $ = require('jquery');
-import { Controller, Keys, EventTypes, InputEvent } from '../overmorrow/Controller';
-import Renderer from '../overmorrow/Renderer';
-import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from '../overmorrow/Utilities';
-import Color from '../overmorrow/primitives/Color';
-import UILabel from '../overmorrow/ui/UILabel';
-import UIWorld, { WorldRenderer } from '../overmorrow/ui/UIWorld';
-import EntityPlayer from '../overmorrow/classes/EntityPlayer';
-import Rectangle from '../overmorrow/primitives/Rectangle';
-import { ActionUseItem, ActionMove } from '../overmorrow/classes/Action';
-import Tile, { TileType } from '../overmorrow/classes/Tile';
+import { Controller, Keys, EventTypes, InputEvent } from '../../src/Controller';
+import Renderer from '../../src/Renderer';
+import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from '../../src/Utilities';
+import Color from '../../src/primitives/Color';
+import UILabel from '../../src/ui/UILabel';
+import UIWorld, { WorldRenderer } from '../../src/ui/UIWorld';
+import EntityPlayer from '../../src/classes/EntityPlayer';
+import Rectangle from '../../src/primitives/Rectangle';
+import { ActionUseItem, ActionMove } from '../../src/classes/Action';
+import Tile, { TileType } from '../../src/classes/Tile';
 import WorldDungeon from './WorldDungeon';
-import { Viewport } from '../overmorrow/primitives/Viewport';
+import { Viewport } from '../../src/primitives/Viewport';
 
 class Demo {
   public static main(): void {
