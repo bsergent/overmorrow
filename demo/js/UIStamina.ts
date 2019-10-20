@@ -1,8 +1,8 @@
-import UIComponent from "../../src/ui/UIComponent";
-import EntityLiving from "../../src/classes/EntityLiving";
-import Renderer from "../../src/Renderer";
-import Rectangle from "../../src/primitives/Rectangle";
-import Color from "../../src/primitives/Color";
+import UIComponent from "../../dist/ui/UIComponent";
+import EntityLiving from "../../dist/classes/EntityLiving";
+import Renderer from "../../dist/Renderer";
+import Rectangle from "../../dist/primitives/Rectangle";
+import Color from "../../dist/primitives/Color";
 declare var DEBUG: boolean;
 
 export default class UIStamina extends UIComponent {

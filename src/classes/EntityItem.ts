@@ -5,7 +5,7 @@ import * as moment from '../../node_modules/moment/moment';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';
 import EntityLiving from './EntityLiving';
-import { DEBUG } from '../overmorrow';
+import { DEBUG } from '../Game';
 
 export default class EntityItem extends Entity {
   private _despawnTime: moment.Moment = null;

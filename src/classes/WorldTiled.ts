@@ -5,7 +5,7 @@ import Rectangle from "../primitives/Rectangle";
 import { WorldRenderer } from "../ui/UIWorld";
 import Entity from './Entity';
 import Circle from "../primitives/Circle";
-import { DEBUG } from "../overmorrow";
+import { DEBUG } from "../Game";
 
 export default class WorldTiled extends World {
   private _tileKey: Map<number, TileKey> = new Map<number, TileKey>();

@@ -1,16 +1,16 @@
 import $ = require('jquery');
-import { Controller, Keys, EventTypes, InputEvent } from '../../src/Controller';
-import Renderer from '../../src/Renderer';
-import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from '../../src/Utilities';
-import Color from '../../src/primitives/Color';
-import UILabel from '../../src/ui/UILabel';
-import UIWorld, { WorldRenderer } from '../../src/ui/UIWorld';
-import EntityPlayer from '../../src/classes/EntityPlayer';
-import Rectangle from '../../src/primitives/Rectangle';
-import { ActionUseItem, ActionMove } from '../../src/classes/Action';
-import Tile, { TileType } from '../../src/classes/Tile';
+import { Controller, Keys, EventTypes, InputEvent } from '../../dist/Controller';
+import Renderer from '../../dist/Renderer';
+import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from '../../dist/Utilities';
+import Color from '../../dist/primitives/Color';
+import UILabel from '../../dist/ui/UILabel';
+import UIWorld, { WorldRenderer } from '../../dist/ui/UIWorld';
+import EntityPlayer from '../../dist/classes/EntityPlayer';
+import Rectangle from '../../dist/primitives/Rectangle';
+import { ActionUseItem, ActionMove } from '../../dist/classes/Action';
+import Tile, { TileType } from '../../dist/classes/Tile';
 import WorldDungeon from './WorldDungeon';
-import { Viewport } from '../../src/primitives/Viewport';
+import { Viewport } from '../../dist/primitives/Viewport';
 
 class Demo {
   public static main(): void {

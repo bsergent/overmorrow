@@ -7,7 +7,7 @@ import UIComponent from './ui/UIComponent';
 import { Filter } from './primitives/Filter';
 import Line from './primitives/Line';
 import Vector from './primitives/Vector';
-import { DEBUG } from './overmorrow';
+import { DEBUG } from './Game';
 
 // TODO Allow setting of default font
 

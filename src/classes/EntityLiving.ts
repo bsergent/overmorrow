@@ -9,7 +9,7 @@ import { Direction, directionToVector } from '../Utilities';
 import Vector from '../primitives/Vector';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';
-import { DEBUG } from '../overmorrow';
+import { DEBUG } from '../Game';
 
 export default abstract class EntityLiving extends Entity {
   // Defines entities with inventory that can use items and engage in combat

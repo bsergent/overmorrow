@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>BFSV-Coding | Overmorrow</title>
 		<link rel="icon" href="assets/logo.png">
-		<script data-main="dist/demo/js/config.js" src="js/lib/require.js"></script>
+		<script data-main="dist/config.js" src="js/lib/require.js"></script>
 
 		<style>
 	body {

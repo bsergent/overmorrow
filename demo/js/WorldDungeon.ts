@@ -1,13 +1,13 @@
 import * as moment from '../../node_modules/moment/moment';
-import WorldSandbox from '../../src/classes/WorldSandbox';
-import Tile, { TileType, DiscoveryLevel } from '../../src/classes/Tile'
-import Rectangle from '../../src/primitives/Rectangle';
-import { Perlin, SeededRandom, Facing, shuffle } from '../../src/Utilities';
-import { WorldRenderer } from '../../src/ui/UIWorld';
-import Vector from '../../src/primitives/Vector';
-import Color from '../../src/primitives/Color';
-import Matrix from '../../src/primitives/Matrix';
-import { Graph, GraphType } from '../../src/primitives/Graph';
+import WorldSandbox from '../../dist/classes/WorldSandbox';
+import Tile, { TileType, DiscoveryLevel } from '../../dist/classes/Tile'
+import Rectangle from '../../dist/primitives/Rectangle';
+import { Perlin, SeededRandom, Facing, shuffle } from '../../dist/Utilities';
+import { WorldRenderer } from '../../dist/ui/UIWorld';
+import Vector from '../../dist/primitives/Vector';
+import Color from '../../dist/primitives/Color';
+import Matrix from '../../dist/primitives/Matrix';
+import { Graph, GraphType } from '../../dist/primitives/Graph';
 
 export default class Dungeon extends WorldSandbox {
   private _rooms: Rectangle[];

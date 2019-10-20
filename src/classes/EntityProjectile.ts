@@ -6,7 +6,7 @@ import Item from './Item';
 import Color from '../primitives/Color';
 import Vector from '../primitives/Vector';
 import EntityLiving from './EntityLiving';
-import { DEBUG } from '../overmorrow';
+import { DEBUG } from '../Game';
 
 export default class EntityProjectile extends Entity {
   protected _trajectory: number = 0; // Direction of movement in degrees

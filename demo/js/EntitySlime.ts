@@ -1,12 +1,12 @@
-import EntityLiving from '../../src/classes/EntityLiving';
-import { WorldRenderer } from '../../src/ui/UIWorld';
-import Rectangle from '../../src/primitives/Rectangle';
-import World from '../../src/classes/World';
-import Item from '../../src/classes/Item';
-import Inventory from '../../src/classes/Inventory';
-import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../../src/Utilities';
-import EntityPlayer from '../../src/classes/EntityPlayer';
-import { ActionMove, ActionUseItem } from '../../src/classes/Action';
+import EntityLiving from '../../dist/classes/EntityLiving';
+import { WorldRenderer } from '../../dist/ui/UIWorld';
+import Rectangle from '../../dist/primitives/Rectangle';
+import World from '../../dist/classes/World';
+import Item from '../../dist/classes/Item';
+import Inventory from '../../dist/classes/Inventory';
+import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../../dist/Utilities';
+import EntityPlayer from '../../dist/classes/EntityPlayer';
+import { ActionMove, ActionUseItem } from '../../dist/classes/Action';
 
 export default class EntitySlime extends EntityLiving {
 

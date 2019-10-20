@@ -2,9 +2,9 @@ declare var requirejs;
 var DEBUG = false;
 var UNITTEST = false;
 requirejs.config({
-  baseUrl: 'dist/demo/js',
+  baseUrl: '../',
   paths: {
-    'jquery': '../../../../node_modules/jquery/dist/jquery'
+    'jquery': 'node_modules/jquery/dist/jquery'
   }
 });
 if (UNITTEST) {
@@ -12,7 +12,7 @@ if (UNITTEST) {
   function  ( UnitTesting ) {
   });
 } else {
-  requirejs(['DemoOverworld'],
+  requirejs(['demo/dist/DemoOverworld'],
   function  ( Demo ) {
   });
 }

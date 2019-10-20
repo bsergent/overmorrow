@@ -1,8 +1,8 @@
 {
   "name": "overmorrow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Typescript canvas game library",
-  "main": "dist/overmorrow.js",
+  "main": "dist/Game.js",
   "author": "Ben Sergent V / ha1fBit",
   "scope": "@bsergent",
   "homepage": "http://hexfrost.us/projects/overmorrow",
@@ -13,9 +13,9 @@
   },
   "scripts": {
     "watch": "tsc -w",
-    "dist": "tsc && webpack --config webpack.config.js",
+    "dist": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "demo": "tsc --project ./demo/tsconfig.json"
+    "demo": "tsc && tsc --project ./demo/tsconfig.json"
   },
   "files": [
     "dist/"
@@ -23,12 +23,10 @@
   "dependencies": {
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
-    "moment": "^2.24.0",
-    "pixi.js": "^5.1.5"
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "@types/jquery": "^3.2.16",
-    "@types/pixi.js": "^4.8.9",
     "dts-bundle-webpack": "^1.0.2",
     "ts-loader": "^6.2.0",
     "typescript": "^2.4.2",
