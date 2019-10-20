@@ -1,8 +1,8 @@
-import * as moment from '../../../node_modules/moment/moment';
-import World from 'overmorrow/classes/World';
-import Tile, { TileType, DiscoveryLevel } from 'overmorrow/classes/Tile';
-import Entity from 'overmorrow/classes/Entity';
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
+import * as moment from '../../node_modules/moment/moment';
+import World from './World';
+import Tile, { TileType, DiscoveryLevel } from './Tile';
+import Entity from './Entity';
+import { WorldRenderer } from '../ui/UIWorld';
 import Rectangle from '../primitives/Rectangle';
 import Color from '../primitives/Color';
 import { Perlin, SeededRandom } from '../Utilities';

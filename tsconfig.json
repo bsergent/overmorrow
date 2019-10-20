@@ -5,9 +5,7 @@
     "sourceMap": true,
     "allowJs": false,
     "removeComments": true,
-    // "watch": true,
     "allowSyntheticDefaultImports": true,
-    // "noImplicitAny": true,
     "declaration": true,
     "outDir": "build"
   },
@@ -15,8 +13,6 @@
     "node_modules/**/*"
   ],
   "include": [
-    // "src/**/*"
-    "src/overmorrow.ts",
-    "src/Game.ts"
+    "src/**/*"
   ]
 }

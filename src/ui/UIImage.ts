@@ -1,7 +1,7 @@
-import Renderer from 'overmorrow/Renderer';
-import UIComponent from 'overmorrow/ui/UIComponent';
-import { InputEvent, EventTypes} from 'overmorrow/Controller';
-import Rectangle from 'overmorrow/primitives/Rectangle';
+import Renderer from '../Renderer';
+import UIComponent from './UIComponent';
+import { InputEvent, EventTypes} from '../Controller';
+import Rectangle from '../primitives/Rectangle';
 import AnimationSheet from '../classes/AnimationSheet';
 
 export default class UIImage extends UIComponent {

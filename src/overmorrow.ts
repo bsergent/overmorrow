@@ -8,6 +8,8 @@
 // module.exports = Overmorrow;
 // global.Overmorrow = Overmorrow;
 
+export let DEBUG = true;
+
 import Game from './Game';
 
 new Game();

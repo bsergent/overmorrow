@@ -1,9 +1,7 @@
-import Tickable from 'overmorrow/interfaces/Tickable';
-import Renderer from 'overmorrow/Renderer';
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
+import Tickable from '../interfaces/Tickable';
+import { WorldRenderer } from '../ui/UIWorld';
 import { toTitleCase } from "../Utilities";
-import Item from 'overmorrow/classes/Item';
-import EntityItem from 'overmorrow/classes/EntityItem';
+import Item from './Item';
 import Rectangle from '../primitives/Rectangle';
 import Color from '../primitives/Color';
 

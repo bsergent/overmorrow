@@ -1,8 +1,8 @@
-import Renderer from 'overmorrow/Renderer';
-import Color from 'overmorrow/primitives/Color';
-import UIComponent from 'overmorrow/ui/UIComponent';
-import { InputEvent, EventTypes} from 'overmorrow/Controller';
-import Rectangle from 'overmorrow/primitives/Rectangle';
+import Renderer from '../Renderer';
+import Color from '../primitives/Color';
+import UIComponent from './UIComponent';
+import { InputEvent, EventTypes} from '../Controller';
+import Rectangle from '../primitives/Rectangle';
 
 export default class UIButton extends UIComponent {
     private _text: string;

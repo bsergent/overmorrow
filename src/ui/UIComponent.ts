@@ -1,7 +1,7 @@
-import Renderer from 'overmorrow/Renderer';
-import { InputEvent } from 'overmorrow/Controller';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Drawable from 'overmorrow/interfaces/Drawable';
+import Renderer from '../Renderer';
+import { InputEvent } from '../Controller';
+import Rectangle from '../primitives/Rectangle';
+import Drawable from '../interfaces/Drawable';
 
 export default abstract class UIComponent extends Rectangle implements Drawable {
   public selected: boolean = false;

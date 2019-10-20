@@ -20,6 +20,7 @@
     "dist/"
   ],
   "dependencies": {
+    "@types/moment": "^2.13.0",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",

@@ -1,6 +1,6 @@
-import Renderer from 'overmorrow/Renderer';
-import Color from 'overmorrow/primitives/Color';
-import UIComponent from 'overmorrow/ui/UIComponent';
+import Renderer from '../Renderer';
+import Color from '../primitives/Color';
+import UIComponent from './UIComponent';
 
 export default class UILabel extends UIComponent {
     private _text: string;

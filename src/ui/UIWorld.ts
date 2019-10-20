@@ -1,10 +1,9 @@
-import Renderer from 'overmorrow/Renderer';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Color from 'overmorrow/primitives/Color';
-import UIComponent from 'overmorrow/ui/UIComponent';
-import World from 'overmorrow/classes/World';
-import EntityPlayer from 'overmorrow/classes/EntityPlayer';
-import Vector from '../primitives/Vector';
+import Renderer from '../Renderer';
+import Rectangle from '../primitives/Rectangle';
+import Color from '../primitives/Color';
+import UIComponent from './UIComponent';
+import World from '../classes/World';
+import EntityPlayer from '../classes/EntityPlayer';
 import { Viewport } from '../primitives/Viewport';
 
 export default class UIWorld extends UIComponent {

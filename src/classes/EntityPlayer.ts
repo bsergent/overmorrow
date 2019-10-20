@@ -1,10 +1,8 @@
-import EntityLiving from 'overmorrow/classes/EntityLiving';
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Color from 'overmorrow/primitives/Color';
-import AnimationSheet from 'overmorrow/classes/AnimationSheet';
-import World from 'overmorrow/classes/World';
-import Item from './Item';
+import EntityLiving from './EntityLiving';
+import { WorldRenderer } from '../ui/UIWorld';
+import Color from '../primitives/Color';
+import AnimationSheet from './AnimationSheet';
+import World from './World';
 import Inventory from './Inventory';
 import { Direction, directionToVector, degreesToDirection } from '../Utilities';
 

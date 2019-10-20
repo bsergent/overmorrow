@@ -1,10 +1,11 @@
-import World from "overmorrow/classes/World";
-import Tile, { DiscoveryLevel } from "overmorrow/classes/Tile";
-import Color from "overmorrow/primitives/Color";
-import Rectangle from "overmorrow/primitives/Rectangle";
+import World from "./World";
+import Tile, { DiscoveryLevel } from "./Tile";
+import Color from "../primitives/Color";
+import Rectangle from "../primitives/Rectangle";
 import { WorldRenderer } from "../ui/UIWorld";
-import Entity from 'overmorrow/classes/Entity';
+import Entity from './Entity';
 import Circle from "../primitives/Circle";
+import { DEBUG } from "../overmorrow";
 
 export default class WorldTiled extends World {
   private _tileKey: Map<number, TileKey> = new Map<number, TileKey>();
@@ -162,7 +163,7 @@ export default class WorldTiled extends World {
     }
 	}
 
-  drawLayer(ui: WorldRenderer, layer: Layer): void {
+  protected drawLayer(ui: WorldRenderer, layer: Layer): void {
     let vArea = ui.getVisibleTileArea();
     // TODO Use visible tile area to lessen loop iterations
     for (let y = vArea.y1; y < vArea.y2; y++) {
@@ -191,7 +192,7 @@ export default class WorldTiled extends World {
     }
   }
 
-  drawBG(ui: WorldRenderer): void {
+  protected drawBG(ui: WorldRenderer): void {
     ui.drawRect(new Rectangle(0, 0, ui.width, ui.height), this._backgroundColor);
     for (var l = 0; l < this._background.length; l++) {
       if (!this._background[l].visible) continue;
@@ -199,7 +200,7 @@ export default class WorldTiled extends World {
     }
   }
 
-  drawFG(ui: WorldRenderer): void {
+  protected drawFG(ui: WorldRenderer): void {
     for (var l = 0; l < this._foreground.length; l++) {
       if (!this._foreground[l].visible) continue;
       this.drawLayer(ui, this._foreground[l]);
@@ -248,7 +249,7 @@ export default class WorldTiled extends World {
   }
 }
 
-interface TileKey {
+export interface TileKey {
   x: number,
   y: number,
   width: number,
@@ -257,7 +258,7 @@ interface TileKey {
   properties: Map<string, any>,
   terrain: any
 }
-interface Layer {
+export interface Layer {
   data: number[],
   height: number,
   name: string,
@@ -268,7 +269,7 @@ interface Layer {
   x: number,
   y: number
 }
-interface Tileset {
+export interface Tileset {
   columns: number,
   firstgid: number,
   image: string,
@@ -282,7 +283,7 @@ interface Tileset {
   tilewidth: number,
   tileproperties: any[]
 }
-interface RawJson {
+export interface RawJson {
   height: number,
   layers: Layer[],
   nextobjectid: number,

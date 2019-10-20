@@ -1,11 +1,12 @@
-import Entity from 'overmorrow/classes/Entity';
-import World from 'overmorrow/classes/World';
+import Entity from './Entity';
+import World from './World';
 import { WorldRenderer } from '../ui/UIWorld';
 import EntityItem from './EntityItem';
 import Item from './Item';
 import Color from '../primitives/Color';
 import Vector from '../primitives/Vector';
 import EntityLiving from './EntityLiving';
+import { DEBUG } from '../overmorrow';
 
 export default class EntityProjectile extends Entity {
   protected _trajectory: number = 0; // Direction of movement in degrees

@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import * as moment from '../../node_modules/moment/moment';
 import Tickable from '../interfaces/Tickable';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';

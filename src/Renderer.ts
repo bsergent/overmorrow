@@ -1,5 +1,5 @@
 import $ = require('jquery');
-import * as moment from 'moment';
+import * as moment from '../node_modules/moment/moment';
 import Rectangle from './primitives/Rectangle';
 import Color from './primitives/Color';
 import { Controller, EventTypes, InputEvent } from './Controller';

@@ -1,8 +1,8 @@
-import Renderer from 'overmorrow/Renderer';
-import { InputEvent, EventTypes } from 'overmorrow/Controller';
-import Color from 'overmorrow/primitives/Color';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import UIComponent from 'overmorrow/ui/UIComponent';
+import Renderer from '../Renderer';
+import { InputEvent, EventTypes } from '../Controller';
+import Color from '../primitives/Color';
+import Rectangle from '../primitives/Rectangle';
+import UIComponent from './UIComponent';
 declare var DEBUG;
 
 export interface UISkin {
