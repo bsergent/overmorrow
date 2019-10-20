@@ -1,6 +1,18 @@
+# System and IDE
+Thumbs.db
+*.DS_Store
+.idea
+.vscode
+
+# Vendors
+node_modules/
+
+# Assets
 *.png
-*.DSStore
+-demo/js/lib/*.js
+
+# Build
 *.js
 *.js.map
--js/lib/*.js
-/node_modules/
+/npm-debug.log
+build/

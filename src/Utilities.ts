@@ -1,4 +1,4 @@
-import * as moment from '../../node_modules/moment/moment';
+import * as moment from 'moment';
 import Vector from './primitives/Vector';
 import Rectangle from './primitives/Rectangle';
 

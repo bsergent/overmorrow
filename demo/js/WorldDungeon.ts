@@ -1,14 +1,13 @@
-import * as moment from '../../node_modules/moment/moment';
-import WorldSandbox from 'overmorrow/classes/WorldSandbox';
-import Tile, { TileType, DiscoveryLevel } from 'overmorrow/classes/Tile'
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import { Perlin, SeededRandom, Facing, shuffle } from 'overmorrow/Utilities';
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
-import Renderer from 'overmorrow/Renderer';
-import Vector from 'overmorrow/primitives/Vector';
-import Color from 'overmorrow/primitives/Color';
-import Matrix from '../overmorrow/primitives/Matrix';
-import { Graph, GraphType } from '../overmorrow/primitives/Graph';
+import * as moment from 'moment';
+import WorldSandbox from '../../js/overmorrow/classes/WorldSandbox';
+import Tile, { TileType, DiscoveryLevel } from '../../js/overmorrow/classes/Tile'
+import Rectangle from '../../js/overmorrow/primitives/Rectangle';
+import { Perlin, SeededRandom, Facing, shuffle } from '../../js/overmorrow/Utilities';
+import { WorldRenderer } from '../../js/overmorrow/ui/UIWorld';
+import Vector from '../../js/overmorrow/primitives/Vector';
+import Color from '../../js/overmorrow/primitives/Color';
+import Matrix from '../../js/overmorrow/primitives/Matrix';
+import { Graph, GraphType } from '../../js/overmorrow/primitives/Graph';
 
 export default class Dungeon extends WorldSandbox {
   private _rooms: Rectangle[];

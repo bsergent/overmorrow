@@ -1,9 +1,9 @@
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
-import AnimationSheet from 'overmorrow/classes/AnimationSheet';
-import World from 'overmorrow/classes/World';
-import { Facing } from 'overmorrow/Utilities';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Vector from 'overmorrow/primitives/Vector';
+import { WorldRenderer } from '../ui/UIWorld';
+import AnimationSheet from '../classes/AnimationSheet';
+import World from '../classes/World';
+import { Facing } from '../Utilities';
+import Rectangle from '../primitives/Rectangle';
+import Vector from '../primitives/Vector';
 
 export default abstract class Entity extends Rectangle {
 	private static _nextId: number = 0;

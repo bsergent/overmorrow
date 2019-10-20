@@ -1,8 +1,8 @@
 import $ = require('jquery');
-import * as moment from '../../../node_modules/moment/moment';
-import Color from 'overmorrow/primitives/Color';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Renderer from 'overmorrow/Renderer';
+import * as moment from '../../node_modules/moment/moment';
+import Color from '../primitives/Color';
+import Rectangle from '../primitives/Rectangle';
+import Renderer from '../Renderer';
 import { Filter, FilterReplaceColor } from '../primitives/Filter';
 
 export default class AnimationSheet {

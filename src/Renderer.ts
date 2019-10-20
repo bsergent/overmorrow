@@ -1,12 +1,9 @@
 import $ = require('jquery');
-import * as moment from '../../node_modules/moment/moment';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Color from 'overmorrow/primitives/Color';
-import Drawable from 'overmorrow/interfaces/Drawable';
-import { Controller, EventTypes, InputEvent } from 'overmorrow/Controller';
-import UIComponent from 'overmorrow/ui/UIComponent';
-import UILabel from 'overmorrow/ui/UILabel';
-import UIPanel from 'overmorrow/ui/UIPanel';
+import * as moment from 'moment';
+import Rectangle from './primitives/Rectangle';
+import Color from './primitives/Color';
+import { Controller, EventTypes, InputEvent } from './Controller';
+import UIComponent from './ui/UIComponent';
 import { Filter } from './primitives/Filter';
 import Line from './primitives/Line';
 import Vector from './primitives/Vector';

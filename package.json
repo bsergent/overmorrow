@@ -1,18 +1,39 @@
 {
   "name": "overmorrow",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Typescript canvas game library",
-  "main": "Demo.js",
-  "dependencies": {
-    "@types/jquery": "^3.2.16",
-    "jquery": "^3.2.1",
-    "lodash": "^4.17.4",
-    "moment": "^2.19.2"
+  "main": "dist/overmorrow.js",
+  "author": "Ben Sergent V / ha1fBit",
+  "scope": "@bsergent",
+  "homepage": "http://hexfrost.us/projects/overmorrow",
+  "bugs": "https://github.com/bsergent/overmorrow/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://bsergent@github.com/bsergent/overmorrow.git"
   },
-  "devDependencies": {},
   "scripts": {
+    "watch": "tsc -w",
+    "dist": "tsc && webpack --config webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Ben Sergent V / ha1fBit",
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "pixi.js": "^5.1.5"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.2.16",
+    "@types/pixi.js": "^4.8.9",
+    "dts-bundle-webpack": "^1.0.2",
+    "ts-loader": "^6.2.0",
+    "typescript": "^2.4.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-node-externals": "^1.7.2"
+  },
   "license": "All Rights Reserved"
 }

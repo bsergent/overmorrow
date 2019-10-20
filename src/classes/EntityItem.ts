@@ -1,7 +1,7 @@
-import Entity from 'overmorrow/classes/Entity';
-import World from 'overmorrow/classes/World';
+import Entity from './Entity';
+import World from './World';
 import Item, { ItemType } from './Item';
-import * as moment from '../../../node_modules/moment/moment';
+import * as moment from 'moment';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';
 import EntityLiving from './EntityLiving';

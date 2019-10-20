@@ -1,9 +1,9 @@
-import * as moment from '../../../node_modules/moment/moment';
-import Tickable from 'overmorrow/interfaces/Tickable';
-import { WorldRenderer } from 'overmorrow/ui/UIWorld';
-import Color from 'overmorrow/primitives/Color';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import Entity from 'overmorrow/classes/Entity';
+import * as moment from 'moment';
+import Tickable from '../interfaces/Tickable';
+import { WorldRenderer } from '../ui/UIWorld';
+import Color from '../primitives/Color';
+import Rectangle from '../primitives/Rectangle';
+import Entity from '../classes/Entity';
 import Vector from '../primitives/Vector';
 import Passage from './Passage';
 

@@ -4,11 +4,11 @@ import Rectangle from 'overmorrow/primitives/Rectangle';
 import Color from 'overmorrow/primitives/Color';
 import AnimationSheet from 'overmorrow/classes/AnimationSheet';
 import World from 'overmorrow/classes/World';
-import Item from '../overmorrow/classes/Item';
-import Inventory from '../overmorrow/classes/Inventory';
-import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../overmorrow/Utilities';
-import EntityPlayer from '../overmorrow/classes/EntityPlayer';
-import { ActionMove, ActionUseItem } from '../overmorrow/classes/Action';
+import Item from '../../js/overmorrow/classes/Item';
+import Inventory from '../../js/overmorrow/classes/Inventory';
+import {facingToDirection, Direction,  directionToVector,  degreesToDirection} from '../../js/overmorrow/Utilities';
+import EntityPlayer from '../../js/overmorrow/classes/EntityPlayer';
+import { ActionMove, ActionUseItem } from '../../js/overmorrow/classes/Action';
 
 export default class EntitySlime extends EntityLiving {
 

@@ -1,6 +1,6 @@
-import Entity from 'overmorrow/classes/Entity';
-import Rectangle from 'overmorrow/primitives/Rectangle';
-import World from 'overmorrow/classes/World';
+import Entity from './Entity';
+import Rectangle from '../primitives/Rectangle';
+import World from './World';
 import Inventory from './Inventory';
 import Action, { ActionState, ActionUseItem, ActionMove } from './Action';
 import Item, { ItemType } from './Item';
