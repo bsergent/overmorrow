@@ -1,0 +1,73 @@
+{
+  "image": "9p_stone.png",
+  "scale": 2,
+  "font": "Times New Roman",
+  "fg_color": "#FFFFFF",
+  "padding": {
+    "top": 9,
+    "right": 9,
+    "bottom": 9,
+    "left": 9
+  },
+  "patches": {
+    "upperleft": {
+      "x": 0,
+      "y": 0,
+      "width": 31,
+      "height": 31
+    },
+    "uppermiddle": {
+      "x": 31,
+      "y": 0,
+      "width": 12,
+      "height": 31,
+      "method": "repeat"
+    },
+    "upperright": {
+      "x": 43,
+      "y": 0,
+      "width": 31,
+      "height": 31
+    },
+    "middleleft": {
+      "x": 0,
+      "y": 31,
+      "width": 31,
+      "height": 12,
+      "method": "repeat"
+    },
+    "middlemiddle": {
+      "x": 31,
+      "y": 31,
+      "width": 12,
+      "height": 12,
+      "method": "repeat"
+    },
+    "middleright": {
+      "x": 43,
+      "y": 31,
+      "width": 31,
+      "height": 12,
+      "method": "repeat"
+    },
+    "lowerleft": {
+      "x": 0,
+      "y": 43,
+      "width": 31,
+      "height": 31
+    },
+    "lowermiddle": {
+      "x": 31,
+      "y": 43,
+      "width": 12,
+      "height": 31,
+      "method": "repeat"
+    },
+    "lowerright": {
+      "x": 43,
+      "y": 43,
+      "width": 31,
+      "height": 31
+    }
+  }
+}

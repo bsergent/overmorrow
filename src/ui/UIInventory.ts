@@ -2,11 +2,12 @@ import Inventory from "../classes/Inventory";
 import Renderer from "../Renderer";
 import { InputEvent, Event, EventTypes, Controller, Keys, Listener } from "../Controller";
 import Item, { ItemQuality, ItemRarity } from "../classes/Item";
-import UIPanel, { UISkin } from "./UIPanel";
+import UIPanel from "./UIPanel";
 import Rectangle from "../primitives/Rectangle";
 import Color from "../primitives/Color";
 import Vector from "../primitives/Vector";
 import { toTitleCase } from "../Utilities";
+import { BorderPatch } from "./BorderPatch";
 declare var DEBUG;
 
 export default abstract class UIInventory extends UIPanel {
@@ -26,11 +27,11 @@ export default abstract class UIInventory extends UIPanel {
 	protected _cellSelected: number = -1;
 	// Ex: (12, 3) will be 12 pixels right of the left padding and 3 pixels below the upper padding and title
 
-	public get skin(): UISkin {
-		return super.skin;
+	public get borderPatch(): BorderPatch {
+		return super.borderPatch;
 	}
-	public set skin(skin: UISkin) {
-		super.skin = skin;
+	public set borderPatch(borderpatch: BorderPatch) {
+		super.borderPatch = borderpatch;
 		this.updateDimensions();
 	}
 
@@ -47,14 +48,20 @@ export default abstract class UIInventory extends UIPanel {
 	// TODO Support custom dimensions
 	protected updateDimensions(): void {
 		if (!this._autoResize) return;
+		if (!this._borderPatch.loaded) {
+			this._borderPatch.onload.push(() => {
+				this.updateDimensions();
+			});
+			return;
+		}
 		let width = 0;
 		let height = 0;
 		for (let pos of this._cellPositions) {
 			width = Math.max(width, pos.x + this._cellSize);
 			height = Math.max(height, pos.y + this._cellSize);
 		}
-		this.width = width + 2 * this.padding;
-		this.height = height + 2 * this.padding + (this.title !== '' ? 18 : 0);
+		this.width = width + 2 * this._borderPatch.padding.left;
+		this.height = height + 2 * this._borderPatch.padding.top + (this.title !== '' ? 18 : 0);
 		//console.log(`Inv[${this.title}] dimensions set to ${this.width}x,${this.height}y`);
 	}
 
@@ -79,14 +86,15 @@ export default abstract class UIInventory extends UIPanel {
 	}
 
 	public draw(ui: Renderer): void {
+		if (!this._borderPatch.loaded) return;
 		super.draw(ui);
 		
 		// Draw item grid
 		let rect: Rectangle = new Rectangle(0, 0, this._cellSize - 2, this._cellSize - 2);
 		for (let c = 0; c < this._cellPositions.length; c++) {
 			let cell = this._cellPositions[c];
-			rect.x1 = this.x1 + this.padding + cell.x + 1;
-			rect.y1 = this.y1 + this.padding + cell.y + (this.title !== '' ? 18 : 0) + 1;
+			rect.x1 = this.x1 + this._borderPatch.padding.left + cell.x + 1;
+			rect.y1 = this.y1 + this._borderPatch.padding.top + cell.y + (this.title !== '' && this._drawTitle ? 18 : 0) + 1;
 			ui.drawRect(rect, c === this._cellHovered ? this._cellColorHover : this._cellColor);
 		}
 
@@ -96,12 +104,12 @@ export default abstract class UIInventory extends UIPanel {
 		rect.height = this._cellSize;
 		for (let c = 0; c < this._cellPositions.length; c++) {
 			let pos = this._cellPositions[c];
-			rect.x1 = this.x1 + this.padding + pos.x;
-			rect.y1 = this.y1 + this.padding + pos.y + (this.title !== '' ? 18 : 0);
+			rect.x1 = this.x1 + this._borderPatch.padding.left + pos.x;
+			rect.y1 = this.y1 + this._borderPatch.padding.top + pos.y + (this.title !== '' && this._drawTitle ? 18 : 0);
 			item = this._inventory.getItemAt(c);
 			if (item !== null) {
 				ui.drawImage(rect, item.image, c === this._cellSelected ? 0.2 : 1.0);
-				if (item.quantity > 1 && this.skin !== undefined) {
+				if (item.quantity > 1 && this._borderPatch.loaded) {
 					let textDims = ui.measureText('' + item.quantity, 'Times New Roman', this._cellTextSize);
 					ui.drawRect(new Rectangle(
 							rect.x1 + this._cellSize - textDims.x - 2,
@@ -111,7 +119,7 @@ export default abstract class UIInventory extends UIPanel {
 						this._cellTextBGColor);
 					ui.drawText(rect.offset(this._cellSize - 1, this._cellSize - this._cellTextSize + 2),
 						'' + item.quantity, 'Times New Roman',
-						this._cellTextSize, this.skin.colorFG, 'right');
+						this._cellTextSize, this._borderPatch.fg_color, 'right');
 				}
 			}
 		}
@@ -145,7 +153,7 @@ export default abstract class UIInventory extends UIPanel {
 			if (rect.x2 > ui.width) rect.x1 = ui.width - rect.width;
 			if (rect.y2 > ui.height) rect.y1 = ui.height - rect.height;
 			ui.drawRect(rect, this._cellTextBGColor);
-			ui.drawRectWire(rect, this.skin.colorFG);
+			ui.drawRectWire(rect, this._borderPatch.fg_color);
 			rect.x1 += padding;
 			rect.y1 += padding;
 			ui.drawText(rect, text, 'Times New Roman', 16, Color.WHITE, 'left', 2);
@@ -157,14 +165,15 @@ export default abstract class UIInventory extends UIPanel {
 		let cell: Rectangle = new Rectangle(0, 0, this._cellSize, this._cellSize);
 		for (let c = 0; c < this._cellPositions.length; c++) {
 			let pos = this._cellPositions[c];
-			cell.x1 = this.x1 + this.padding + pos.x;
-			cell.y1 = this.y1 + this.padding + pos.y + (this.title !== '' ? 18 : 0);
+			cell.x1 = this.x1 + this._borderPatch.padding.left + pos.x;
+			cell.y1 = this.y1 + this._borderPatch.padding.top + pos.y + (this.title !== '' && this._drawTitle ? 18 : 0);
 			if (cell.contains(x, y)) return c;
 		}
 		return -1;
 	}
 
   public input(ui: Renderer, e: InputEvent): boolean {
+		if (!this._borderPatch.loaded) return;
 		switch (e.type) {
 			case EventTypes.MOUSEMOVE:
 				// Hovered cells

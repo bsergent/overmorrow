@@ -1,0 +1,73 @@
+{
+  "image": "9p_wood.png",
+  "scale": 3,
+  "font": "Courier New",
+  "fg_color": "#d1b79f",
+  "padding": {
+    "top": 24,
+    "right": 24,
+    "bottom": 24,
+    "left": 24
+  },
+  "patches": {
+    "upperleft": {
+      "x": 0,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    "uppermiddle": {
+      "x": 15,
+      "y": 0,
+      "width": 16,
+      "height": 16,
+      "method": "repeat"
+    },
+    "upperright": {
+      "x": 31,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    "middleleft": {
+      "x": 0,
+      "y": 15,
+      "width": 16,
+      "height": 16,
+      "method": "repeat"
+    },
+    "middlemiddle": {
+      "x": 15,
+      "y": 15,
+      "width": 16,
+      "height": 16,
+      "method": "repeat"
+    },
+    "middleright": {
+      "x": 31,
+      "y": 15,
+      "width": 16,
+      "height": 16,
+      "method": "repeat"
+    },
+    "lowerleft": {
+      "x": 0,
+      "y": 31,
+      "width": 16,
+      "height": 16
+    },
+    "lowermiddle": {
+      "x": 15,
+      "y": 31,
+      "width": 16,
+      "height": 16,
+      "method": "repeat"
+    },
+    "lowerright": {
+      "x": 31,
+      "y": 31,
+      "width": 16,
+      "height": 16
+    }
+  }
+}

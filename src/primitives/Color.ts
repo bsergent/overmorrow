@@ -7,6 +7,17 @@ export default class Color {
   public static BLUE = new Color(0,0,255);
   public static BROWN = new Color(76,55,24);
   public static TRANSPARENT = new Color(0,0,0,0);
+
+  public static fromString(str: string): Color {
+    if (str.indexOf('#') === 0)
+      str = str.substr(1);
+    let color = new Color(
+      parseInt(str.substr(0, 2), 16),
+      parseInt(str.substr(2, 2), 16),
+      parseInt(str.substr(4, 2), 16));
+    return color;
+  }
+
   private _r:number; // 0-255
   private _g:number; // 0-255
   private _b:number; // 0-255

@@ -47,7 +47,7 @@ class Demo {
     renderer.addComponent(playerPosLabel, 10);
 
 
-    UIPanel.setDefaultSkin('assets/borderPatch.png', 4, 24, new Color(87, 73, 57, 1), new Color(195, 170, 141), 'Courier New');
+    UIPanel.setDefaultBorderPatch('assets/9p_wood');
     let panel = new UIPanel(10, 10, 250, 250);
     panel.setTitle('Test');
 

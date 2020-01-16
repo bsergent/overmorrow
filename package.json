@@ -13,6 +13,7 @@
   },
   "scripts": {
     "watch": "tsc -w",
+    "build": "tsc",
     "dist": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "demo": "tsc && tsc --project ./demo/tsconfig.json -w"
