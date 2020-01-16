@@ -15,7 +15,7 @@
     "watch": "tsc -w",
     "dist": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "demo": "tsc && tsc --project ./demo/tsconfig.json"
+    "demo": "tsc && tsc --project ./demo/tsconfig.json -w"
   },
   "files": [
     "dist/"

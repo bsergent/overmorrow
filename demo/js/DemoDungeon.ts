@@ -154,7 +154,7 @@ class Demo {
     });
     Controller.addListener(EventTypes.SCROLL)
     .setAction((event: InputEvent) => {
-      uiworld.tileScale += Math.sign(event.d);
+      uiworld.tileScale -= Math.sign(event.d);
       if (DEBUG) console.log('tileScale=' + uiworld.tileScale);
     });
     Controller.addListener(EventTypes.KEYUP)
