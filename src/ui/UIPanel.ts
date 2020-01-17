@@ -94,7 +94,7 @@ export default class UIPanel extends UIComponent {
 	public input(ui: Renderer, e: InputEvent): boolean {
 		if (!this._borderPatch.loaded) return;
 		// Send events to components
-		if (e.type === EventTypes.MOUSEDOWN || e.type === EventTypes.MOUSEUP) {
+		if (e.type === EventTypes.MOUSEDOWN || e.type === EventTypes.MOUSEUP || e.type === EventTypes.MOUSEMOVE) {
 			e.x -= this.x1 + this._borderPatch.padding.left;
 			e.y -= this.y1 + this._borderPatch.padding.top;
 		}
@@ -106,7 +106,7 @@ export default class UIPanel extends UIComponent {
 					return true;
 			}
 		}
-		if (e.type === EventTypes.MOUSEDOWN || e.type === EventTypes.MOUSEUP) {
+		if (e.type === EventTypes.MOUSEDOWN || e.type === EventTypes.MOUSEUP || e.type === EventTypes.MOUSEMOVE) {
 			e.x += this.x1 + this._borderPatch.padding.left;
 			e.y += this.y1 + this._borderPatch.padding.top;
 		}

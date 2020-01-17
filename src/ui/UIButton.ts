@@ -49,7 +49,7 @@ export default class UIButton extends UIComponent {
   
     public draw(ui: Renderer): void {
 			// TODO Add some more robust button rendering with a border patch, as well as hover and select skins
-      ui.drawRect(this, this._colorBG);
+      ui.drawRect(this, this._hovered ? Color.RED : this._colorBG);
 			ui.drawText(new Rectangle(this.x1 + this.width / 2, this.y1 + 2, 0, 0), this._text, this._font, this._size, this._colorFG, 'center');
 		}
 		
