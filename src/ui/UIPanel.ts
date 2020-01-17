@@ -32,6 +32,12 @@ export default class UIPanel extends UIComponent {
 	public get title(): string {
 		return this._title;
 	}
+	public get drawSpace(): Rectangle {
+		if (!this._borderPatch.loaded) return new Rectangle(0, 0, 0, 0);
+		return this.clone()
+				.offset(this._borderPatch.padding.left, this._borderPatch.padding.top)
+				.shrink(this._borderPatch.padding.horizontal, this._borderPatch.padding.vertical);
+	}
 
 	constructor(x: number, y: number, width: number, height: number) {
 		super(x, y, width, height);
@@ -78,6 +84,12 @@ export default class UIPanel extends UIComponent {
 				comp.draw(ui);
 		}
 		ui.translateContext(-(this.x1 + this._borderPatch.padding.left), -(this.y1 + this._borderPatch.padding.top));
+
+		if (DEBUG && this._borderPatch.loaded)
+			ui.drawText(
+				new Rectangle(this.x1 + 24, this.y2 + 2, 0, 0),
+				this._borderPatch.image, 'Courier New', 12,
+				Color.WHITE.clone().setAlpha(0.5), 'left');
 	}
 	public input(ui: Renderer, e: InputEvent): boolean {
 		if (!this._borderPatch.loaded) return;

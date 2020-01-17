@@ -4,10 +4,10 @@
   "font": "Times New Roman",
   "fg_color": "#FFFFFF",
   "padding": {
-    "top": 9,
-    "right": 9,
-    "bottom": 9,
-    "left": 9
+    "top": 8,
+    "right": 8,
+    "bottom": 8,
+    "left": 8
   },
   "patches": {
     "upperleft": {

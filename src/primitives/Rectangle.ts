@@ -108,6 +108,20 @@ export default class Rectangle extends Line {
     return this;
   }
 
+  public expand(x: number, y: number): Rectangle {
+    this.width += x;
+    this.height += y;
+    return this;
+  }
+
+  public shrink(x: number, y: number): Rectangle {
+    return this.expand(-x, -y);
+  }
+
+  public toString(): string {
+    return `[(x1=${this.x1},y1=${this.y1}),(x2=${this.x2},y2=${this.y2}),(w=${this.width},h=${this.height})]`;
+  }
+
   private swapCorners(): void {
     this.a.x = this.a.x ^ this.b.x;
     this.b.x = this.a.x ^ this.b.x;

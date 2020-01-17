@@ -9,6 +9,7 @@ export default class Item {
   public power: number;
   private _quantity: number;
   private _type: ItemType;
+	private _meta: Map<string, any>;
 
   public get quantity(): number {
     return this._quantity;
@@ -28,11 +29,18 @@ export default class Item {
       this.description = type.description;
     if (this._type === undefined || this.power === this._type.power)
       this.power = type.power;
+    let newMeta: Map<string, any> = new Map<string, any>();
+    for (let i in type.defaultMeta)
+      newMeta[i] = type.defaultMeta[i];
+    this._meta = newMeta;
     this._type = type;
   }
   public get image(): string {
     return this.type.image; // TODO Add option to use an animation/sprite sheet
   }
+	public get meta(): Map<string, any> {
+		return this._meta;
+	}
 
   constructor(type: string, quantity: number = 1) {
     this.type = ItemType.getType(type);
@@ -101,6 +109,7 @@ export class ItemType {
   private _action: Function = null;
   private _invWidth: number = 1;
   private _invHeight: number = 1;
+	private _defaultMeta: Map<string, any>;
 
   public get type(): string {
     return this._type;
@@ -144,6 +153,9 @@ export class ItemType {
   public get invHeight(): number {
     return this._invHeight;
   }
+	public get defaultMeta(): Map<string, any> {
+		return this._defaultMeta;
+	}
 
   public setName(name: string): ItemType {
     this._name = name;
@@ -213,6 +225,14 @@ export class ItemType {
     this._invHeight = height;
     return this;
   }
+	/**
+	 * @param defaultMeta Default meta information map
+	 * @returns Self reference for method chaining
+	 */
+	public setDefaultMeta(defaultMeta: Map<string, any>): ItemType {
+		this._defaultMeta = defaultMeta;
+		return this;
+	}
 }
 
 export enum ItemRarity {

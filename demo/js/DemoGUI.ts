@@ -11,7 +11,7 @@ import { ActionUseItem, ActionMove } from '../../dist/classes/Action';
 import Tile, { TileType } from '../../dist/classes/Tile';
 import WorldDungeon from './WorldDungeon';
 import { Viewport } from '../../dist/primitives/Viewport';
-import UIEngraving from './UIEngraving';
+import UIEngravingPanel from './UIEngravingPanel';
 import UIInventoryGrid from '../../dist/ui/UIInventoryGrid';
 import Inventory from '../../dist/classes/Inventory';
 import Item, { ItemType, ItemRarity } from '../../dist/classes/Item';
@@ -42,8 +42,8 @@ class Demo {
       .setPower(10)
       .setWeight(5);
     ItemType.addType('sword_flint')
-    .setName('Flint Sword')
-    .setImage('assets/item_sword_obsidian.png')
+    .setName('Flint Knife')
+    .setImage('assets/item_sword_flint.png')
     .setDescription('Sharp enough, but won\'t last long')
     .setRarity(ItemRarity.COMMON)
     .setWeapon(true)
@@ -51,7 +51,7 @@ class Demo {
     .setWeight(3);
     ItemType.addType('sword_bronze')
     .setName('Bronze Sword')
-    .setImage('assets/item_sword_obsidian.png')
+    .setImage('assets/item_sword_bronze.png')
     .setDescription('Sturdy sword that should last a while')
     .setRarity(ItemRarity.COMMON)
     .setWeapon(true)
@@ -59,7 +59,7 @@ class Demo {
     .setWeight(8);
     ItemType.addType('sword_iron')
     .setName('Iron Sword')
-    .setImage('assets/item_sword_obsidian.png')
+    .setImage('assets/item_sword_iron.png')
     .setDescription('Sturdy sword with a sharp edge')
     .setRarity(ItemRarity.UNCOMMON)
     .setWeapon(true)
@@ -73,7 +73,7 @@ class Demo {
     iteminv.addItem(new Item('sword_flint', 1));
     UIPanel.setDefaultBorderPatch('assets/9p_wood');
     renderer.addComponent(new UIInventoryGrid(296, 300, 32, 5, 3, iteminv), 1);
-    renderer.addComponent(new UIEngraving(146, 64), 1);
+    renderer.addComponent(new UIEngravingPanel(146, 64), 1);
 
     DEBUG = true;
 

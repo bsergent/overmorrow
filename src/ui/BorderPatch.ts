@@ -10,17 +10,18 @@ export interface PatchJSON {
 	height: number,
 	method: 'repeat'|'stretch'|undefined
 }
+export interface PaddingJSON {
+	top: number,
+	right: number,
+	bottom: number,
+	left: number
+}
 export interface BorderPatchJSON {
 	image: string,
 	scale: number,
 	font: string,
 	fg_color: string,
-	padding: {
-		top: number,
-		right: number,
-		bottom: number,
-		left: number
-	},
+	padding: PaddingJSON,
 	patches: {
 		upperleft: PatchJSON,
 		uppermiddle: PatchJSON,
@@ -38,6 +39,25 @@ export class Patch extends Rectangle {
 	constructor(json: PatchJSON) {
 		super(json.x, json.y, json.width, json.height);
 		this.method = json.method;
+	}
+}
+
+export class Padding {
+	public top: number = 0;
+	public right: number = 0;
+	public bottom: number = 0;
+	public left: number = 0;
+	public get horizontal(): number {
+		return this.right + this.left;
+	}
+	public get vertical(): number {
+		return this.top + this.bottom;
+	}
+	constructor(json: PaddingJSON, scale: number) {
+		this.top = json.top * scale;
+		this.right = json.right * scale;
+		this.bottom = json.bottom * scale;
+		this.left = json.left * scale;
 	}
 }
 
@@ -63,12 +83,7 @@ export class BorderPatch {
 		lowermiddle: Patch,
 		lowerright: Patch
 	};
-	public padding: {
-		top: number,
-		right: number,
-		bottom: number,
-		left: number
-	}
+	public padding: Padding = null;
 	public image: string = '';
 	public scale: number = 1;
 	public font: string = '';
@@ -120,7 +135,7 @@ export class BorderPatch {
 				lowerright: new Patch(json.patches.lowerright)
 			};
 			this.scale = json.scale;
-			this.padding = json.padding;
+			this.padding = new Padding(json.padding, this.scale);
 			this.font = json.font;
 			this.fg_color = Color.fromString(json.fg_color);
 		});

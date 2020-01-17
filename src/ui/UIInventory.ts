@@ -25,6 +25,7 @@ export default abstract class UIInventory extends UIPanel {
 	protected _autoResize: boolean = true;
 	protected _cellHovered: number = -1;
 	protected _cellSelected: number = -1;
+	protected _drawItemGrid: boolean = true;
 	// Ex: (12, 3) will be 12 pixels right of the left padding and 3 pixels below the upper padding and title
 
 	public get borderPatch(): BorderPatch {
@@ -86,17 +87,22 @@ export default abstract class UIInventory extends UIPanel {
 	}
 
 	public draw(ui: Renderer): void {
-		if (!this._borderPatch.loaded) return;
 		super.draw(ui);
-		
+		this.drawItems(ui);
+	}
+
+	protected drawItems(ui: Renderer): void {
+		if (!this._borderPatch.loaded) return;
+		let rect: Rectangle = new Rectangle(0, 0, this._cellSize, this._cellSize);
+
 		// Draw item grid
-		let rect: Rectangle = new Rectangle(0, 0, this._cellSize - 2, this._cellSize - 2);
-		for (let c = 0; c < this._cellPositions.length; c++) {
-			let cell = this._cellPositions[c];
-			rect.x1 = this.x1 + this._borderPatch.padding.left + cell.x + 1;
-			rect.y1 = this.y1 + this._borderPatch.padding.top + cell.y + (this.title !== '' && this._drawTitle ? 18 : 0) + 1;
-			ui.drawRect(rect, c === this._cellHovered ? this._cellColorHover : this._cellColor);
-		}
+		if (this._drawItemGrid)
+			for (let c = 0; c < this._cellPositions.length; c++) {
+				let cell = this._cellPositions[c];
+				rect.x1 = this.x1 + this._borderPatch.padding.left + cell.x;
+				rect.y1 = this.y1 + this._borderPatch.padding.top + cell.y + (this.title !== '' && this._drawTitle ? 18 : 0);
+				ui.drawRect(rect, c === this._cellHovered ? this._cellColorHover : this._cellColor);
+			}
 
 		// Draw items in grid
 		let item: Item;
@@ -179,11 +185,12 @@ export default abstract class UIInventory extends UIPanel {
 				// Hovered cells
 				this._cellHovered = this.getCellAtCursor(e.x, e.y);
 				break;
-			case EventTypes.MOUSEUP:	
+			case EventTypes.MOUSEUP:
 				if (UIInventory._selectedItem !== null && this._cellHovered !== -1) {
 					// Dropping/swapping/stacking items
 					// TODO Implement picking up half of a stack
 					// TODO Implement putting down one item of a stack
+					// TODO Handle letting go of the item outside in cell
 					if (DEBUG) console.log(`Moving Item[${UIInventory._selectedItem.name}] from Inv[${UIInventory._selectedItemSource.title}][${UIInventory._selectedItemSource._cellSelected}] to Inv[${this.title}][${this._cellHovered}]`);
 					let src = UIInventory._selectedItem;
 					let dest = this._inventory.getItemAt(this._cellHovered);

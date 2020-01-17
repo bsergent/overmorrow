@@ -6,6 +6,7 @@ export default class Color {
   public static LIME = new Color(0,255,0);
   public static BLUE = new Color(0,0,255);
   public static BROWN = new Color(76,55,24);
+  public static GOLD = new Color(212, 175, 55);
   public static TRANSPARENT = new Color(0,0,0,0);
 
   public static fromString(str: string): Color {
