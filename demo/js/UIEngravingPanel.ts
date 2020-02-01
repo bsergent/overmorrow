@@ -10,9 +10,11 @@ import UIImage from "../../dist/ui/UIImage";
 import UIInventory from "../../dist/ui/UIInventory";
 import { InputEvent, EventTypes } from "../../dist/Controller";
 import UIButton from "../../dist/ui/UIButton";
+import { sleep } from "../../dist/Utilities";
 
 export default class UIEngravingPanel extends UIInventory {
   public surface: UICarvingSurface;
+  public runeline: UIRuneLine;
 
   constructor(x: number, y: number) {
     super(x, y, 32, new Inventory(1, 'Engraving Surface'), []);
@@ -31,19 +33,44 @@ export default class UIEngravingPanel extends UIInventory {
       this.setCellPositions([new Vector(3 * bp.scale, this.drawSpace.height - 19 * bp.scale)]);
 
       // Runeline
-      this.addComponent(new UIRuneLine(
+      this.runeline = new UIRuneLine(
         22 * bp.scale, this.drawSpace.height - 22 * bp.scale,
-        bp.scale, [ new Rune(), new Rune(), new Rune() ]), 1);
+        bp.scale, [ new Rune(), new Rune(), new Rune() ]);
+      this.addComponent(this.runeline, 1);
 
       // Carving Surface
-      this.addComponent(new UICarvingSurface(2 * bp.scale, 2 * bp.scale, 14, 8, bp.scale), 1);
+      this.surface = new UICarvingSurface(2 * bp.scale, 2 * bp.scale, 14, 8, bp.scale);
+      this.addComponent(this.surface, 1);
 
-      // Testing
-      let btn = new UIButton(256, 64, 36, 16, 'Test');
+      // Imbument Button
+      this.addComponent(new UIImage(
+        94 * bp.scale, this.drawSpace.height - 22 * bp.scale,
+        22 * bp.scale, 22 * bp.scale,
+        'assets/itemslot.png'), 1);
+      let btn = new UIButton(96 * bp.scale, 74 * bp.scale, 18 * bp.scale, 18 * bp.scale, 'Imbue');
+      btn.setColorBG(Color.fromString('#792F2F'));
+      btn.setColorBGHover(Color.fromString('#843333'));
       btn.setAction(() => {
-        console.log('Clicked button!');
+        console.log('Beginning imbument process.');
+        this.surface.imbue().then((runes) => {
+          console.log('Imbument process complete.');
+          this.runeline.setRunes(runes);
+        });
       })
       this.addComponent(btn, 1);
+
+      // Testing
+      this.addComponent(new UIImage(
+        (94 + 26) * bp.scale, this.drawSpace.height - 22 * bp.scale,
+        22 * bp.scale, 22 * bp.scale,
+        'assets/itemslot.png'), 1);
+      let testbtn = new UIButton((96 + 26) * bp.scale, 74 * bp.scale, 18 * bp.scale, 18 * bp.scale, 'Clear');
+      testbtn.setColorBG(Color.fromString('#947aa8'));
+      testbtn.setColorBGHover(Color.fromString('#9f86b1'));
+      testbtn.setAction(() => {
+        this.surface.prepare();
+      })
+      this.addComponent(testbtn, 1);
     });
   }
 
@@ -81,15 +108,28 @@ export class UIRuneLine extends UIComponent {
     for (let r = 0; r < this._runes.length && r < this._runepositions.length; r++)
       ui.drawRect(this._runepositions[r], Color.GOLD);
   }
+
+  public setRunes(runes: Rune[]): void {
+    this._runes = runes;
+  }
 }
 
 export class UICarvingSurface extends UIComponent {
   protected _columns: number;
   protected _rows: number;
-  protected _scale: number = 1;
   protected _state: CarvingState[] = [];
+  // Drawing & interaction
+  protected _scale: number = 1;
+  protected _alttexture: boolean[] = [];
   protected _clickedcell: number = -1;
   protected _hoveredcell: number = -1;
+  private _anistart: number = (new Date).getTime();
+  private _anidur: number = 3; // seconds/cycle
+  private _borderpatch: BorderPatch = new BorderPatch('assets/9p_stone_light');
+  // Imbuement process
+  protected _imbuing: boolean = false;
+  protected _imbumentspeed: number = 8; // cells/second
+  protected _imbumentpromise: Promise<Rune[]> = null;
   
   constructor(x: number, y: number, columns: number, rows: number, scale: number) {
     super(x, y, columns * 8 * scale, rows * 8 * scale);
@@ -97,8 +137,9 @@ export class UICarvingSurface extends UIComponent {
     this._rows = rows;
     this._scale = scale;
 
+    this.prepare();
     for (let x = 0; x < this._columns * this._rows; x++)
-      this._state[x] = Math.random() > 0.05 ? CarvingState.PRISTINE : (Math.random() > 0.5 ? CarvingState.BLEMISHED1 : CarvingState.BLEMISHED2);
+      this._alttexture[x] = Math.random() < 0.5;
   }
 
   public draw(ui: Renderer): void {
@@ -110,22 +151,42 @@ export class UICarvingSurface extends UIComponent {
         rect.y1 = this.y1 + y * rect.height;
         switch (this._state[this._columns * y + x]) {
           case CarvingState.PRISTINE:
-            drect.x1 =  0; drect.y1 = 0; break;
+            drect.x1 = this._alttexture[this._columns * y + x] ? 0 : 8; drect.y1 = 0; break;
           case CarvingState.BLEMISHED1:
-            drect.x1 =  8; drect.y1 = 0; break;
-          case CarvingState.BLEMISHED2:
             drect.x1 = 16; drect.y1 = 0; break;
+          case CarvingState.BLEMISHED2:
+            drect.x1 = 24; drect.y1 = 0; break;
           case CarvingState.CUT:
-            drect.x1 =  0; drect.y1 = 8; break;
+            drect.x1 = this._alttexture[this._columns * y + x] ? 0 : 8; drect.y1 = 8; break;
           case CarvingState.FILLING:
-            drect.x1 =  8; drect.y1 = 8; break;
-          case CarvingState.FILLED:
             drect.x1 = 16; drect.y1 = 8; break;
+          case CarvingState.FILLED:
+            drect.x1 = 24; drect.y1 = 8; break;
         }
-        ui.drawSprite(rect, drect, 'assets/carvingspace.png');
+
+        // Fluctuate lighting on filled squares
+        let opac = 1;
+        let t = (new Date()).getTime() - this._anistart;
+        t /= 1000;
+        let minopac = 0.85;
+        if (this._state[this._columns * y + x] === CarvingState.FILLED)
+          opac = (1 - minopac) / 2 * Math.sin(2 * Math.PI / this._anidur * t) + (1 - ((1 - minopac) / 2));
+        
+        ui.drawSprite(rect, drect, 'assets/carvingspace.png', opac);
         if (this._columns * y + x === this._hoveredcell)
           ui.drawRectWire(rect, Color.GOLD);
       }
+    }
+
+    if (this._borderpatch.loaded) {
+      let border = this.clone();
+      border.x1 -= 2 * this._borderpatch.scale;
+      border.y1 -= 2 * this._borderpatch.scale;
+      border.width += 4 * this._borderpatch.scale;
+      border.height += 4 * this._borderpatch.scale;
+      ui.setOpacity(0.8);
+      this._borderpatch.draw(ui, border);
+      ui.setOpacity();
     }
   }
 
@@ -158,6 +219,52 @@ export class UICarvingSurface extends UIComponent {
   public loadCarvingData(): void {
     throw 'Not yet implemented.';
   }
+
+  public prepare(): void {
+    // TODO Calculate man/min number of blemishes based on item quality and a number in that range
+    for (let x = 0; x < this._columns * this._rows; x++)
+      this._state[x] = Math.random() > 0.05 ? CarvingState.PRISTINE : (Math.random() > 0.5 ? CarvingState.BLEMISHED1 : CarvingState.BLEMISHED2);
+  }
+
+  public async imbue(): Promise<Rune[]> {
+    if (this._imbuing) return;
+    this._imbuing = true;
+    let runes: Rune[] = [];
+
+    let cutcells: number[] = [];
+    let tocheck: number[] = [];
+    let indexoffsetstocheck: number[] = [
+      -this._columns - 1, -this._columns, -this._columns + 1,
+      -1, +1,
+      this._columns - 1, this._columns, this._columns + 1];
+    for (let c = 0; c < this._rows * this._columns; c++)
+      if (this._state[c] === CarvingState.CUT)
+        cutcells.push(c);
+    for (let cut of cutcells) {
+      if (this._state[cut] !== CarvingState.CUT) continue;
+      tocheck.push(cut);
+
+      for (let c of tocheck) {
+        // Check adj. cells to add to 'tocheck'
+        for (let offset of indexoffsetstocheck)
+          if (c + offset >= 0 && c + offset < this._state.length && this._state[c + offset] === CarvingState.CUT) {
+            this._state[c + offset] = CarvingState.FILLING;
+            tocheck.push(c + offset);
+            await sleep(1000 / this._imbumentspeed);
+          }
+        
+        // Imbue current cell
+        this._state[c] = CarvingState.FILLED;
+      }
+    }
+    
+    this._imbuing = false;
+    return runes;
+  }
+
+  public isImbuing(): boolean {
+    return this._imbuing;
+  }
 }
 
 export enum CarvingState {
@@ -166,7 +273,7 @@ export enum CarvingState {
   BLEMISHED2,
   CUT,
   FILLING,
-  FILLED
+  FILLED // The filled texture should really pulsate... Maybe use the animation sheet?
 }
 
 export class Rune {
