@@ -1,0 +1,73 @@
+{
+  "image": "9p_stone_light.png",
+  "scale": 2,
+  "font": "Times New Roman",
+  "fg_color": "#FFFFFF",
+  "padding": {
+    "top": 3,
+    "right": 3,
+    "bottom": 3,
+    "left": 3
+  },
+  "patches": {
+    "upperleft": {
+      "x": 0,
+      "y": 0,
+      "width": 25,
+      "height": 9
+    },
+    "uppermiddle": {
+      "x": 26,
+      "y": 0,
+      "width": 32,
+      "height": 9,
+      "method": "repeat"
+    },
+    "upperright": {
+      "x": 58,
+      "y": 0,
+      "width": 17,
+      "height": 9
+    },
+    "middleleft": {
+      "x": 0,
+      "y": 10,
+      "width": 25,
+      "height": 26,
+      "method": "repeat"
+    },
+    "middlemiddle": {
+      "x": 26,
+      "y": 10,
+      "width": 32,
+      "height": 26,
+      "method": "repeat"
+    },
+    "middleright": {
+      "x": 58,
+      "y": 10,
+      "width": 17,
+      "height": 26,
+      "method": "repeat"
+    },
+    "lowerleft": {
+      "x": 0,
+      "y": 36,
+      "width": 25,
+      "height": 11
+    },
+    "lowermiddle": {
+      "x": 26,
+      "y": 36,
+      "width": 32,
+      "height": 11,
+      "method": "repeat"
+    },
+    "lowerright": {
+      "x": 58,
+      "y": 36,
+      "width": 17,
+      "height": 11
+    }
+  }
+}

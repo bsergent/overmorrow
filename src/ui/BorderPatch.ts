@@ -142,12 +142,12 @@ export class BorderPatch {
 	}
 
 	public draw(ui: Renderer, loc: Rectangle): void {
-    // TODO Handle imperfect sizes (currently draws under/over)
 		if (loc.width < this.minwidth || loc.height < this.minheight) {
       // Draw only center patch
 			let draw = new Rectangle(0, 0, 0, 0);
 			let drawwidth = this.patches.middlemiddle.width * this.scale;
 			let drawheight = this.patches.middlemiddle.height * this.scale;
+			// TODO Handle partial draws
 			for (let y = loc.y1; y < loc.y2; y += drawheight) {
 				for (let x = loc.x1; x < loc.x2; x += drawwidth) {
 					draw.x1 = x;
@@ -159,41 +159,109 @@ export class BorderPatch {
 			}
 		} else {
 			// Draw all nine patches
-			// Draw central area
+			// Draw central patch
+			// TODO Handle partial draws
 			for (let y = loc.y1 + this.patches.upperleft.height * this.scale; y < loc.y2 - this.patches.lowerleft.height * this.scale; y += this.patches.middlemiddle.height * this.scale)
 			  for (let x = loc.x1 + this.patches.upperleft.width * this.scale; x < loc.x2 - this.patches.lowerleft.width * this.scale; x += this.patches.middlemiddle.width * this.scale)
 				  ui.drawSprite(new Rectangle(
 					x, y, this.patches.middlemiddle.width * this.scale, this.patches.middlemiddle.height * this.scale
 					), this.patches.middlemiddle, this.image);
 
-			// Draw sides
+			// Draw left/right patches
 			for (let y = loc.y1 + this.patches.upperleft.height * this.scale; y < loc.y2 - this.patches.lowerleft.height * this.scale; y += this.patches.middleleft.height * this.scale) {
-				ui.drawSprite(new Rectangle(
-					loc.x1,
-					y,
-					this.patches.middleleft.width * this.scale,
-					this.patches.middleleft.height * this.scale
-				), this.patches.middleleft, this.image);
-				ui.drawSprite(new Rectangle(
-					loc.x2 - this.patches.upperright.width * this.scale,
-					y,
-					this.patches.middleright.width * this.scale,
-					this.patches.middleright.height * this.scale
-				), this.patches.middleright, this.image);
+				let patchPosition: Rectangle;
+				let patchTexture: Rectangle;
+
+				// Check if the last patch needs a partial draw instead of full draw
+				let remainingHeight = (loc.y2 - this.patches.lowerleft.height * this.scale) - y;
+				let patchHeight = this.patches.middleleft.height * this.scale;
+				let spaceToPatchRatio = remainingHeight / patchHeight;
+
+				if (spaceToPatchRatio < 1) {
+					// Partial draw
+					// Left
+					patchPosition = new Rectangle(
+						loc.x1,
+						y,
+						this.patches.middleleft.width * this.scale,
+						this.patches.middleleft.height * this.scale * spaceToPatchRatio);
+					patchTexture = this.patches.middleleft.clone();
+					patchTexture.height *= spaceToPatchRatio;
+					ui.drawSprite(patchPosition, patchTexture, this.image);
+					// Right
+					patchPosition = new Rectangle(
+						loc.x2 - this.patches.upperright.width * this.scale,
+						y,
+						this.patches.middleright.width * this.scale,
+						this.patches.middleright.height * this.scale * spaceToPatchRatio);
+					patchTexture = this.patches.middleright.clone();
+					patchTexture.height *= spaceToPatchRatio;
+					ui.drawSprite(patchPosition, patchTexture, this.image);
+				} else {
+					// Full draw
+					// Left
+					ui.drawSprite(new Rectangle(
+						loc.x1,
+						y,
+						this.patches.middleleft.width * this.scale,
+						this.patches.middleleft.height * this.scale
+					), this.patches.middleleft, this.image);
+					// Right
+					ui.drawSprite(new Rectangle(
+						loc.x2 - this.patches.upperright.width * this.scale,
+						y,
+						this.patches.middleright.width * this.scale,
+						this.patches.middleright.height * this.scale
+					), this.patches.middleright, this.image);
+				}
 			}
+			// Draw top/bottom patches
 			for (let x = loc.x1 + this.patches.upperleft.width * this.scale; x < loc.x2 - this.patches.lowerleft.width * this.scale; x += this.patches.uppermiddle.width * this.scale) {
-				ui.drawSprite(new Rectangle(
-					x,
-					loc.y1,
-					this.patches.uppermiddle.width * this.scale,
-					this.patches.uppermiddle.height * this.scale
-				), this.patches.uppermiddle, this.image);
-				ui.drawSprite(new Rectangle(
-					x,
-					loc.y2 - this.patches.lowerleft.height * this.scale,
-					this.patches.lowermiddle.width * this.scale,
-					this.patches.lowermiddle.height * this.scale
-				), this.patches.lowermiddle, this.image);
+				let patchPosition: Rectangle;
+				let patchTexture: Rectangle;
+
+				// Check if the last patch needs a partial draw instead of full draw
+				let remainingWidth = (loc.x2 - this.patches.lowerright.width * this.scale) - x;
+				let patchWidth = this.patches.uppermiddle.width * this.scale;
+				let spaceToPatchRatio = remainingWidth / patchWidth;
+
+				if (spaceToPatchRatio < 1) {
+					// Partial draw
+					// Top
+					patchPosition = new Rectangle(
+						x,
+						loc.y1,
+						this.patches.uppermiddle.width * this.scale * spaceToPatchRatio,
+						this.patches.uppermiddle.height * this.scale);
+					patchTexture = this.patches.uppermiddle.clone();
+					patchTexture.width *= spaceToPatchRatio;
+					ui.drawSprite(patchPosition, patchTexture, this.image);
+					// Bottom
+					patchPosition = new Rectangle(
+						x,
+						loc.y2 - this.patches.lowerleft.height * this.scale,
+						this.patches.lowermiddle.width * this.scale * spaceToPatchRatio,
+						this.patches.lowermiddle.height * this.scale);
+					patchTexture = this.patches.lowermiddle.clone();
+					patchTexture.width *= spaceToPatchRatio;
+					ui.drawSprite(patchPosition, patchTexture, this.image);
+				} else {
+					// Full draw
+					// Top
+					ui.drawSprite(new Rectangle(
+						x,
+						loc.y1,
+						this.patches.uppermiddle.width * this.scale,
+						this.patches.uppermiddle.height * this.scale
+					), this.patches.uppermiddle, this.image);
+					// Bottom
+					ui.drawSprite(new Rectangle(
+						x,
+						loc.y2 - this.patches.lowerleft.height * this.scale,
+						this.patches.lowermiddle.width * this.scale,
+						this.patches.lowermiddle.height * this.scale
+					), this.patches.lowermiddle, this.image);
+				}
 			}
 
 			// Draw corners

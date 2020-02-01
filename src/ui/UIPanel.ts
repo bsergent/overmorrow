@@ -85,11 +85,20 @@ export default class UIPanel extends UIComponent {
 		}
 		ui.translateContext(-(this.x1 + this._borderPatch.padding.left), -(this.y1 + this._borderPatch.padding.top));
 
-		if (DEBUG && this._borderPatch.loaded)
+		if (DEBUG && this._borderPatch.loaded) {
 			ui.drawText(
 				new Rectangle(this.x1 + 24, this.y2 + 2, 0, 0),
 				this._borderPatch.image, 'Courier New', 12,
 				Color.WHITE.clone().setAlpha(0.5), 'left');
+			ui.drawRectWire(this.clone()
+				.shrink(
+					2 * this._borderPatch.padding.right,
+					2 * this._borderPatch.padding.bottom)
+				.offset(
+					this._borderPatch.padding.left,
+					this._borderPatch.padding.top)
+				, Color.WHITE.clone().setAlpha(0.3));
+		}
 	}
 	public input(ui: Renderer, e: InputEvent): boolean {
 		if (!this._borderPatch.loaded) return;

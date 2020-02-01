@@ -4,10 +4,10 @@
   "font": "Courier New",
   "fg_color": "#d1b79f",
   "padding": {
-    "top": 24,
-    "right": 24,
-    "bottom": 24,
-    "left": 24
+    "top": 6,
+    "right": 5,
+    "bottom": 5,
+    "left": 5
   },
   "patches": {
     "upperleft": {
