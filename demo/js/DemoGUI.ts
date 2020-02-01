@@ -75,6 +75,10 @@ class Demo {
     renderer.addComponent(new UIInventoryGrid(296, 300, 32, 5, 3, iteminv), 1);
     renderer.addComponent(new UIEngravingPanel(146, 64), 1);
 
+    Controller.addListener(EventTypes.KEYUP).setKeys([Keys.KEY_ENTER]).setAction(() => {
+      DEBUG = !DEBUG;
+    });
+
     DEBUG = true;
 
     console.log('Initialized');

@@ -24,6 +24,7 @@ export default class Renderer {
   private _width: number;
   private _height: number;
   private _filters: Filter[] = []; // Applied to the temp canvas
+  private _opacityStack: number[] = [];
 
   constructor(canvasActive: JQuery<HTMLCanvasElement>, canvasBuffer: JQuery<HTMLCanvasElement>, canvasTemp: JQuery<HTMLCanvasElement>) {
     this._canvasActive = canvasActive;
@@ -127,6 +128,22 @@ export default class Renderer {
     this._context.imageSmoothingEnabled = enable;
   }
 
+  /**
+   * Set the opacity for subsequent draws.
+   * @param opacity Opacity as percentage 0-1, leave undefined to revert
+   */
+  public setOpacity(opacity?: number): void {
+    if (opacity === undefined) {
+      if (this._opacityStack.length > 0)
+        this._context.globalAlpha = this._opacityStack.pop();
+      else
+        this._context.globalAlpha = 1;
+    } else {
+      this._opacityStack.push(this._context.globalAlpha);
+      this._context.globalAlpha = opacity;
+    }
+  }
+
   public translateContext(x: number, y: number): void {
     this._context.translate(x ,y);
   }
@@ -168,7 +185,7 @@ export default class Renderer {
       this._imageCache.set(url, new Image());
       this._imageCache.get(url).src = url;
     }
-    this._context.globalAlpha = opacity;
+    this.setOpacity(opacity * this._context.globalAlpha);
     if (rotation.deg !== 0) {
       this._context.save();
       this._context.translate(rect.x1 + (rect.width*rotation.x), rect.y1 + (rect.height*rotation.y));
@@ -178,7 +195,7 @@ export default class Renderer {
     } else {
       this._context.drawImage(this._imageCache.get(url), rect.x1, rect.y1, rect.width, rect.height);
     }
-    this._context.globalAlpha = 1;
+    this.setOpacity();
     if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);
   }
 
@@ -201,7 +218,7 @@ export default class Renderer {
     }
 
     // Draw while handling opacity and rotation
-    this._context.globalAlpha = opacity;
+    this.setOpacity(opacity * this._context.globalAlpha);
     if (rotation.deg !== 0) {
       this._context.save();
 			this._context.translate(rect.x1 + (rect.width/2), rect.y1 + (rect.height/2));
@@ -217,6 +234,7 @@ export default class Renderer {
       else
         this._context.drawImage(this._imageCache.get(url), dr.x1, dr.y1, dr.width, dr.height, rect.x1, rect.y1, rect.width, rect.height);
     }
+    this.setOpacity();
     // TODO Implement colorization and color replacement
     if (DEBUG && rotation.deg !== 0) this.drawRect(new Rectangle(rect.x1 + (rect.width*rotation.x) - 3, rect.y1 + (rect.height*rotation.y) - 3, 6, 6), Color.RED);
   }

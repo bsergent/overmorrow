@@ -9,6 +9,7 @@ export default class UIButton extends UIComponent {
     private _font: string = 'Times New Roman';
     private _size: number = 16;
     private _colorBG: Color = Color.BLACK;
+    private _colorBGHover: Color = Color.GRAY;
     private _colorFG: Color = Color.WHITE;
 		private _alignment: 'left'|'center'|'right' = 'left';
 		private _hovered: boolean = false;
@@ -34,6 +35,10 @@ export default class UIButton extends UIComponent {
       this._colorBG = color;
       return this;
     }
+    public setColorBGHover(color: Color): UIButton {
+      this._colorBGHover = color;
+      return this;
+    }
     public setColorFG(color: Color): UIButton {
       this._colorFG = color;
       return this;
@@ -49,7 +54,7 @@ export default class UIButton extends UIComponent {
   
     public draw(ui: Renderer): void {
 			// TODO Add some more robust button rendering with a border patch, as well as hover and select skins
-      ui.drawRect(this, this._hovered ? Color.RED : this._colorBG);
+      ui.drawRect(this, this._hovered ? this._colorBGHover : this._colorBG);
 			ui.drawText(new Rectangle(this.x1 + this.width / 2, this.y1 + 2, 0, 0), this._text, this._font, this._size, this._colorFG, 'center');
 		}
 		

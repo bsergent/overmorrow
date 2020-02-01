@@ -401,3 +401,7 @@ export function shuffle<T>(list: T[], randomFunc: Function = Math.random): T[] {
   }
   return list;
 }
+
+export async function sleep(ms): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
