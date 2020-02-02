@@ -51,6 +51,10 @@ export default class Rectangle extends Line {
   set height(value: number) {
     this.y2 += (value - this.height);
   }
+  
+  get area(): number {
+    return this.width * this.height;
+  }
 
   get center(): Vector {
     return new Vector((this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2);
@@ -116,6 +120,19 @@ export default class Rectangle extends Line {
 
   public shrink(x: number, y: number): Rectangle {
     return this.expand(-x, -y);
+  }
+
+  public scale(factor: number): Rectangle {
+    this.x1 *= factor;
+    this.y1 *= factor;
+    this.scaleDims(factor);
+    return this;
+  }
+
+  public scaleDims(factor: number): Rectangle {
+    this.width *= factor;
+    this.height *= factor;
+    return this;
   }
 
   public toString(): string {

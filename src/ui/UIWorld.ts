@@ -85,10 +85,10 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   private _renderer: Renderer;
 
   public get tileScale(): number { // Number of pixels a single tile occupies
-    return this.viewport.scale;
+    return this.viewport.zoom;
   }
   public set tileScale(scale: number) {
-    this.viewport.scale = scale;
+    this.viewport.zoom = scale;
   }
 
   constructor(renderer: Renderer, viewport: Viewport) {

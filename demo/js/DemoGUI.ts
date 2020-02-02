@@ -79,8 +79,6 @@ class Demo {
       DEBUG = !DEBUG;
     });
 
-    DEBUG = true;
-
     console.log('Initialized');
 
     // Main game loop

@@ -1,6 +1,7 @@
 import * as moment from '../node_modules/moment/moment';
 import Vector from './primitives/Vector';
 import Rectangle from './primitives/Rectangle';
+import Color from './primitives/Color';
 
 export class TimeKeep {
   public lastTwentyTickTimes: number[] = [];
@@ -403,5 +404,20 @@ export function shuffle<T>(list: T[], randomFunc: Function = Math.random): T[] {
 }
 
 export async function sleep(ms): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  await new Promise(resolve => setTimeout(resolve, ms));
+  return;
+}
+
+let processingCanvas: HTMLCanvasElement = null;
+let processingContext: CanvasRenderingContext2D = null;
+export function getPixelColor(image: HTMLImageElement, x: number, y: number): Color {
+  if (processingContext === null) {
+    processingCanvas = document.createElement('canvas');
+    processingContext = processingCanvas.getContext('2d');
+  }
+
+  processingContext.clearRect(0, 0, processingCanvas.width, processingCanvas.height);
+  processingContext.drawImage(image, 0, 0);
+  let data = processingContext.getImageData(x, y, 1, 1).data;
+  return new Color(data[0], data[1], data[2], data[3]);
 }

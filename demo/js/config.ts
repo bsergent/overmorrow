@@ -1,5 +1,5 @@
 declare var requirejs;
-var DEBUG = false;
+var DEBUG = true;
 var UNITTEST = false;
 var version = '';
 
