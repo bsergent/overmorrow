@@ -1,5 +1,4 @@
 import $ = require('jquery');
-import * as moment from '../../node_modules/moment/moment';
 import Color from '../primitives/Color';
 import Rectangle from '../primitives/Rectangle';
 import Renderer from '../Renderer';
@@ -14,7 +13,7 @@ export default class AnimationSheet {
   private _currentTag: FrameTag = null;
   private _initialTag: string = '';
   private _frameTags: Map<string, FrameTag> = new Map();
-  private _lastAnimationTime: moment.Moment;
+  private _lastAnimationTime: number;
   private _durationMultiplier: number = 1;
   private _currentDirectionForward: boolean;
   private _filters: Filter[] = [];
@@ -51,7 +50,7 @@ export default class AnimationSheet {
     if (this._frames.length <= 0) return;
 
     // Advance frame
-    if (!this.paused && this._lastAnimationTime.clone().add(this._frames[this._currentFrameIndex].duration * this._durationMultiplier, 'ms') < moment()) {
+    if (!this.paused && this._lastAnimationTime + this._frames[this._currentFrameIndex].duration * this._durationMultiplier < Date.now()) {
       // Increment the frame index
       if (this._currentDirectionForward) this._currentFrameIndex++;
       else this._currentFrameIndex--;
@@ -68,7 +67,7 @@ export default class AnimationSheet {
         else
           this._currentFrameIndex = this._currentTag.to;
 
-      this._lastAnimationTime = moment();
+      this._lastAnimationTime = Date.now();
     }
 
     // Draw
@@ -89,7 +88,7 @@ export default class AnimationSheet {
     this._currentTag = this._frameTags.get(name);
     this._currentFrameIndex = this._currentTag.from;
     this._currentDirectionForward = this._currentTag.direction !== 'reverse';
-    this._lastAnimationTime = moment();
+    this._lastAnimationTime = Date.now();
     return this;
   }
 

@@ -1,4 +1,3 @@
-import * as moment from '../node_modules/moment/moment';
 import Vector from './primitives/Vector';
 import Rectangle from './primitives/Rectangle';
 import Color from './primitives/Color';
@@ -9,15 +8,15 @@ export class TimeKeep {
   private _index: number = 0;
   private _avgTPS: number = 1;
   private _delta: number = 1;
-  private _globalStartTime: moment.Moment;
-  private _currentStartTime: moment.Moment;
+  private _globalStartTime: number;
+  private _currentStartTime: number;
   private _totalTicks: number;
   private _lastFrameTime: number = 1;
   private _minFrameTime = 50;//250; // in milliseconds
 
   constructor() {
-    this._globalStartTime = moment();
-    this._currentStartTime = moment();
+    this._globalStartTime = Date.now();
+    this._currentStartTime = Date.now();
   }
 
   public addTick(tick: number): void {
@@ -48,10 +47,10 @@ export class TimeKeep {
     return this._minFrameTime - this._lastFrameTime < 0 ? 0 : this._minFrameTime - this._lastFrameTime;
   }
   public startUpdate(): void {
-    this._currentStartTime = moment();
+    this._currentStartTime = Date.now();
   }
   public completeUpdate(): void {
-    this._lastFrameTime = moment().diff(this._currentStartTime);
+    this._lastFrameTime = Date.now() - this._currentStartTime;
     this._index++;
     if (this._index > 20)
       this._index = 0;

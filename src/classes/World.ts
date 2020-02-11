@@ -1,4 +1,3 @@
-import * as moment from '../../node_modules/moment/moment';
 import Tickable from '../interfaces/Tickable';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';
@@ -100,7 +99,7 @@ export default abstract class World implements Tickable {
 	public abstract discover(x: number, y: number, radius: number): void;
 
 	public tick(delta: number): number {
-		let startTime = moment();
+		let startTime = Date.now();
 		// Update tiles and entities
 		for (let e of this._entities)
 			e.tick(delta, this);
@@ -131,7 +130,7 @@ export default abstract class World implements Tickable {
 			if (this.collides(e1))
 				e1.revertMovement(this);
 		}
-		return moment().diff(startTime);
+		return Date.now() - startTime;
 	}
 
 	public draw(ui: WorldRenderer): void {

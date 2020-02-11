@@ -1,5 +1,4 @@
 import $ = require('jquery');
-import * as moment from '../node_modules/moment/moment';
 import Rectangle from './primitives/Rectangle';
 import Color from './primitives/Color';
 import { Controller, EventTypes, InputEvent } from './Controller';
@@ -58,7 +57,7 @@ export default class Renderer {
   }
 
   public draw(): number {
-    let startTime = moment();
+    let startTime = Date.now();
     this.drawRect(new Rectangle(0, 0, this._width, this._height), Color.BLACK);
     for (let componentArray of this._components) {
       if (componentArray === undefined)
@@ -75,7 +74,7 @@ export default class Renderer {
         comp.draw(this);
     }
     this.drawBuffer();
-    return moment().diff(startTime);
+    return Date.now() - startTime;
   }
 
   private processInput(e: InputEvent): void {

@@ -1,14 +1,13 @@
 import Entity from './Entity';
 import World from './World';
-import Item, { ItemType } from './Item';
-import * as moment from '../../node_modules/moment/moment';
+import Item from './Item';
 import { WorldRenderer } from '../ui/UIWorld';
 import Color from '../primitives/Color';
 import EntityLiving from './EntityLiving';
 import { DEBUG } from '../Game';
 
 export default class EntityItem extends Entity {
-  private _despawnTime: moment.Moment = null;
+  private _despawnTime: number = null;
   private _pulseOpacity: number = 1.0;
   private _pulseSpeed: number = Math.PI * 2 / 16;
   private _pulseAngle: number = 0;
@@ -20,7 +19,7 @@ export default class EntityItem extends Entity {
     this._collidable = false;
     this.item = item;
     if (despawnSeconds !== -1)
-      this._despawnTime = moment().add(despawnSeconds, 'second');
+      this._despawnTime = Date.now() + (despawnSeconds * 1000);
   }
 
   public draw(ui: WorldRenderer): void {
@@ -34,11 +33,10 @@ export default class EntityItem extends Entity {
   
   public tick(delta: number, world: World): void {
     super.tick(delta, world);
-    if (this._despawnTime != null) {
-      let diff = moment().diff(this._despawnTime, 'second');
-      if (diff > 0)
+    if (this._despawnTime !== null) {
+      if (Date.now() > this._despawnTime)
         world.removeEntity(this);
-      else if (diff > -5)
+      else if (Date.now() > this._despawnTime - 5000)
         this._pulseSpeed = Math.PI * 4 / 16;
     }
     this._pulseAngle += this._pulseSpeed * delta;

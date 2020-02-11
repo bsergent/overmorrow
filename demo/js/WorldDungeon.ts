@@ -1,4 +1,3 @@
-import * as moment from '../../node_modules/moment/moment';
 import WorldSandbox from '../../dist/classes/WorldSandbox';
 import Tile, { TileType, DiscoveryLevel } from '../../dist/classes/Tile'
 import Rectangle from '../../dist/primitives/Rectangle';
@@ -81,12 +80,12 @@ export default class Dungeon extends WorldSandbox {
 
   public tick(delta: number): number {
     super.tick(delta);
-    let startTime = moment();
+    let startTime = Date.now();
     if (this.name === 'SpreadMinTree')
       this._tick1(delta);
     else if (this.name === 'PerfectSparsen')
       this._tick2(delta);
-		return moment().diff(startTime);
+		return Date.now() - startTime;
   }
 
   private _gen1State: Gen1State = Gen1State.RANDOM_ROOMS;

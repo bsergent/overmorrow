@@ -1,4 +1,3 @@
-import * as moment from '../../node_modules/moment/moment';
 import World from './World';
 import Tile, { TileType, DiscoveryLevel } from './Tile';
 import Entity from './Entity';
@@ -44,10 +43,10 @@ export default class WorldSandbox extends World {
   }
 
   public tick(delta: number): number {
-    let startTime = moment();
+    let startTime = Date.now();
 		this._tilesFG.forEach((row) => { row.forEach((tile) => { if (tile !== null) tile.tick(delta) }) });
     super.tick(delta);
-		return moment().diff(startTime);
+		return Date.now() - startTime;
   }
 
   public draw(ui: WorldRenderer): void {
