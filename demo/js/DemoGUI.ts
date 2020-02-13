@@ -1,28 +1,20 @@
 import $ = require('jquery');
-import { Controller, Keys, EventTypes, InputEvent } from '../../dist/Controller';
-import Renderer from '../../dist/Renderer';
-import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from '../../dist/Utilities';
-import Color from '../../dist/primitives/Color';
-import UILabel from '../../dist/ui/UILabel';
-import UIWorld, { WorldRenderer } from '../../dist/ui/UIWorld';
-import EntityPlayer from '../../dist/classes/EntityPlayer';
-import Rectangle from '../../dist/primitives/Rectangle';
-import { ActionUseItem, ActionMove } from '../../dist/classes/Action';
-import Tile, { TileType } from '../../dist/classes/Tile';
-import WorldDungeon from './WorldDungeon';
-import { Viewport } from '../../dist/primitives/Viewport';
-import UIEngravingPanel from './UIEngravingPanel';
-import UIInventoryGrid from '../../dist/ui/UIInventoryGrid';
 import Inventory from '../../dist/classes/Inventory';
-import Item, { ItemType, ItemRarity } from '../../dist/classes/Item';
+import Item, { ItemRarity, ItemType } from '../../dist/classes/Item';
+import { Controller, EventTypes, Keys } from '../../dist/Controller';
+import Color from '../../dist/primitives/Color';
+import UIInventoryGrid from '../../dist/ui/UIInventoryGrid';
+import UILabel from '../../dist/ui/UILabel';
 import UIPanel from '../../dist/ui/UIPanel';
+import { TimeKeep } from '../../dist/Utilities';
+import UIEngravingPanel from './UIEngravingPanel';
+import RendererCanvas from '../../dist/RendererCanvas';
 
 class Demo {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
-      $('#buffer') as JQuery<HTMLCanvasElement>,
-      $('#temp') as JQuery<HTMLCanvasElement>);
+    var renderer = new RendererCanvas($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');

@@ -5,6 +5,7 @@ import UIComponent from './UIComponent';
 import World from '../classes/World';
 import EntityPlayer from '../classes/EntityPlayer';
 import { Viewport } from '../primitives/Viewport';
+import RendererCanvas from '../RendererCanvas';
 
 export default class UIWorld extends UIComponent {
   private _worldRenderer: WorldRenderer = null;
@@ -79,7 +80,8 @@ export default class UIWorld extends UIComponent {
   }
 }
 
-export class WorldRenderer extends Renderer { // Wrapper for Renderer class that handles the viewport
+export class WorldRenderer extends RendererCanvas { // Wrapper for Renderer class that handles the viewport
+  // TODO Make wrappers for both renderer types? Or not actually extend Renderer
   public viewport: Viewport;
   public world: World;
   private _renderer: Renderer;
@@ -92,7 +94,7 @@ export class WorldRenderer extends Renderer { // Wrapper for Renderer class that
   }
 
   constructor(renderer: Renderer, viewport: Viewport) {
-    super(null, null, null); // Ignore own render functions and just call them on the given Renderer with needed transformations
+    super(null, null); // Ignore own render functions and just call them on the given Renderer with needed transformations
     this._renderer = renderer;
     this.viewport = viewport;
   }

@@ -1,6 +1,5 @@
 import $ = require('jquery');
 import { Controller, Keys, EventTypes, InputEvent } from '../../dist/Controller';
-import Renderer from '../../dist/Renderer';
 import { TimeKeep, Direction, degreesToDirection, facingToDirection, Facing } from '../../dist/Utilities';
 import Color from '../../dist/primitives/Color';
 import UILabel from '../../dist/ui/UILabel';
@@ -26,13 +25,13 @@ import UIInventoryGrid from '../../dist/ui/UIInventoryGrid';
 import EntityProjectile from '../../dist/classes/EntityProjectile';
 import UIHealth from './UIHealth';
 import UIStamina from './UIStamina';
+import RendererCanvas from '../../dist/RendererCanvas';
 
 class Demo {
   public static main(): void {
     Controller.init($('#game'));
-    var renderer = new Renderer($('#game') as JQuery<HTMLCanvasElement>,
-      $('#buffer') as JQuery<HTMLCanvasElement>,
-      $('#temp') as JQuery<HTMLCanvasElement>);
+    var renderer = new RendererCanvas($('#game') as JQuery<HTMLCanvasElement>,
+      $('#buffer') as JQuery<HTMLCanvasElement>);
 
     // Set up UI
     let tpsLabel = new UILabel(renderer.width - 2, 2, '1');
